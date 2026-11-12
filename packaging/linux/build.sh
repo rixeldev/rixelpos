@@ -81,6 +81,7 @@ fi
 
 # AUR-ready PKGBUILD
 sed "s/@VERSION@/$VERSION/g" "$ROOT/packaging/linux/PKGBUILD" > "$OUT/PKGBUILD"
+cp "$ROOT/packaging/linux/rixelpos.install" "$OUT/rixelpos.install"
 
 echo
 echo "Artefactos en $OUT:"
