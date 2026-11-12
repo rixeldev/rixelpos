@@ -190,6 +190,9 @@ dotnet test RixelPOS.sln -c Release
   5. `git tag vX.Y.Z && git push origin vX.Y.Z` → publica la release versionada.
 - El job `pacman-repo` está serializado (`concurrency: pacman-repo`) para que dos pushes
   seguidos no compitan por la rama `gh-pages`.
+- Los paquetes Arch **no deben incluir un `/lib` de nivel superior** (choca con el paquete
+  `filesystem`). Las reglas udev van en `/usr/lib/udev/rules.d`; lo mismo aplica al `.deb`
+  en sistemas con `usrmerge`.
 
 ## 10. Seguridad y datos
 

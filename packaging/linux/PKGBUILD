@@ -31,7 +31,7 @@ build() {
 package() {
   install -d "$pkgdir/usr/bin" "$pkgdir/usr/lib/rixelpos" \
     "$pkgdir/usr/share/applications" "$pkgdir/usr/share/icons/hicolor/256x256/apps" \
-    "$pkgdir/lib/udev/rules.d"
+    "$pkgdir/usr/lib/udev/rules.d"
 
   cp -a "$srcdir/app/." "$pkgdir/usr/lib/rixelpos/"
   ln -s /usr/lib/rixelpos/RixelPOS "$pkgdir/usr/bin/rixelpos"
@@ -40,7 +40,7 @@ package() {
   install -m644 "$srcdir/rixelpos-$pkgver/src/RixelPOS.Desktop/Assets/rixelpos-256.png" \
     "$pkgdir/usr/share/icons/hicolor/256x256/apps/rixelpos.png"
   install -m644 "$srcdir/rixelpos-$pkgver/packaging/linux/udev/99-rixelpos.rules" \
-    "$pkgdir/lib/udev/rules.d/99-rixelpos.rules"
+    "$pkgdir/usr/lib/udev/rules.d/99-rixelpos.rules"
   install -m644 "$srcdir/rixelpos-$pkgver/LICENSE" "$pkgdir/usr/lib/rixelpos/LICENSE"
   install -d "$pkgdir/usr/bin"
   cat > "$pkgdir/usr/bin/rixelpos-install-dotnet" <<'EOF'

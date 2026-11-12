@@ -73,8 +73,8 @@ fi
 if command -v dpkg-deb >/dev/null 2>&1; then
   echo "== .deb =="
   cp -a "$APPDIR/usr" "$PKG/"
-  mkdir -p "$PKG/lib/udev/rules.d" "$PKG/usr/share/licenses/rixelpos"
-  cp "$ROOT/packaging/linux/udev/99-rixelpos.rules" "$PKG/lib/udev/rules.d/99-rixelpos.rules"
+  mkdir -p "$PKG/usr/lib/udev/rules.d" "$PKG/usr/share/licenses/rixelpos"
+  cp "$ROOT/packaging/linux/udev/99-rixelpos.rules" "$PKG/usr/lib/udev/rules.d/99-rixelpos.rules"
   cp "$ROOT/LICENSE" "$PKG/usr/share/licenses/rixelpos/LICENSE"
   cat > "$PKG/DEBIAN/control" <<EOF
 Package: rixelpos
@@ -103,11 +103,10 @@ fi
 
 # Arch Linux / CachyOS package
 echo "== Arch package =="
-mkdir -p "$ARCHPKG" "$ARCHPKG/usr/share/licenses/rixelpos" "$ARCHPKG/lib/udev/rules.d"
+mkdir -p "$ARCHPKG" "$ARCHPKG/usr/share/licenses/rixelpos" "$ARCHPKG/usr/lib/udev/rules.d"
 cp -a "$APPDIR/usr" "$ARCHPKG/"
-cp -a "$APPDIR/lib" "$ARCHPKG/" 2>/dev/null || true
 cp "$ROOT/LICENSE" "$ARCHPKG/usr/share/licenses/rixelpos/LICENSE"
-cp "$ROOT/packaging/linux/udev/99-rixelpos.rules" "$ARCHPKG/lib/udev/rules.d/99-rixelpos.rules"
+cp "$ROOT/packaging/linux/udev/99-rixelpos.rules" "$ARCHPKG/usr/lib/udev/rules.d/99-rixelpos.rules"
 cp "$ROOT/packaging/linux/rixelpos.install" "$ARCHPKG/.INSTALL"
 BUILD_DATE="$(date +%s)"
 INSTALLED_SIZE="$(du -sb "$ARCHPKG/usr" | cut -f1)"
@@ -142,7 +141,7 @@ depend = libglvnd
 optdepend = dotnet-sdk: optional SDK for development and source builds
 EOF
 ARCH_FILE="$OUT/${NAME}-${PKGVER}-${PKGREL}-${ARCH}.pkg.tar.zst"
-( cd "$ARCHPKG" && bsdtar --zstd -cf "$ARCH_FILE" .PKGINFO .INSTALL usr lib )
+( cd "$ARCHPKG" && bsdtar --zstd -cf "$ARCH_FILE" .PKGINFO .INSTALL usr )
 echo "  $ARCH_FILE"
 
 # Pacman repository (for the optional custom repo / GitHub Pages)
