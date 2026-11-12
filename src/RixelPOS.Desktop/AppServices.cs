@@ -44,6 +44,7 @@ public static class AppServices
         services.AddSingleton<SettingsService>();
         services.AddSingleton<AuditService>();
         services.AddSingleton<AuthService>();
+        services.AddSingleton<LockService>();
         services.AddSingleton<SetupService>();
         services.AddSingleton<CashRegisterService>();
         services.AddSingleton<InventoryService>();
@@ -69,6 +70,7 @@ public static class AppServices
         services.AddSingleton<SoundService>();
         services.AddSingleton<ScanRouter>();
         services.AddSingleton<FileDialogService>();
+        services.AddSingleton<ClipboardService>();
         services.AddSingleton<DialogService>();
 
         services.AddTransient<DashboardViewModel>();

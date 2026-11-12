@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text;
 using RixelPOS.Application.Abstractions;
 using RixelPOS.Application.Services;
 using RixelPOS.Application.Sessions;
@@ -49,6 +51,64 @@ public sealed class InventoryService
     public IReadOnlyList<Category> GetCategories() => _store.GetCategories();
 
     public IReadOnlyList<TaxRate> GetTaxRates() => _store.GetTaxRates();
+
+    /// <summary>
+    /// Builds a readable, unique SKU from the product name and barcode. Falls back to a
+    /// numeric suffix when the base code is already taken.
+    /// </summary>
+    public string GenerateSku(string name, string? barcode = null, Guid? exceptProductId = null)
+    {
+        var slug = Slug(name);
+        if (slug.Length == 0)
+        {
+            slug = "PROD";
+        }
+
+        if (slug.Length > 12)
+        {
+            slug = slug[..12];
+        }
+
+        var code = new string((barcode ?? "").Where(char.IsLetterOrDigit).ToArray());
+        if (code.Length > 8)
+        {
+            code = code[^8..];
+        }
+
+        var baseSku = code.Length == 0 ? slug : $"{slug}-{code}";
+        var candidate = baseSku;
+        var suffix = 2;
+        while (_store.SkuExists(candidate, exceptProductId))
+        {
+            candidate = $"{baseSku}-{suffix++}";
+        }
+
+        return candidate;
+    }
+
+    private static string Slug(string value)
+    {
+        var normalized = value.Normalize(NormalizationForm.FormD);
+        var sb = new StringBuilder(normalized.Length);
+        foreach (var ch in normalized)
+        {
+            if (CharUnicodeInfo.GetUnicodeCategory(ch) == UnicodeCategory.NonSpacingMark)
+            {
+                continue;
+            }
+
+            if (char.IsLetterOrDigit(ch))
+            {
+                sb.Append(char.ToUpperInvariant(ch));
+            }
+            else if (sb.Length > 0 && sb[^1] != '-')
+            {
+                sb.Append('-');
+            }
+        }
+
+        return sb.ToString().Trim('-');
+    }
 
     public void CreateCategory(string name)
     {

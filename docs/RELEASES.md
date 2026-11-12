@@ -147,6 +147,9 @@ Get-FileHash .\RixelPOS-Setup-*.exe -Algorithm SHA256
 - **Desde 1.1.0** los precios se interpretan con impuesto incluido: la migración `002`
   marca el catálogo existente como inclusivo para que el total a pagar sea el precio
   registrado. Si antes usabas impuesto exclusivo, revisa tus precios tras actualizar.
+- **Desde 1.2.0** no hay tasa de impuesto por defecto y la migración `003` pone a 0% los
+  productos que conservaban el 18% implícito. Si tu negocio cobra impuesto, vuelve a
+  configurar la tasa en Ajustes después de actualizar.
 
 ## 7. Versionado
 

@@ -335,6 +335,17 @@ public sealed partial class ReportsViewModel : ViewModelBase, IActivatable
     }
 
     [RelayCommand]
+    private async Task PreviewInvoiceAsync()
+    {
+        if (_foundSale is null)
+        {
+            return;
+        }
+
+        await _dialogs.ShowReceiptPreviewAsync(_foundSale);
+    }
+
+    [RelayCommand]
     private async Task ReprintInvoiceAsync()
     {
         if (_foundSale is null)

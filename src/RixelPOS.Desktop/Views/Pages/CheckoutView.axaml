@@ -183,7 +183,9 @@
             <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8">
               <Button Classes="ghost" Content="{loc:Tr common.discount}" Padding="8,9" HorizontalAlignment="Stretch" Command="{Binding ApplySaleDiscountCommand}" />
               <Button Grid.Column="1" Classes="ghost" Content="{loc:Tr checkout.hold}" Padding="8,9" HorizontalAlignment="Stretch" Command="{Binding HoldCommand}" />
-              <Button Grid.Row="1" Grid.ColumnSpan="2" Classes="primary big" Content="{loc:Tr checkout.charge}" HorizontalAlignment="Stretch" Command="{Binding ChargeCommand}" IsEnabled="{Binding HasItems}" />
+              <Button Grid.Row="1" Grid.ColumnSpan="2" Classes="primary big" Content="{loc:Tr checkout.charge}"
+                      ToolTip.Tip="{loc:Tr shortcuts.charge}" HorizontalAlignment="Stretch"
+                      Command="{Binding ChargeCommand}" IsEnabled="{Binding HasItems}" />
             </Grid>
 
             <Border Classes="dangerCard" IsVisible="{Binding StatusIsError}">

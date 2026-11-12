@@ -90,6 +90,7 @@ public sealed partial class MainViewModel : ViewModelBase
     private readonly ThemeService _theme;
     private readonly LocalizationService _loc;
     private readonly IClock _clock;
+    private readonly CheckoutViewModel _checkout;
     private readonly ScanRouter _scannerRouter;
     private readonly IScannerListener _scannerListener;
     private readonly IAppLogger _logger;
@@ -140,6 +141,7 @@ public sealed partial class MainViewModel : ViewModelBase
         _scannerListener = scannerListener;
         _logger = logger;
 
+        _checkout = checkout;
         _pages["dashboard"] = dashboard;
         _pages["checkout"] = checkout;
         _pages["inventory"] = inventory;
@@ -230,6 +232,18 @@ public sealed partial class MainViewModel : ViewModelBase
         {
             Navigate(value.Key);
         }
+    }
+
+    public void FocusCheckoutSearch()
+    {
+        Navigate("checkout");
+        _checkout.RequestFocus();
+    }
+
+    public async Task ChargeAsync()
+    {
+        Navigate("checkout");
+        await _checkout.ChargeCommand.ExecuteAsync(null);
     }
 
     [RelayCommand]

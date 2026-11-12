@@ -63,19 +63,19 @@
               </StackPanel>
               <StackPanel Grid.Row="0" Grid.Column="1" Spacing="6">
                 <TextBlock Text="{loc:Tr setup.legalName}" Classes="caption" />
-                <TextBox Text="{Binding LegalName}" />
+                <TextBox Text="{Binding LegalName}" Watermark="{loc:Tr setup.legalNamePlaceholder}" />
               </StackPanel>
               <StackPanel Grid.Row="1" Grid.Column="0" Spacing="6">
                 <TextBlock Text="{loc:Tr setup.taxId}" Classes="caption" />
-                <TextBox Text="{Binding TaxId}" />
+                <TextBox Text="{Binding TaxId}" Watermark="1-01-00000-1" />
               </StackPanel>
               <StackPanel Grid.Row="1" Grid.Column="1" Spacing="6">
                 <TextBlock Text="{loc:Tr setup.phone}" Classes="caption" />
-                <TextBox Text="{Binding Phone}" />
+                <TextBox Text="{Binding Phone}" Watermark="809-000-0000" />
               </StackPanel>
               <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Spacing="6">
                 <TextBlock Text="{loc:Tr setup.address}" Classes="caption" />
-                <TextBox Text="{Binding Address}" />
+                <TextBox Text="{Binding Address}" Watermark="{loc:Tr setup.addressPlaceholder}" />
               </StackPanel>
               <StackPanel Grid.Row="3" Grid.Column="0" Spacing="6">
                 <TextBlock Text="{loc:Tr setup.language}" Classes="caption" />
@@ -96,30 +96,30 @@
             <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="12">
               <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
                 <TextBlock Text="{loc:Tr setup.currencyCode}" Classes="caption" />
-                <TextBox Text="{Binding CurrencyCode}" />
+                <TextBox Text="{Binding CurrencyCode}" Watermark="DOP" />
               </StackPanel>
               <StackPanel Grid.Row="0" Grid.Column="1" Spacing="6">
                 <TextBlock Text="{loc:Tr setup.currencySymbol}" Classes="caption" />
-                <TextBox Text="{Binding CurrencySymbol}" />
+                <TextBox Text="{Binding CurrencySymbol}" Watermark="RD$" />
               </StackPanel>
               <StackPanel Grid.Row="1" Grid.Column="0" Spacing="6">
                 <TextBlock Text="{loc:Tr setup.taxName}" Classes="caption" />
-                <TextBox Text="{Binding TaxName}" />
+                <TextBox Text="{Binding TaxName}" Watermark="ITBIS" />
               </StackPanel>
               <StackPanel Grid.Row="1" Grid.Column="1" Spacing="6">
                 <TextBlock Text="{loc:Tr setup.taxRate}" Classes="caption" />
-                <TextBox Text="{Binding TaxPercent}" />
+                <TextBox Text="{Binding TaxPercent}" Watermark="0" />
               </StackPanel>
               <StackPanel Grid.Row="2" Grid.Column="0" Spacing="6">
                 <TextBlock Text="{loc:Tr setup.invoicePrefix}" Classes="caption" />
-                <TextBox Text="{Binding InvoicePrefix}" />
+                <TextBox Text="{Binding InvoicePrefix}" Watermark="A" />
               </StackPanel>
               <StackPanel Grid.Row="2" Grid.Column="1" Spacing="6">
                 <TextBlock Text="{loc:Tr settings.receiptWidth}" Classes="caption" />
                 <ComboBox ItemsSource="{Binding ReceiptWidths}" SelectedIndex="{Binding ReceiptWidthIndex}" HorizontalAlignment="Stretch" />
               </StackPanel>
             </Grid>
-            <CheckBox Content="{loc:Tr setup.pricesIncludeTax}" IsChecked="{Binding PricesIncludeTax}" />
+            <TextBlock Text="{loc:Tr setup.pricesIncludeTax}" Classes="caption" TextWrapping="Wrap" />
             <Border Classes="accentCard">
               <TextBlock Text="{loc:Tr setup.tipTax}"
                          TextWrapping="Wrap" Foreground="{DynamicResource TextBrush}" FontSize="13" />

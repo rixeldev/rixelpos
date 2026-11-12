@@ -21,7 +21,7 @@ public static class Defaults
     public const int InvoicePadding = 6;
     public const int ScannerDebounceMs = 350;
     public const int DiscountApprovalPercent = 20;
-    public const int DefaultTaxRateBasisPoints = 1800;
+    public const int DefaultTaxRateBasisPoints = 0;
     public const int BackupKeepCount = 14;
     public const int LowStockDefaultMilli = 5_000;
     public const int ReceiptWidthMm = 80;

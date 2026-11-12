@@ -194,6 +194,7 @@ public sealed partial class SqliteStore : IPosStore
         s.ShowQrOnReceipt = Bool("receipt.qr", true);
         s.ReceiptWidth = Enum("receipt.width", ReceiptWidth.Mm80);
         s.AutoPrintReceipt = Bool("receipt.autoprint", true);
+        s.PreviewReceiptBeforePrint = Bool("receipt.preview", true);
         s.PrinterConnection = Str("printer.connection", "");
         s.PrinterName = Str("printer.name", "");
         s.CashDrawerEnabled = Bool("drawer.enabled", true);
@@ -207,6 +208,7 @@ public sealed partial class SqliteStore : IPosStore
         s.DiscountApprovalPercent = Int("discount.approval_percent", Defaults.DiscountApprovalPercent);
         s.RequireManagerForVoids = Bool("void.manager", true);
         s.RequireManagerForRefunds = Bool("refund.manager", true);
+        s.AutoLockMinutes = Int("security.autolock_minutes", 5);
         s.Language = Enum("ui.language", AppLanguage.Spanish);
         s.Theme = Enum("ui.theme", AppTheme.Dark);
         s.UiScalePercent = Int("ui.scale", 100);
@@ -249,6 +251,7 @@ public sealed partial class SqliteStore : IPosStore
                 ["receipt.qr"] = s.ShowQrOnReceipt.ToString(),
                 ["receipt.width"] = s.ReceiptWidth.ToString(),
                 ["receipt.autoprint"] = s.AutoPrintReceipt.ToString(),
+                ["receipt.preview"] = s.PreviewReceiptBeforePrint.ToString(),
                 ["printer.connection"] = s.PrinterConnection,
                 ["printer.name"] = s.PrinterName,
                 ["drawer.enabled"] = s.CashDrawerEnabled.ToString(),
@@ -262,6 +265,7 @@ public sealed partial class SqliteStore : IPosStore
                 ["discount.approval_percent"] = s.DiscountApprovalPercent.ToString(CultureInfo.InvariantCulture),
                 ["void.manager"] = s.RequireManagerForVoids.ToString(),
                 ["refund.manager"] = s.RequireManagerForRefunds.ToString(),
+                ["security.autolock_minutes"] = s.AutoLockMinutes.ToString(CultureInfo.InvariantCulture),
                 ["ui.language"] = s.Language.ToString(),
                 ["ui.theme"] = s.Theme.ToString(),
                 ["ui.scale"] = s.UiScalePercent.ToString(CultureInfo.InvariantCulture),

@@ -20,7 +20,7 @@
         <StackPanel Spacing="6"><TextBlock Text="{loc:Tr common.email}" Classes="caption" /><TextBox Text="{Binding Email}" /></StackPanel>
         <StackPanel Spacing="6"><TextBlock Text="{loc:Tr common.address}" Classes="caption" /><TextBox Text="{Binding Address}" /></StackPanel>
         <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-          <StackPanel Spacing="6"><TextBlock Text="{loc:Tr customers.creditLimit}" Classes="caption" /><TextBox Text="{Binding CreditLimitText}" /></StackPanel>
+          <StackPanel Spacing="6"><TextBlock Text="{loc:Tr customers.creditLimit}" Classes="caption" /><TextBox Text="{Binding CreditLimitText}" Watermark="0.00" /></StackPanel>
           <CheckBox Grid.Column="1" Content="{loc:Tr common.active}" IsChecked="{Binding IsActive}" VerticalAlignment="Bottom" />
         </Grid>
         <StackPanel Spacing="6"><TextBlock Text="{loc:Tr common.notes}" Classes="caption" /><TextBox Text="{Binding Notes}" AcceptsReturn="True" Height="80" /></StackPanel>

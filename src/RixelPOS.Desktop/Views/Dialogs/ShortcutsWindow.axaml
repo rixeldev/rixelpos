@@ -1,0 +1,28 @@
+<dialogs:DialogWindow xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:dialogs="using:RixelPOS.Desktop.Views.Dialogs"
+                     xmlns:loc="using:RixelPOS.Desktop.Localization"
+                     x:Class="RixelPOS.Desktop.Views.Dialogs.ShortcutsWindow"
+                     Title="{loc:Tr shortcuts.title}"
+                     Width="640" Height="720" MinWidth="460" MinHeight="420"
+                     ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
+                     Background="{DynamicResource SurfaceBrush}">
+  <dialogs:DialogWindow.KeyBindings>
+    <KeyBinding Gesture="Escape" Command="{Binding CloseDialogCommand}" />
+    <KeyBinding Gesture="F12" Command="{Binding CloseDialogCommand}" />
+  </dialogs:DialogWindow.KeyBindings>
+  <Grid RowDefinitions="Auto,*,Auto" Margin="24" RowSpacing="12">
+    <StackPanel Spacing="2">
+      <TextBlock Text="{loc:Tr shortcuts.title}" Classes="h2" />
+      <TextBlock Text="{loc:Tr shortcuts.hint}" Classes="caption" TextWrapping="Wrap" />
+    </StackPanel>
+    <Border Grid.Row="1" Classes="soft" Padding="18">
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <SelectableTextBlock Text="{loc:Tr shortcuts.body}" FontFamily="monospace"
+                             FontSize="13" LineHeight="21" />
+      </ScrollViewer>
+    </Border>
+    <Button Grid.Row="2" Classes="primary" Content="{loc:Tr common.close}"
+            Command="{Binding CloseDialogCommand}" HorizontalAlignment="Right" />
+  </Grid>
+</dialogs:DialogWindow>

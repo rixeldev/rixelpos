@@ -75,7 +75,7 @@ public sealed class SetupService
         settings.CurrencySymbol = string.IsNullOrWhiteSpace(request.CurrencySymbol) ? Branding.DefaultCurrencySymbol : request.CurrencySymbol.Trim();
         settings.TaxName = string.IsNullOrWhiteSpace(request.TaxName) ? "ITBIS" : request.TaxName.Trim();
         settings.DefaultTaxRateBasisPoints = Math.Clamp(request.TaxBasisPoints, 0, 10_000);
-        settings.PricesIncludeTax = request.PricesIncludeTax;
+        settings.PricesIncludeTax = true;
         settings.InvoicePrefix = string.IsNullOrWhiteSpace(request.InvoicePrefix) ? "A" : request.InvoicePrefix.Trim();
         settings.ReceiptWidth = request.ReceiptWidth;
         settings.Language = request.Language;

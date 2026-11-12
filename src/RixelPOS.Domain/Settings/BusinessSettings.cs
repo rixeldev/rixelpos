@@ -35,6 +35,7 @@ public sealed class BusinessSettings
     public bool ShowQrOnReceipt { get; set; } = true;
     public ReceiptWidth ReceiptWidth { get; set; } = ReceiptWidth.Mm80;
     public bool AutoPrintReceipt { get; set; } = true;
+    public bool PreviewReceiptBeforePrint { get; set; } = true;
 
     public string PrinterConnection { get; set; } = "";
     public string PrinterName { get; set; } = "";
@@ -50,6 +51,9 @@ public sealed class BusinessSettings
     public int DiscountApprovalPercent { get; set; } = Defaults.DiscountApprovalPercent;
     public bool RequireManagerForVoids { get; set; } = true;
     public bool RequireManagerForRefunds { get; set; } = true;
+
+    /// <summary>Minutes of inactivity before the POS locks itself. 0 disables the lock.</summary>
+    public int AutoLockMinutes { get; set; } = 5;
 
     public AppLanguage Language { get; set; } = AppLanguage.Spanish;
     public AppTheme Theme { get; set; } = AppTheme.Dark;

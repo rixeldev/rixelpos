@@ -1,0 +1,36 @@
+<dialogs:DialogWindow xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:dialogs="using:RixelPOS.Desktop.Views.Dialogs"
+                     xmlns:loc="using:RixelPOS.Desktop.Localization"
+                     x:Class="RixelPOS.Desktop.Views.Dialogs.LockWindow"
+                     Title="{loc:Tr lock.title}"
+                     Width="440" SizeToContent="Height" CanResize="False"
+                     ShowInTaskbar="False" SystemDecorations="None"
+                     WindowStartupLocation="CenterOwner"
+                     Background="{DynamicResource SurfaceBrush}">
+  <dialogs:DialogWindow.KeyBindings>
+    <KeyBinding Gesture="Enter" Command="{Binding UnlockCommand}" />
+  </dialogs:DialogWindow.KeyBindings>
+  <StackPanel Margin="30" Spacing="16">
+    <Border Width="72" Height="72" CornerRadius="24" Background="{DynamicResource AccentSoftBrush}"
+            HorizontalAlignment="Center">
+      <PathIcon Data="{DynamicResource IconLock}" Width="30" Height="30"
+                Foreground="{DynamicResource AccentBrush}"
+                HorizontalAlignment="Center" VerticalAlignment="Center" />
+    </Border>
+    <StackPanel Spacing="4" HorizontalAlignment="Center">
+      <TextBlock Text="{loc:Tr lock.title}" Classes="h1" HorizontalAlignment="Center" />
+      <TextBlock Text="{Binding UserName}" Classes="muted" HorizontalAlignment="Center" />
+      <TextBlock Text="{loc:Tr lock.message}" Classes="caption" HorizontalAlignment="Center" />
+    </StackPanel>
+    <TextBox x:Name="PinBox" Text="{Binding Pin}" PasswordChar="●" MaxLength="8"
+             Watermark="{loc:Tr lock.pin}" Classes="big" HorizontalContentAlignment="Center" />
+    <TextBlock Text="{Binding ErrorMessage}" Classes="danger" TextWrapping="Wrap"
+               HorizontalAlignment="Center" IsVisible="{Binding HasError}" />
+    <Button Classes="primary big" Content="{loc:Tr lock.unlock}"
+            Command="{Binding UnlockCommand}" IsEnabled="{Binding CanUnlock}"
+            HorizontalAlignment="Stretch" />
+    <Button Classes="ghost" Content="{loc:Tr lock.logout}"
+            Command="{Binding LogoutCommand}" HorizontalAlignment="Stretch" />
+  </StackPanel>
+</dialogs:DialogWindow>

@@ -36,8 +36,8 @@ Desktop (Avalonia) ──> Application ──> Domain
 SQLite con `PRAGMA journal_mode=WAL`, `foreign_keys=ON`, `busy_timeout=5000` y
 `sequential=NORMAL`. Migraciones embebidas en
 `src/RixelPOS.Infrastructure/Data/Migrations/` (aditivas: `001_initial.sql`,
-`002_tax_inclusive_pricing.sql`, …) aplicadas por `SqliteDb.Initialize()` y
-registradas en `schema_migrations`.
+`002_tax_inclusive_pricing.sql`, `003_zero_default_tax.sql`, …) aplicadas por
+`SqliteDb.Initialize()` y registradas en `schema_migrations`.
 
 Tablas y relaciones principales:
 
@@ -77,10 +77,11 @@ Los campos de fecha se guardan como ISO-8601 UTC y se convierten a hora local so
    - impuesto **inclusivo**: `net = round(gross × 10000 / (10000 + rate))`, `tax = gross - net`.
 5. Se suman neto, impuesto y total. Todo redondeo usa `MidpointRounding.AwayFromZero`.
 
-Por defecto **el precio de venta ya incluye impuesto**: se guarda el precio final que paga
-el cliente y el impuesto se extrae del mismo (`net = gross - tax`). La migración `002`
-marca los productos existentes como inclusivos para que al actualizar no se sume el
-impuesto al total. Los tests cubren impuestos 18%, exentos, descuentos y reparto de residuos.
+Por defecto **el precio de venta ya incluye impuesto** y **la tasa por defecto es 0%**:
+se guarda el precio final que paga el cliente y, si hay tasa, el impuesto se extrae del
+mismo (`net = gross - tax`). Las migraciones `002` y `003` marcan los productos existentes
+como inclusivos y eliminan la tasa implícita del 18% para que el total sea el precio
+registrado. Los tests cubren impuestos 18%, exentos, descuentos y reparto de residuos.
 
 ## 5. Flujo transaccional de una venta
 

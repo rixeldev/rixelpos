@@ -111,7 +111,13 @@ public sealed partial class SqliteStore
 
     public bool BarcodeExists(string code, Guid? exceptProductId = null) =>
         WithConnection(c => c.ExecuteScalar<long>(
-            "SELECT COUNT(1) FROM product_barcodes WHERE code = @code AND (@except IS NULL OR product_id <> @except)",
+            """
+            SELECT COUNT(1)
+            FROM product_barcodes b
+            JOIN products p ON p.id = b.product_id
+            WHERE b.code = @code AND p.is_active = 1
+              AND (@except IS NULL OR b.product_id <> @except)
+            """,
             new { code, except = exceptProductId?.ToString() }) > 0);
 
     public bool SkuExists(string sku, Guid? exceptProductId = null) =>
@@ -170,6 +176,13 @@ public sealed partial class SqliteStore
 
                 foreach (var barcode in product.Barcodes.Where(b => !string.IsNullOrWhiteSpace(b.Code)))
                 {
+                    // Reclaim codes that belong to inactive products (for example after CSV deactivation).
+                    connection.Execute("""
+                        DELETE FROM product_barcodes
+                        WHERE code = @code
+                          AND product_id IN (SELECT id FROM products WHERE is_active = 0)
+                        """, new { code = barcode.Code.Trim() }, transaction);
+
                     connection.Execute("""
                         INSERT INTO product_barcodes(id, product_id, code, is_primary)
                         VALUES(@id, @productId, @code, @isPrimary)
@@ -193,9 +206,22 @@ public sealed partial class SqliteStore
     }
 
     public void ArchiveProduct(Guid id) =>
-        WithConnection((c, tx) => c.Execute(
-            "UPDATE products SET is_active = 0, updated_at = @now WHERE id = @id",
-            new { id = id.ToString(), now = DateTime.UtcNow }, tx));
+        InTransaction((c, tx) =>
+        {
+            // Free the SKU and barcodes so the same product can be created again.
+            c.Execute(
+                """
+                UPDATE products
+                SET is_active = 0,
+                    sku = sku || '-archived-' || substr(id, 1, 8),
+                    updated_at = @now
+                WHERE id = @id
+                """,
+                new { id = id.ToString(), now = DateTime.UtcNow }, tx);
+            c.Execute("DELETE FROM product_barcodes WHERE product_id = @id",
+                new { id = id.ToString() }, tx);
+            return true;
+        });
 
     public void AdjustStock(Guid productId, decimal delta, StockMovementType type, Guid? userId,
         string? userName, string? reference = null, Guid? referenceId = null, string? note = null)

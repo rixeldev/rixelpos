@@ -38,6 +38,7 @@
       <Button Classes="soft" Content="{loc:Tr checkout.printReceipt}" Command="{Binding PrintCommand}" HorizontalAlignment="Stretch" />
       <Button Grid.Column="1" Classes="soft" Content="{loc:Tr checkout.exportPdf}" Command="{Binding ExportPdfCommand}" HorizontalAlignment="Stretch" />
     </Grid>
+    <Button Classes="soft" Content="{loc:Tr receipt.preview}" Command="{Binding PreviewCommand}" HorizontalAlignment="Stretch" />
     <Button Classes="primary big" Content="{loc:Tr checkout.newSale}" Command="{Binding DoneCommand}" HorizontalAlignment="Stretch" />
 
     <Border Classes="dangerCard" IsVisible="{Binding StatusIsError}">

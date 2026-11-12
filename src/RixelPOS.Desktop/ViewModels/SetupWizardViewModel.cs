@@ -27,12 +27,12 @@ public sealed partial class SetupWizardViewModel : ViewModelBase
     [ObservableProperty] private string _taxId = "";
     [ObservableProperty] private string _address = "";
     [ObservableProperty] private string _phone = "";
-    [ObservableProperty] private string _currencyCode = "DOP";
-    [ObservableProperty] private string _currencySymbol = "RD$";
-    [ObservableProperty] private string _taxName = "ITBIS";
-    [ObservableProperty] private string _taxPercent = "18";
+    [ObservableProperty] private string _currencyCode = "";
+    [ObservableProperty] private string _currencySymbol = "";
+    [ObservableProperty] private string _taxName = "";
+    [ObservableProperty] private string _taxPercent = "";
     [ObservableProperty] private bool _pricesIncludeTax = true;
-    [ObservableProperty] private string _invoicePrefix = "A";
+    [ObservableProperty] private string _invoicePrefix = "";
     [ObservableProperty] private int _receiptWidthIndex;
     [ObservableProperty] private string _printerConnection = "";
     [ObservableProperty] private DeviceInfo? _selectedPrinter;
@@ -215,7 +215,7 @@ public sealed partial class SetupWizardViewModel : ViewModelBase
                 CurrencyCode,
                 CurrencySymbol,
                 TaxName,
-                (int)Math.Round(ParseDecimal(TaxPercent, 18) * 100),
+                (int)Math.Round(ParseDecimal(TaxPercent, 0) * 100),
                 PricesIncludeTax,
                 InvoicePrefix,
                 ReceiptWidthIndex == 0 ? ReceiptWidth.Mm58 : ReceiptWidth.Mm80,
@@ -252,7 +252,6 @@ public sealed partial class SetupWizardViewModel : ViewModelBase
         string? error = Step switch
         {
             0 when string.IsNullOrWhiteSpace(BusinessName) => _loc.Get("setup.required"),
-            1 when string.IsNullOrWhiteSpace(CurrencySymbol) || string.IsNullOrWhiteSpace(TaxName) => _loc.Get("setup.required"),
             3 when string.IsNullOrWhiteSpace(AdminFullName) || string.IsNullOrWhiteSpace(AdminUsername) => _loc.Get("setup.required"),
             3 when AdminPassword.Length < 8 => _loc.Get("users.password"),
             3 when AdminPin.Length is < 4 or > 8 || !AdminPin.All(char.IsDigit) => _loc.Get("users.pin"),

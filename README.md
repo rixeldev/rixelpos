@@ -52,7 +52,11 @@ self-contained para no depender de un runtime instalado en la caja.
 - Escáner en modo **keyboard-wedge** (sin configuración) y escáner **serial** opcional.
 - Búsqueda por nombre, SKU o código de barras con autocompletado.
 - El precio que registras **ya incluye impuesto**: es exactamente lo que paga el cliente.
+- Sin tasa de impuesto por defecto: si no configuras una, el total es el precio tal cual.
 - Al escanear o escribir un código exacto, el artículo se agrega automáticamente.
+- Vista previa del comprobante antes de imprimir, con impresión o PDF desde la misma ventana.
+- Bloqueo automático por inactividad con PIN del usuario actual.
+- Atajos de teclado completos y ayuda con F12; SKU automático a partir del nombre y el código.
 - Cantidades, descuentos por línea y por venta (porcentaje o monto fijo), eliminación de líneas.
 - Ventas en espera y reanudación.
 - Pago en efectivo con cambio automático, tarjeta, transferencia, crédito a favor y venta a crédito.
@@ -101,6 +105,8 @@ self-contained para no depender de un runtime instalado en la caja.
 - Bitácora de auditoría de acciones sensibles.
 - Ajustes de negocio, impuestos, facturación fiscal, recibos, hardware, usuarios, respaldos, tema e idioma.
 - Instancia única por carpeta de datos y validación de integridad al restaurar respaldos.
+- “Acerca de” con sitio web, correo de soporte copiable y licencia de uso.
+- Los productos archivados liberan su SKU y sus códigos de barras para poder recrearlos.
 - Copias de seguridad locales automáticas/manuales, restauración y retención configurable.
 
 ### Experiencia

@@ -85,7 +85,7 @@
     </Border>
 
     <!-- Main area -->
-    <Grid Grid.Column="1" RowDefinitions="Auto,*" Margin="22,18,22,0">
+    <Grid Grid.Column="1" RowDefinitions="Auto,*" Margin="22,18,22,18">
       <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,16">
         <StackPanel Spacing="2">
           <TextBlock Text="{Binding PageTitle}" Classes="h1" />
@@ -98,6 +98,9 @@
               <TextBlock Text="{Binding CashStatus}" FontSize="12" VerticalAlignment="Center" />
             </StackPanel>
           </Border>
+          <Button Classes="icon ghost" ToolTip.Tip="{loc:Tr shortcuts.open}" Click="OnShortcutsClick">
+            <TextBlock Text="?" FontSize="16" FontWeight="Bold" />
+          </Button>
           <Button Classes="icon ghost" ToolTip.Tip="{loc:Tr settings.theme}" Command="{Binding ToggleThemeCommand}">
             <PathIcon Data="{DynamicResource IconMoon}" Width="18" Height="18" />
           </Button>

@@ -7,6 +7,7 @@ using RixelPOS.Application.Customers;
 using RixelPOS.Application.Printing;
 using RixelPOS.Application.Services;
 using RixelPOS.Desktop.Localization;
+using RixelPOS.Desktop.Services;
 using RixelPOS.Domain.Entities;
 using RixelPOS.Domain.Enums;
 using RixelPOS.Infrastructure;
@@ -456,6 +457,7 @@ public sealed partial class SaleCompletedViewModel : DialogViewModelBase
     private readonly LocalizationService _loc;
     private readonly Sale _sale;
     private readonly PrintResult? _initialPrint;
+    private readonly DialogService _dialogs;
 
     [ObservableProperty] private string _invoiceNumber = "";
     [ObservableProperty] private string _totalText = "";
@@ -464,13 +466,15 @@ public sealed partial class SaleCompletedViewModel : DialogViewModelBase
     [ObservableProperty] private bool _showChange;
     [ObservableProperty] private bool _statusIsError;
 
-    public SaleCompletedViewModel(ReceiptService receipt, SettingsService settings, LocalizationService loc, Sale sale, PrintResult? initialPrint = null)
+    public SaleCompletedViewModel(ReceiptService receipt, SettingsService settings, LocalizationService loc,
+        Sale sale, PrintResult? initialPrint, DialogService dialogs)
     {
         _receipt = receipt;
         _settings = settings;
         _loc = loc;
         _sale = sale;
         _initialPrint = initialPrint;
+        _dialogs = dialogs;
         InvoiceNumber = sale.Invoice?.Number ?? $"#{sale.Number}";
         TotalText = settings.FormatMoney(sale.TotalCents);
         ChangeText = settings.FormatMoney(sale.ChangeCents);
@@ -479,6 +483,17 @@ public sealed partial class SaleCompletedViewModel : DialogViewModelBase
         {
             StatusMessage = initialPrint.Message;
             StatusIsError = !initialPrint.Success;
+        }
+    }
+
+    [RelayCommand]
+    private async Task PreviewAsync()
+    {
+        var result = await _dialogs.ShowReceiptPreviewAsync(_sale);
+        if (result is not null)
+        {
+            StatusMessage = result.Message;
+            StatusIsError = !result.Success;
         }
     }
 

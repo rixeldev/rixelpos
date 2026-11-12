@@ -11,7 +11,7 @@ public sealed class Product
     public string? CategoryName { get; set; }
     public long CostCents { get; set; }
     public long PriceCents { get; set; }
-    public int TaxRateBasisPoints { get; set; } = Defaults.DefaultTaxRateBasisPoints;
+    public int TaxRateBasisPoints { get; set; }
 
     /// <summary>True when <see cref="PriceCents"/> already includes tax (default for new products).</summary>
     public bool TaxInclusive { get; set; } = true;

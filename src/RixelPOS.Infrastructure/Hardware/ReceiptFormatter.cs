@@ -170,6 +170,122 @@ public static class ReceiptFormatter
         return b.Build();
     }
 
+    /// <summary>Plain-text rendering used by the in-app receipt preview.</summary>
+    public static string FormatPreview(ReceiptData data)
+    {
+        var width = data.Width == ReceiptWidth.Mm58 ? 32 : 42;
+        var sale = data.Sale;
+        var symbol = data.CurrencySymbol;
+        var sb = new StringBuilder();
+
+        void Center(string text)
+        {
+            var value = Truncate(text, width);
+            var pad = Math.Max(0, (width - value.Length) / 2);
+            sb.AppendLine(new string(' ', pad) + value);
+        }
+
+        void Row(string left, string right) => sb.AppendLine(Columns(left, right, width));
+        void Separator(char c = '-') => sb.AppendLine(new string(c, width));
+
+        Center(data.Business.Name);
+        if (!string.IsNullOrWhiteSpace(data.Business.LegalName) && data.Business.LegalName != data.Business.Name)
+        {
+            Center(data.Business.LegalName);
+        }
+
+        if (!string.IsNullOrWhiteSpace(data.Business.TaxId))
+        {
+            Center($"RNC: {data.Business.TaxId}");
+        }
+
+        foreach (var line in Wrap(data.Business.Address, width))
+        {
+            Center(line);
+        }
+
+        if (!string.IsNullOrWhiteSpace(data.Business.Phone))
+        {
+            Center($"Tel: {data.Business.Phone}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(data.Business.Email))
+        {
+            Center(data.Business.Email);
+        }
+
+        Separator('=');
+        Center(data.Invoice is not null ? "FACTURA" : "RECIBO");
+        if (data.Invoice is not null)
+        {
+            Center($"No. {data.Invoice.Number}");
+            if (!string.IsNullOrWhiteSpace(data.Invoice.Ncf))
+            {
+                Center($"NCF: {data.Invoice.Ncf}");
+            }
+        }
+
+        Center((sale.CompletedAt ?? sale.CreatedAt).ToLocalTime().ToString("dd/MM/yyyy HH:mm"));
+        Row("Cajero", data.CashierName);
+        if (!string.IsNullOrWhiteSpace(sale.CustomerName))
+        {
+            Row("Cliente", sale.CustomerName);
+        }
+
+        Separator();
+        foreach (var line in sale.Lines)
+        {
+            foreach (var wrapped in Wrap(line.Name, width))
+            {
+                sb.AppendLine(wrapped);
+            }
+
+            Row($"  {line.Quantity:0.###} x {FormatMoney(line.UnitPriceCents, symbol)}",
+                FormatMoney(line.TotalCents, symbol));
+        }
+
+        Separator();
+        Row("Subtotal", FormatMoney(sale.SubtotalCents, symbol));
+        if (sale.DiscountCents > 0)
+        {
+            Row("Descuento", "-" + FormatMoney(sale.DiscountCents, symbol));
+        }
+
+        if (sale.TaxCents > 0)
+        {
+            Row(data.TaxName, FormatMoney(sale.TaxCents, symbol));
+        }
+
+        Separator('=');
+        Row("TOTAL", FormatMoney(sale.TotalCents, symbol));
+        Separator('=');
+        foreach (var payment in sale.Payments)
+        {
+            Row(PaymentLabel(payment.Method), FormatMoney(payment.AmountCents, symbol));
+        }
+
+        if (sale.ChangeCents > 0)
+        {
+            Row("Cambio", FormatMoney(sale.ChangeCents, symbol));
+        }
+
+        if (!string.IsNullOrWhiteSpace(data.Footer))
+        {
+            Separator();
+            foreach (var line in Wrap(data.Footer, width))
+            {
+                Center(line);
+            }
+        }
+
+        if (data.ShowQr && !string.IsNullOrWhiteSpace(data.QrPayload))
+        {
+            Center("QR incluido en el comprobante impreso");
+        }
+
+        return sb.ToString();
+    }
+
     public static string FormatMoney(long cents, string symbol) =>
         $"{symbol} {cents / 100m:N2}";
 

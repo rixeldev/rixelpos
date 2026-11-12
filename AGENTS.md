@@ -30,6 +30,8 @@
    **Los precios de venta ya incluyen impuesto**: el precio que escribe el usuario es el
    total que paga el cliente y el impuesto se extrae del mismo. No añadas el impuesto
    encima del total; `PricesIncludeTax` y `Product.TaxInclusive` son `true` por defecto.
+   **La tasa por defecto es 0%**: no asumas ITBIS/IVA. Solo se aplica si el negocio la
+   configura o el producto la define.
 4. **Toda venta es atómica** dentro de una transacción SQLite. La numeración de factura,
    stock, pagos, crédito y auditoría se guardan en la misma transacción.
 5. **Migraciones aditivas.** Nunca edites una migración ya publicada; crea
@@ -136,6 +138,17 @@ Cambios típicos:
   usa `ScannerDebounceMs` y solo actúa con coincidencia exacta de código/SKU.
 - **Instancia única**: un solo proceso por carpeta de datos (`SingleInstance`). Un segundo
   intento muestra un aviso y se cierra; nunca abras dos cajas sobre la misma DB.
+- **Accesibilidad**: F1–F8 navegan, F9 cobra, Ctrl+F enfoca la búsqueda, F12 abre los
+  atajos, Ctrl+L cierra sesión y Ctrl+Shift+L bloquea. En el pago, F1–F5 eligen método y
+  Ctrl+Enter agrega el pago. Los campos nuevos usan `Watermark`, nunca texto por defecto.
+- **Bloqueo por inactividad**: `AutoLockMinutes` (por defecto 5; 0 desactiva) bloquea la
+  caja y exige el PIN del usuario actual (`LockService` + `LockWindow`). No permitas cerrar
+  la ventana de bloqueo sin desbloquear o cerrar sesión.
+- **Vista previa**: `PreviewReceiptBeforePrint` muestra el comprobante antes de imprimir
+  (`ReceiptPreviewWindow`). Cualquier cambio en el recibo debe verse también en
+  `ReceiptFormatter.FormatPreview`.
+- **SKU y códigos**: el SKU se genera con nombre + código de barras (`InventoryService.GenerateSku`).
+  Al archivar un producto se liberan su SKU y sus códigos de barras.
 - **Feedback**: sonidos de escaneo encontrado/nuevo/error, mensajes claros y estados
   vacíos útiles. Nunca mostrar excepciones crudas.
 - **Colores/tema**: tokens en `App.axaml` y `Assets/Styles.axaml`; probar claro y oscuro.

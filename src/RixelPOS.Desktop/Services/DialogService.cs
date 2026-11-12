@@ -134,8 +134,16 @@ public sealed class DialogService
 
     public async Task ShowSaleCompletedAsync(Sale sale, PrintResult? printResult)
     {
-        var vm = new SaleCompletedViewModel(_receipt, _settings, _loc, sale, printResult);
+        var vm = new SaleCompletedViewModel(_receipt, _settings, _loc, sale, printResult, this);
         await ShowAsync(new SaleCompletedWindow(), vm);
+    }
+
+    /// <summary>Shows the receipt as it will be printed. Returns the print result when printed.</summary>
+    public async Task<PrintResult?> ShowReceiptPreviewAsync(Sale sale)
+    {
+        var vm = new ReceiptPreviewViewModel(_receipt, _loc, sale);
+        await ShowAsync(new ReceiptPreviewWindow(), vm);
+        return vm.PrintResult;
     }
 
     public async Task<HeldSaleItem?> PickHeldSaleAsync(IReadOnlyList<HeldSaleItem> items)

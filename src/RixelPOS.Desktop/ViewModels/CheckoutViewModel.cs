@@ -104,6 +104,8 @@ public sealed partial class CheckoutViewModel : ViewModelBase, IActivatable, ISc
         FocusSearchRequested?.Invoke(this, EventArgs.Empty);
     }
 
+    public void RequestFocus() => FocusSearchRequested?.Invoke(this, EventArgs.Empty);
+
     public bool HandleScan(string code)
     {
         AddByCode(code);
@@ -456,7 +458,9 @@ public sealed partial class CheckoutViewModel : ViewModelBase, IActivatable, ISc
             PrintResult? printResult = null;
             if (_settings.Current.AutoPrintReceipt)
             {
-                printResult = await _receipt.PrintAsync(sale);
+                printResult = _settings.Current.PreviewReceiptBeforePrint
+                    ? await _dialogs.ShowReceiptPreviewAsync(sale)
+                    : await _receipt.PrintAsync(sale);
             }
 
             LoadCart(new Cart());

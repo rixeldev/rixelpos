@@ -45,6 +45,42 @@ public sealed class DatabaseTests
     }
 
     [Fact]
+    public void Migration_Removes_The_Implicit_Tax_Rate()
+    {
+        using var app = new TestApp();
+        var product = app.CreateProduct("Producto con ITBIS", 11800, 1, taxBp: 1800);
+
+        using (var connection = app.Db.Open())
+        {
+            using (var updateProduct = connection.CreateCommand())
+            {
+                updateProduct.CommandText = "UPDATE products SET tax_rate_bp = 1800 WHERE id = @id";
+                updateProduct.Parameters.AddWithValue("@id", product.Id.ToString());
+                updateProduct.ExecuteNonQuery();
+            }
+
+            using (var updateSetting = connection.CreateCommand())
+            {
+                updateSetting.CommandText = "UPDATE settings SET value = '1800' WHERE key = 'tax.default_bp'";
+                updateSetting.ExecuteNonQuery();
+            }
+
+            using (var forgetMigration = connection.CreateCommand())
+            {
+                forgetMigration.CommandText = "DELETE FROM schema_migrations WHERE version = 3";
+                forgetMigration.ExecuteNonQuery();
+            }
+        }
+
+        app.Db.Initialize();
+
+        var reloaded = app.Store.GetProduct(product.Id)!;
+        Assert.Equal(0, reloaded.TaxRateBasisPoints);
+        Assert.True(reloaded.TaxInclusive);
+        Assert.Equal(0, app.Store.LoadSettings().DefaultTaxRateBasisPoints);
+    }
+
+    [Fact]
     public void Migration_Makes_Existing_Products_Tax_Inclusive()
     {
         using var app = new TestApp();
@@ -137,6 +173,29 @@ public sealed class CheckoutTests
         var second = app.Sell(secondCart);
         Assert.Equal("A-000002", second.Invoice!.Number);
         Assert.Equal(7, app.Store.GetProduct(product.Id)!.Stock);
+    }
+
+    [Fact]
+    public void Fresh_Product_Without_Tax_Charges_Exactly_Its_Price_And_Returns_Change()
+    {
+        using var app = new TestApp();
+        app.OpenRegister(100000);
+        var product = app.CreateProduct("Precio plano", 20000, 5, taxBp: 0, taxInclusive: true);
+
+        var cart = new Cart();
+        cart.AddProduct(product, 1);
+        Assert.Equal(20000, cart.Totals.TotalCents);
+        Assert.Equal(0, cart.Totals.TaxCents);
+
+        var sale = app.Sell(cart, new Payment
+        {
+            Method = PaymentMethod.Cash,
+            AmountCents = 20000,
+            TenderedCents = 50000
+        });
+
+        Assert.Equal(20000, sale.TotalCents);
+        Assert.Equal(30000, sale.ChangeCents);
     }
 
     [Fact]
@@ -382,6 +441,30 @@ public sealed class PrintingTests
     }
 
     [Fact]
+    public void Receipt_Preview_Matches_The_Final_Total()
+    {
+        using var app = new TestApp();
+        app.OpenRegister();
+        var product = app.CreateProduct("Producto sin impuesto", 20000, 5, taxBp: 0, taxInclusive: true);
+        var cart = new Cart();
+        cart.AddProduct(product, 1);
+        var sale = app.Sell(cart, new Payment
+        {
+            Method = PaymentMethod.Cash,
+            AmountCents = 20000,
+            TenderedCents = 50000
+        });
+
+        var preview = ReceiptFormatter.FormatPreview(app.Receipt.BuildData(sale));
+
+        Assert.Contains("Producto sin impuesto", preview);
+        Assert.Contains("TOTAL", preview);
+        Assert.Contains("200.00", preview);
+        Assert.Contains("300.00", preview); // change
+        Assert.DoesNotContain("ITBIS", preview);
+    }
+
+    [Fact]
     public void Pdf_Invoice_Is_Generated()
     {
         using var app = new TestApp();
@@ -458,6 +541,28 @@ public sealed class PrintingTests
         var product = app.Store.GetProducts().Single(p => p.Sku == "CSV-1");
         Assert.Equal(123456, product.PriceCents);
         Assert.True(product.TaxInclusive);
+    }
+
+    [Fact]
+    public void Archived_Product_Frees_Its_Barcode()
+    {
+        using var app = new TestApp();
+        var product = app.CreateProduct("Producto temporal", 1000, 1, barcode: "746000000123");
+
+        app.Inventory.ArchiveProduct(product.Id);
+
+        Assert.False(app.Store.BarcodeExists("746000000123"));
+        var recreated = app.CreateProduct("Producto temporal 2", 1200, 1, barcode: "746000000123");
+        Assert.NotNull(app.Store.GetProduct(recreated.Id));
+    }
+
+    [Fact]
+    public void GenerateSku_Uses_Name_And_Barcode()
+    {
+        using var app = new TestApp();
+        var sku = app.Inventory.GenerateSku("Café molido", "746000000001");
+        Assert.Equal("CAFE-MOLIDO-00000001", sku);
+        Assert.False(app.Store.SkuExists(sku));
     }
 
     [Fact]

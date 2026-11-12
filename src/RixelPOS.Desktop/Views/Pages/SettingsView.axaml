@@ -97,10 +97,9 @@
               </Grid>
             </Border>
             <StackPanel Spacing="2">
-              <CheckBox Content="{loc:Tr settings.pricesIncludeTax}"
-                IsChecked="{Binding PricesIncludeTax}" />
+              <TextBlock Text="{loc:Tr settings.pricesIncludeTax}" FontWeight="SemiBold" />
               <TextBlock Text="{loc:Tr settings.pricesIncludeTaxHint}" Classes="caption"
-                         TextWrapping="Wrap" Margin="28,0,0,0" />
+                         TextWrapping="Wrap" />
             </StackPanel>
             <Border Classes="card">
               <StackPanel Spacing="12">
@@ -195,6 +194,8 @@
                 </Grid>
                 <CheckBox Content="{loc:Tr settings.autoPrint}"
                   IsChecked="{Binding AutoPrintReceipt}" />
+                <CheckBox Content="{loc:Tr settings.previewBeforePrint}"
+                  IsChecked="{Binding PreviewReceiptBeforePrint}" />
                 <CheckBox Content="{loc:Tr settings.showQr}" IsChecked="{Binding ShowQrOnReceipt}" />
                 <CheckBox Content="{loc:Tr settings.autoOpenDrawer}"
                   IsChecked="{Binding AutoOpenDrawerOnCash}" />
@@ -239,13 +240,25 @@
 
       <!-- Users -->
       <TabItem Header="{loc:Tr settings.tabUsers}">
-        <Grid Margin="0,14,0,0" RowDefinitions="Auto,*" RowSpacing="10">
+        <Grid Margin="0,14,0,0" RowDefinitions="Auto,Auto,*" RowSpacing="10">
           <Grid ColumnDefinitions="*,Auto">
             <TextBlock Text="{loc:Tr settings.users}" Classes="h3" VerticalAlignment="Center" />
             <Button Grid.Column="1" Classes="primary" Content="{loc:Tr settings.addUser}"
               Command="{Binding AddUserCommand}" />
           </Grid>
-          <Border Grid.Row="1" Classes="card" Padding="0">
+          <Border Grid.Row="1" Classes="card">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+              <StackPanel Spacing="4">
+                <TextBlock Text="{loc:Tr settings.autoLock}" FontWeight="SemiBold" />
+                <TextBlock Text="{loc:Tr settings.autoLockHint}" Classes="caption" TextWrapping="Wrap" />
+              </StackPanel>
+              <StackPanel Grid.Column="1" Spacing="4" Width="140">
+                <TextBox Text="{Binding AutoLockMinutesText}" Watermark="5" />
+                <TextBlock Text="{loc:Tr settings.minutes}" Classes="caption" HorizontalAlignment="Center" />
+              </StackPanel>
+            </Grid>
+          </Border>
+          <Border Grid.Row="2" Classes="card" Padding="0">
             <DataGrid ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedUser}"
               Background="Transparent" BorderThickness="0">
               <DataGrid.Columns>
@@ -397,10 +410,21 @@
                 </StackPanel>
               </StackPanel>
               <Separator />
-              <TextBlock Text="{loc:Tr settings.support}: support@rixel.dev" />
-              <TextBlock Text="{loc:Tr settings.website}: rixel.dev" />
-              <TextBlock
-                Text="{loc:Tr settings.license}: © 2026 RixelDev. Todos los derechos reservados." />
+              <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                <TextBlock Text="{loc:Tr settings.support}" Classes="caption" VerticalAlignment="Center" />
+                <Button Grid.Column="1" Classes="link" Content="{Binding SupportEmail}"
+                        Command="{Binding EmailSupportCommand}" HorizontalAlignment="Left" />
+                <Button Grid.Column="2" Classes="soft" Content="{loc:Tr settings.copyEmail}"
+                        Command="{Binding CopyEmailCommand}" />
+              </Grid>
+              <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                <TextBlock Text="{loc:Tr settings.website}" Classes="caption" VerticalAlignment="Center" />
+                <Button Grid.Column="1" Classes="link" Content="{Binding WebsiteUrl}"
+                        Command="{Binding OpenWebsiteCommand}" HorizontalAlignment="Left" />
+              </Grid>
+              <Separator />
+              <TextBlock Text="{Binding LicenseName}" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding LicenseText}" Classes="caption" TextWrapping="Wrap" />
             </StackPanel>
           </Border>
           <Border Classes="soft">

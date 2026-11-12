@@ -27,7 +27,7 @@ public sealed partial class CustomerEditorViewModel : DialogViewModelBase
     [ObservableProperty] private string _taxId = "";
     [ObservableProperty] private string _address = "";
     [ObservableProperty] private string _email = "";
-    [ObservableProperty] private string _creditLimitText = "0.00";
+    [ObservableProperty] private string _creditLimitText = "";
     [ObservableProperty] private string _notes = "";
     [ObservableProperty] private bool _isActive = true;
 
@@ -60,7 +60,9 @@ public sealed partial class CustomerEditorViewModel : DialogViewModelBase
             return;
         }
 
-        if (!decimal.TryParse(CreditLimitText.Replace(',', '.'), NumberStyles.Number, CultureInfo.InvariantCulture, out var credit) || credit < 0)
+        var credit = 0m;
+        if (!string.IsNullOrWhiteSpace(CreditLimitText) &&
+            (!decimal.TryParse(CreditLimitText.Replace(',', '.'), NumberStyles.Number, CultureInfo.InvariantCulture, out credit) || credit < 0))
         {
             ErrorMessage = LocalizationService.Instance.Get("dialogs.invalidAmount");
             return;
@@ -251,13 +253,13 @@ public sealed partial class ProductEditorViewModel : DialogViewModelBase
     [ObservableProperty] private string _sku = "";
     [ObservableProperty] private string _barcode = "";
     [ObservableProperty] private string _newBarcode = "";
-    [ObservableProperty] private string _priceText = "0.00";
-    [ObservableProperty] private string _costText = "0.00";
-    [ObservableProperty] private string _taxPercentText = "18";
-    [ObservableProperty] private bool _taxInclusive;
-    [ObservableProperty] private string _stockText = "0";
-    [ObservableProperty] private string _minStockText = "5";
-    [ObservableProperty] private string _unit = "unit";
+    [ObservableProperty] private string _priceText = "";
+    [ObservableProperty] private string _costText = "";
+    [ObservableProperty] private string _taxPercentText = "";
+    [ObservableProperty] private bool _taxInclusive = true;
+    [ObservableProperty] private string _stockText = "";
+    [ObservableProperty] private string _minStockText = "";
+    [ObservableProperty] private string _unit = "";
     [ObservableProperty] private bool _isFavorite;
     [ObservableProperty] private bool _trackStock = true;
     [ObservableProperty] private string _notes = "";
@@ -313,8 +315,8 @@ public sealed partial class ProductEditorViewModel : DialogViewModelBase
         }
         else
         {
-            TaxPercentText = (settings.Current.DefaultTaxRateBasisPoints / 100m).ToString("0.##", CultureInfo.InvariantCulture);
-            TaxInclusive = settings.Current.PricesIncludeTax;
+            TaxPercentText = "";
+            TaxInclusive = true;
             if (!string.IsNullOrWhiteSpace(barcode))
             {
                 Barcodes.Add(new BarcodeEntry(barcode, true));
@@ -457,12 +459,12 @@ public sealed partial class ProductEditorViewModel : DialogViewModelBase
             var product = _existing ?? new Product();
             product.Name = Name.Trim();
             product.Sku = string.IsNullOrWhiteSpace(Sku)
-                ? $"P-{DateTime.Now:yyMMddHHmmssfff}"
+                ? _inventory.GenerateSku(product.Name, Barcodes.FirstOrDefault()?.Code, _existing?.Id)
                 : Sku.Trim();
             product.PriceCents = price;
             product.CostCents = cost;
             product.TaxRateBasisPoints = (int)Math.Round(taxPercent * 100, MidpointRounding.AwayFromZero);
-            product.TaxInclusive = TaxInclusive;
+            product.TaxInclusive = true;
             product.Unit = string.IsNullOrWhiteSpace(Unit) ? "unit" : Unit.Trim();
             product.MinStock = minStock;
             product.IsFavorite = IsFavorite;
@@ -505,6 +507,11 @@ public sealed partial class ProductEditorViewModel : DialogViewModelBase
     private static bool TryMoney(string text, out long cents)
     {
         cents = 0;
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return true;
+        }
+
         if (!decimal.TryParse(text.Replace(',', '.'), NumberStyles.Number, CultureInfo.InvariantCulture, out var value) || value < 0)
         {
             return false;
@@ -514,8 +521,16 @@ public sealed partial class ProductEditorViewModel : DialogViewModelBase
         return true;
     }
 
-    private static bool TryDecimal(string text, out decimal value) =>
-        decimal.TryParse(text.Replace(',', '.'), NumberStyles.Number, CultureInfo.InvariantCulture, out value);
+    private static bool TryDecimal(string text, out decimal value)
+    {
+        value = 0;
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return true;
+        }
+
+        return decimal.TryParse(text.Replace(',', '.'), NumberStyles.Number, CultureInfo.InvariantCulture, out value);
+    }
 }
 
 public sealed partial class BarcodeEntry : ObservableObject

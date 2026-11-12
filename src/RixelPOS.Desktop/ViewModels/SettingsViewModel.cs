@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Avalonia;
 using RixelPOS.Application.Abstractions;
 using RixelPOS.Application.Printing;
 using RixelPOS.Application.Services;
@@ -75,6 +76,7 @@ public sealed partial class SettingsViewModel : ViewModelBase, IActivatable
     private readonly LocalizationService _loc;
     private readonly AppSession _session;
     private readonly IAppLogger _logger;
+    private readonly ClipboardService _clipboard;
 
     [ObservableProperty] private int _selectedTabIndex;
     [ObservableProperty] private string _businessName = "";
@@ -98,6 +100,8 @@ public sealed partial class SettingsViewModel : ViewModelBase, IActivatable
     [ObservableProperty] private int _receiptWidthIndex = 1;
     [ObservableProperty] private string _receiptFooter = "";
     [ObservableProperty] private bool _autoPrintReceipt;
+    [ObservableProperty] private bool _previewReceiptBeforePrint;
+    [ObservableProperty] private string _autoLockMinutesText = "";
     [ObservableProperty] private bool _showQrOnReceipt;
     [ObservableProperty] private string _printerConnection = "";
     [ObservableProperty] private string _printerName = "";
@@ -141,7 +145,8 @@ public sealed partial class SettingsViewModel : ViewModelBase, IActivatable
         ThemeService theme,
         LocalizationService loc,
         AppSession session,
-        IAppLogger logger)
+        IAppLogger logger,
+        ClipboardService clipboard)
     {
         _settings = settings;
         _auth = auth;
@@ -156,6 +161,7 @@ public sealed partial class SettingsViewModel : ViewModelBase, IActivatable
         _loc = loc;
         _session = session;
         _logger = logger;
+        _clipboard = clipboard;
         VersionText = $"{Branding.ProductName} {Branding.Version} · {Branding.Company}";
         Load();
     }
@@ -172,6 +178,61 @@ public sealed partial class SettingsViewModel : ViewModelBase, IActivatable
     public string[] Languages => new[] { "Español", "English" };
     public string DataFolder => AppPaths.DataDirectory;
     public string LogFolder => AppPaths.LogsDirectory;
+    public string SupportEmail => Branding.SupportEmail;
+    public string WebsiteUrl => Branding.Website;
+    public string LicenseName => _loc.Get("settings.licenseName");
+    public string LicenseText => _loc.Get("settings.licenseText");
+
+    [RelayCommand]
+    private async Task EmailSupportAsync()
+    {
+        try
+        {
+            OpenUrl($"mailto:{Branding.SupportEmail}");
+        }
+        catch
+        {
+            await CopyEmailAsync();
+        }
+    }
+
+    [RelayCommand]
+    private async Task OpenWebsiteAsync()
+    {
+        try
+        {
+            OpenUrl(Branding.Website);
+        }
+        catch (Exception ex)
+        {
+            ReportError(ex);
+        }
+    }
+
+    private static void OpenUrl(string url)
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        }
+        else if (OperatingSystem.IsMacOS())
+        {
+            Process.Start("open", url);
+        }
+        else
+        {
+            Process.Start("xdg-open", url);
+        }
+    }
+
+    [RelayCommand]
+    private async Task CopyEmailAsync()
+    {
+        var copied = await _clipboard.SetTextAsync(Branding.SupportEmail);
+        StatusMessage = copied ? _loc.Get("settings.emailCopied") : Branding.SupportEmail;
+        StatusIsError = !copied;
+        HasStatus = true;
+    }
 
     public void Activate()
     {
@@ -223,8 +284,8 @@ public sealed partial class SettingsViewModel : ViewModelBase, IActivatable
             s.CurrencyCode = CurrencyCode.Trim().ToUpperInvariant();
             s.CurrencySymbol = CurrencySymbol.Trim();
             s.TaxName = TaxName.Trim();
-            s.DefaultTaxRateBasisPoints = (int)Math.Round(ParseDecimal(TaxPercentText, 18) * 100);
-            s.PricesIncludeTax = PricesIncludeTax;
+            s.DefaultTaxRateBasisPoints = (int)Math.Round(ParseDecimal(TaxPercentText, 0) * 100);
+            s.PricesIncludeTax = true;
             s.InvoicePrefix = InvoicePrefix.Trim();
             s.InvoicePadding = (int)Math.Round(ParseDecimal(InvoicePaddingText, 6));
             s.FiscalMode = FiscalModeIndex == 1 ? FiscalMode.DominicanNcf : FiscalMode.None;
@@ -233,6 +294,7 @@ public sealed partial class SettingsViewModel : ViewModelBase, IActivatable
             s.ReceiptWidth = ReceiptWidthIndex == 0 ? ReceiptWidth.Mm58 : ReceiptWidth.Mm80;
             s.ReceiptFooter = ReceiptFooter.Trim();
             s.AutoPrintReceipt = AutoPrintReceipt;
+            s.PreviewReceiptBeforePrint = PreviewReceiptBeforePrint;
             s.ShowQrOnReceipt = ShowQrOnReceipt;
             s.PrinterConnection = PrinterConnection.Trim();
             s.PrinterName = PrinterName.Trim();
@@ -247,6 +309,7 @@ public sealed partial class SettingsViewModel : ViewModelBase, IActivatable
             s.DiscountApprovalPercent = (int)Math.Round(ParseDecimal(DiscountApprovalText, 20));
             s.RequireManagerForVoids = RequireManagerForVoids;
             s.RequireManagerForRefunds = RequireManagerForRefunds;
+            s.AutoLockMinutes = (int)Math.Round(ParseDecimal(AutoLockMinutesText, 5));
             s.StoreCreditEnabled = StoreCreditEnabled;
             s.CreditSalesEnabled = CreditSalesEnabled;
             s.Theme = ThemeIndex switch { 0 => AppTheme.Light, 1 => AppTheme.Dark, _ => AppTheme.System };
@@ -576,6 +639,8 @@ public sealed partial class SettingsViewModel : ViewModelBase, IActivatable
         ReceiptWidthIndex = s.ReceiptWidth == ReceiptWidth.Mm58 ? 0 : 1;
         ReceiptFooter = s.ReceiptFooter;
         AutoPrintReceipt = s.AutoPrintReceipt;
+        PreviewReceiptBeforePrint = s.PreviewReceiptBeforePrint;
+        AutoLockMinutesText = s.AutoLockMinutes.ToString();
         ShowQrOnReceipt = s.ShowQrOnReceipt;
         PrinterConnection = s.PrinterConnection;
         PrinterName = s.PrinterName;

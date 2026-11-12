@@ -21,6 +21,28 @@ public partial class PaymentWindow : DialogWindow
             return;
         }
 
+        if (e.Key == Key.Enter && e.KeyModifiers.HasFlag(KeyModifiers.Control))
+        {
+            vm.AddPaymentCommand.Execute(null);
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key is Key.F1 or Key.F2 or Key.F3 or Key.F4 or Key.F5 && e.KeyModifiers == KeyModifiers.None)
+        {
+            var method = e.Key switch
+            {
+                Key.F1 => "Cash",
+                Key.F2 => "Card",
+                Key.F3 => "Transfer",
+                Key.F4 => "StoreCredit",
+                _ => "Credit"
+            };
+            vm.SelectMethodCommand.Execute(method);
+            e.Handled = true;
+            return;
+        }
+
         if (e.Key == Key.Enter)
         {
             if (vm.CanConfirm)

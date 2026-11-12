@@ -105,7 +105,9 @@ public class SaleCalculatorTests
     [Fact]
     public void New_Products_Are_Tax_Inclusive_By_Default()
     {
-        Assert.True(new Product().TaxInclusive);
+        var product = new Product();
+        Assert.True(product.TaxInclusive);
+        Assert.Equal(0, product.TaxRateBasisPoints);
         Assert.True(new RixelPOS.Domain.Settings.BusinessSettings().PricesIncludeTax);
     }
 

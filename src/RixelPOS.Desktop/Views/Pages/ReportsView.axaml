@@ -149,6 +149,7 @@
               </StackPanel>
               <TextBlock Grid.Column="1" Text="{Binding FoundInvoiceTotal}" FontWeight="Bold" VerticalAlignment="Center" />
               <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6">
+                <Button Classes="ghost" Content="{loc:Tr receipt.preview}" Command="{Binding PreviewInvoiceCommand}" />
                 <Button Classes="ghost" Content="{loc:Tr receipt.reprint}" Command="{Binding ReprintInvoiceCommand}" />
                 <Button Classes="ghost" Content="{loc:Tr receipt.invoicePdf}" Command="{Binding ExportInvoicePdfCommand}" />
               </StackPanel>

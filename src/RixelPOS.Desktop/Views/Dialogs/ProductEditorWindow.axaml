@@ -23,12 +23,12 @@
         <StackPanel Spacing="12">
           <StackPanel Spacing="6">
             <TextBlock Text="{loc:Tr common.name}" Classes="caption" />
-            <TextBox x:Name="NameBox" Text="{Binding Name}" Classes="big" />
+            <TextBox x:Name="NameBox" Text="{Binding Name}" Classes="big" Watermark="{loc:Tr inventory.productNamePlaceholder}" />
           </StackPanel>
           <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
             <StackPanel Spacing="6">
               <TextBlock Text="{loc:Tr common.sku}" Classes="caption" />
-              <TextBox Text="{Binding Sku}" />
+              <TextBox Text="{Binding Sku}" Watermark="{loc:Tr inventory.skuPlaceholder}" />
             </StackPanel>
             <StackPanel Grid.Column="1" Spacing="6">
               <TextBlock Text="{loc:Tr common.category}" Classes="caption" />
@@ -74,11 +74,11 @@
           <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
             <StackPanel Spacing="6">
               <TextBlock Text="{loc:Tr common.price}" Classes="caption" />
-              <TextBox Text="{Binding PriceText}" />
+              <TextBox Text="{Binding PriceText}" Watermark="0.00" />
             </StackPanel>
             <StackPanel Grid.Column="1" Spacing="6">
               <TextBlock Text="{loc:Tr common.cost}" Classes="caption" />
-              <TextBox Text="{Binding CostText}" />
+              <TextBox Text="{Binding CostText}" Watermark="0.00" />
             </StackPanel>
           </Grid>
         </StackPanel>
@@ -88,32 +88,24 @@
           <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
             <StackPanel Spacing="6">
               <TextBlock Text="{loc:Tr common.tax}" Classes="caption" />
-              <TextBox Text="{Binding TaxPercentText}" />
-            </StackPanel>
-            <StackPanel Grid.Column="1" Spacing="6" IsVisible="{Binding IsDeferred}">
-              <TextBlock Text="{loc:Tr common.unit}" Classes="caption" />
-              <TextBox Text="{Binding Unit}" />
+              <TextBox Text="{Binding TaxPercentText}" Watermark="0" />
             </StackPanel>
           </Grid>
-          <StackPanel Spacing="2">
-            <CheckBox Content="{loc:Tr inventory.taxInclusive}" IsChecked="{Binding TaxInclusive}" />
-            <TextBlock Text="{loc:Tr inventory.taxInclusiveHint}" Classes="caption"
-                       TextWrapping="Wrap" Margin="28,0,0,0" IsVisible="{Binding TaxInclusive}" />
-          </StackPanel>
+          <TextBlock Text="{loc:Tr inventory.taxInclusiveHint}" Classes="caption" TextWrapping="Wrap" />
           <Grid ColumnDefinitions="*,*" ColumnSpacing="12" IsVisible="{Binding !IsDeferred}">
             <StackPanel Spacing="6">
               <TextBlock Text="{loc:Tr inventory.initialStock}" Classes="caption" />
-              <TextBox Text="{Binding StockText}" IsEnabled="{Binding IsNew}" />
+              <TextBox Text="{Binding StockText}" IsEnabled="{Binding IsNew}" Watermark="0" />
             </StackPanel>
             <StackPanel Grid.Column="1" Spacing="6">
               <TextBlock Text="{loc:Tr inventory.minStock}" Classes="caption" />
-              <TextBox Text="{Binding MinStockText}" />
+              <TextBox Text="{Binding MinStockText}" Watermark="0" />
             </StackPanel>
           </Grid>
           <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
             <StackPanel Spacing="6">
               <TextBlock Text="{loc:Tr common.unit}" Classes="caption" />
-              <TextBox Text="{Binding Unit}" />
+              <TextBox Text="{Binding Unit}" Watermark="{loc:Tr inventory.unitPlaceholder}" />
             </StackPanel>
             <StackPanel Grid.Column="1" Spacing="6">
               <TextBlock Text="{loc:Tr common.status}" Classes="caption" />
