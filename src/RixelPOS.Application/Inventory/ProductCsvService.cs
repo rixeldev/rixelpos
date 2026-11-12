@@ -146,7 +146,9 @@ public sealed class ProductCsvService
                     product.PriceCents = price;
                     product.CostCents = ParseMoney(Get("cost"));
                     product.TaxRateBasisPoints = ParsePercent(Get("tax_percent"));
-                    product.TaxInclusive = Get("tax_inclusive") is "1" or "true" or "True" or "si" or "sí";
+                    var inclusive = Get("tax_inclusive");
+                    product.TaxInclusive = string.IsNullOrWhiteSpace(inclusive)
+                        || inclusive is "1" or "true" or "True" or "si" or "sí";
                     product.Stock = ParseQuantity(Get("stock"));
                     product.MinStock = ParseQuantity(Get("min_stock"));
                     product.Unit = string.IsNullOrWhiteSpace(Get("unit")) ? "unit" : Get("unit");
@@ -258,11 +260,29 @@ public sealed class ProductCsvService
             return 0;
         }
 
-        text = text.Replace("RD$", "", StringComparison.OrdinalIgnoreCase)
-            .Replace("$", "")
-            .Replace(",", "")
-            .Trim();
-        return decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out var value)
+        // Accept any currency prefix/suffix (RD$, US$, €, ...) and both decimal styles.
+        var cleaned = new string(text.Where(ch => char.IsDigit(ch) || ch is '.' or ',' or '-').ToArray());
+        if (cleaned.Length == 0)
+        {
+            return 0;
+        }
+
+        var lastComma = cleaned.LastIndexOf(',');
+        var lastDot = cleaned.LastIndexOf('.');
+        if (lastComma >= 0 && lastDot >= 0)
+        {
+            // The right-most separator is the decimal one.
+            cleaned = lastComma > lastDot
+                ? cleaned.Replace(".", "").Replace(',', '.')
+                : cleaned.Replace(",", "");
+        }
+        else if (lastComma >= 0)
+        {
+            var decimals = cleaned.Length - lastComma - 1;
+            cleaned = decimals is 1 or 2 ? cleaned.Replace(',', '.') : cleaned.Replace(",", "");
+        }
+
+        return decimal.TryParse(cleaned, NumberStyles.Number, CultureInfo.InvariantCulture, out var value)
             ? Money.ToCents(value)
             : 0;
     }

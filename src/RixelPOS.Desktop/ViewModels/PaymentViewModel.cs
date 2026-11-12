@@ -17,6 +17,9 @@ public sealed record PaymentRequest(long TotalCents, Customer? Customer, bool St
 
 public sealed record PaymentResult(IReadOnlyList<Payment> Payments, Customer? Customer);
 
+/// <summary>Quick-cash chip. <paramref name="Value"/> is the command parameter.</summary>
+public sealed record QuickAmountItem(string Label, string Value);
+
 public sealed class PaymentLineItem
 {
     public PaymentLineItem(Payment payment, string methodName, string amountText, string? detail = null)
@@ -64,10 +67,12 @@ public sealed partial class PaymentViewModel : DialogViewModelBase
         _loc = loc;
         SelectMethod("Cash");
         UpdateMethodLabels();
+        BuildQuickAmounts();
     }
 
     public ObservableCollection<Customer> Customers { get; } = new();
     public ObservableCollection<PaymentLineItem> Payments { get; } = new();
+    public ObservableCollection<QuickAmountItem> QuickAmounts { get; } = new();
 
     public PaymentResult? Result { get; private set; }
 
@@ -82,6 +87,7 @@ public sealed partial class PaymentViewModel : DialogViewModelBase
         LoadCustomers();
         SelectMethod("Cash");
         UpdateMethodLabels();
+        BuildQuickAmounts();
         Recalculate();
         _initialized = true;
     }
@@ -245,15 +251,29 @@ public sealed partial class PaymentViewModel : DialogViewModelBase
     [RelayCommand]
     private void QuickAmount(string? value)
     {
-        AmountText = value switch
+        if (value == "exact")
         {
-            "exact" => (RemainingCents / 100m).ToString("0.00", CultureInfo.InvariantCulture),
-            "100" => "100",
-            "500" => "500",
-            "1000" => "1000",
-            "2000" => "2000",
-            _ => AmountText
-        };
+            AmountText = (RemainingCents / 100m).ToString("0.00", CultureInfo.InvariantCulture);
+            return;
+        }
+
+        if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var amount) && amount > 0)
+        {
+            AmountText = amount.ToString("0.##", CultureInfo.InvariantCulture);
+        }
+    }
+
+    /// <summary>Builds the quick-cash chips with the configured currency symbol.</summary>
+    private void BuildQuickAmounts()
+    {
+        QuickAmounts.Clear();
+        QuickAmounts.Add(new QuickAmountItem(_loc.Get("checkout.exact"), "exact"));
+        foreach (var amount in new[] { 100, 500, 1000, 2000 })
+        {
+            QuickAmounts.Add(new QuickAmountItem(
+                _settings.FormatMoney(amount * 100L),
+                amount.ToString(CultureInfo.InvariantCulture)));
+        }
     }
 
     [RelayCommand]
@@ -395,7 +415,7 @@ public sealed partial class PaymentViewModel : DialogViewModelBase
             return true;
         }
 
-        var text = AmountText.Replace(",", ".").Replace("RD$", "").Replace("$", "").Trim();
+        var text = StripCurrency(AmountText).Replace(",", ".").Trim();
         if (!decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out var amount))
         {
             return false;
@@ -403,6 +423,19 @@ public sealed partial class PaymentViewModel : DialogViewModelBase
 
         cents = (long)Math.Round(amount * 100m, MidpointRounding.AwayFromZero);
         return true;
+    }
+
+    /// <summary>Removes the configured currency symbol so amounts can be parsed.</summary>
+    private string StripCurrency(string text)
+    {
+        text = text.Trim();
+        var symbol = _settings.Current.CurrencySymbol;
+        if (!string.IsNullOrWhiteSpace(symbol))
+        {
+            text = text.Replace(symbol, "", StringComparison.OrdinalIgnoreCase);
+        }
+
+        return text.Replace("$", "", StringComparison.Ordinal).Trim();
     }
 
     private string MethodName(PaymentMethod method) => method switch

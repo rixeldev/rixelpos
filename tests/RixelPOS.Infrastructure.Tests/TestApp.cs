@@ -80,7 +80,7 @@ public sealed class TestApp : IDisposable
         Setup = new SetupService(Store, Hasher, Settings, Clock);
         Setup.CompleteSetup(new SetupRequest(
             "Minimarket Rixel", "Minimarket Rixel SRL", "1-01-00000-1", "Av. Principal 12", "809-000-0000",
-            "DOP", "RD$", "ITBIS", 1800, false, "A", ReceiptWidth.Mm80,
+            "DOP", "RD$", "ITBIS", 1800, true, "A", ReceiptWidth.Mm80,
             "admin", "Administrador", "Rixel1234", "1234", AppLanguage.Spanish, AppTheme.Dark, ""));
         var admin = Store.FindUserByUsername("admin")!;
         Session.SignIn(admin);
@@ -121,7 +121,8 @@ public sealed class TestApp : IDisposable
 
     public void OpenRegister(long openingCents = 0) => Cash.Open(openingCents);
 
-    public Product CreateProduct(string name, long priceCents, decimal stock = 10, int taxBp = 1800, long costCents = 0, string? barcode = null)
+    public Product CreateProduct(string name, long priceCents, decimal stock = 10, int taxBp = 1800,
+        long costCents = 0, string? barcode = null, bool taxInclusive = false)
     {
         var product = new Product
         {
@@ -130,6 +131,7 @@ public sealed class TestApp : IDisposable
             PriceCents = priceCents,
             CostCents = costCents,
             TaxRateBasisPoints = taxBp,
+            TaxInclusive = taxInclusive,
             Stock = stock,
             MinStock = 2,
             Unit = "unit"

@@ -93,6 +93,23 @@ public class SaleCalculatorTests
     }
 
     [Fact]
+    public void Inclusive_Price_Is_Exactly_What_The_Customer_Pays()
+    {
+        // A 100.00 sale price with 18% tax included must charge 100.00, not 118.00.
+        var totals = SaleCalculator.Calculate(new[] { Line(1, 10000, inclusive: true) }, Discount.None);
+        Assert.Equal(10000, totals.TotalCents);
+        Assert.Equal(8475, totals.SubtotalCents);
+        Assert.Equal(1525, totals.TaxCents);
+    }
+
+    [Fact]
+    public void New_Products_Are_Tax_Inclusive_By_Default()
+    {
+        Assert.True(new Product().TaxInclusive);
+        Assert.True(new RixelPOS.Domain.Settings.BusinessSettings().PricesIncludeTax);
+    }
+
+    [Fact]
     public void Line_Discount_Reduces_Taxable_Base()
     {
         var line = Line(1, 10000);

@@ -27,6 +27,9 @@
    desarrollo/actualizaciones.
 3. **Dinero en centavos enteros (`long`), nunca `float`/`double`.** Cantidades de
    stock en milésimas enteras (`stock_milli`). Redondeo `AwayFromZero`.
+   **Los precios de venta ya incluyen impuesto**: el precio que escribe el usuario es el
+   total que paga el cliente y el impuesto se extrae del mismo. No añadas el impuesto
+   encima del total; `PricesIncludeTax` y `Product.TaxInclusive` son `true` por defecto.
 4. **Toda venta es atómica** dentro de una transacción SQLite. La numeración de factura,
    stock, pagos, crédito y auditoría se guardan en la misma transacción.
 5. **Migraciones aditivas.** Nunca edites una migración ya publicada; crea
@@ -125,7 +128,11 @@ Cambios típicos:
 - **Sin duplicados**: el título de sección se muestra una vez en la cabecera de la app;
   no repitas “Ajustes”, “Pago”, “Consumidor final”, etc.
 - **Toque y teclado**: botones ≥40 px, acciones principales ≥54 px; `Enter` agrega/cobra,
-  `Esc` cierra, `F1–F8` navega, `Ctrl+L` cierra sesión.
+  `Esc` cierra, `F1–F8` navega, `Ctrl+L` cierra sesión. Al escanear o escribir un código
+  exacto en el checkout, el artículo se agrega solo (sin pulsar buscar): el temporizador
+  usa `ScannerDebounceMs` y solo actúa con coincidencia exacta de código/SKU.
+- **Instancia única**: un solo proceso por carpeta de datos (`SingleInstance`). Un segundo
+  intento muestra un aviso y se cierra; nunca abras dos cajas sobre la misma DB.
 - **Feedback**: sonidos de escaneo encontrado/nuevo/error, mensajes claros y estados
   vacíos útiles. Nunca mostrar excepciones crudas.
 - **Colores/tema**: tokens en `App.axaml` y `Assets/Styles.axaml`; probar claro y oscuro.
@@ -177,7 +184,8 @@ dotnet test RixelPOS.sln -c Release
 - Contraseñas/PIN con bcrypt; nunca texto plano.
 - Aprobación de encargado para anulación/descuentos altos según ajustes.
 - SQLite WAL + transacciones; `VACUUM INTO` para backups.
-- Restaurar crea un backup de seguridad y exige reinicio.
+- Restaurar valida `PRAGMA integrity_check` y las tablas esenciales antes de copiar; crea
+  un backup de seguridad y exige reinicio. Un archivo inválido se rechaza.
 - Revisa `SECURITY.md` antes de cambiar autenticación, backups o red.
 - No añadas telemetría ni llamadas externas sin consentimiento y documentación.
 

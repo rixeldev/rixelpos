@@ -143,10 +143,12 @@ public sealed class PurchaseOrderItem
 public sealed class PurchaseLineItem : ObservableObject
 {
     private readonly Action _changed;
+    private readonly Func<long, string> _formatMoney;
     private decimal _quantity;
     private string _costText;
 
-    public PurchaseLineItem(Product product, long costCents, decimal quantity, Action changed)
+    public PurchaseLineItem(Product product, long costCents, decimal quantity, Action changed,
+        Func<long, string> formatMoney)
     {
         Product = product;
         Name = product.Name;
@@ -154,6 +156,7 @@ public sealed class PurchaseLineItem : ObservableObject
         Quantity = quantity;
         _costText = (costCents / 100m).ToString("0.00");
         _changed = changed;
+        _formatMoney = formatMoney;
     }
 
     public Product Product { get; }
@@ -194,5 +197,5 @@ public sealed class PurchaseLineItem : ObservableObject
 
     public long TotalCents => (long)Math.Round(Quantity * CostCents, MidpointRounding.AwayFromZero);
 
-    public string TotalText => $"RD$ {TotalCents / 100m:N2}";
+    public string TotalText => _formatMoney(TotalCents);
 }

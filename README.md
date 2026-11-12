@@ -51,6 +51,8 @@ self-contained para no depender de un runtime instalado en la caja.
 - Pantalla única de cobro: buscador siempre enfocado, favoritos táctiles, carrito grande y total visible.
 - Escáner en modo **keyboard-wedge** (sin configuración) y escáner **serial** opcional.
 - Búsqueda por nombre, SKU o código de barras con autocompletado.
+- El precio que registras **ya incluye impuesto**: es exactamente lo que paga el cliente.
+- Al escanear o escribir un código exacto, el artículo se agrega automáticamente.
 - Cantidades, descuentos por línea y por venta (porcentaje o monto fijo), eliminación de líneas.
 - Ventas en espera y reanudación.
 - Pago en efectivo con cambio automático, tarjeta, transferencia, crédito a favor y venta a crédito.
@@ -63,7 +65,7 @@ self-contained para no depender de un runtime instalado en la caja.
 - Factura **A4 en PDF** (SkiaSharp) con tabla de líneas, impuestos, pagos y QR.
 - Numeración secuencial configurable (`A-000123`), prefijo y padding.
 - Reimpresión de recibos desde el inicio y el historial de clientes; búsqueda de factura por número.
-- Impuesto configurable (ITBIS/IVA/VAT) con precios inclusivos o exclusivos.
+- Impuesto configurable (ITBIS/IVA/VAT); por defecto los precios ya lo incluyen.
 - Capa fiscal enchufable. Módulo opcional **NCF (República Dominicana)**; el núcleo no depende de él.
 
 ### Inventario
@@ -98,6 +100,7 @@ self-contained para no depender de un runtime instalado en la caja.
 - Aprobación de encargado para anular, devolver o aplicar descuentos altos.
 - Bitácora de auditoría de acciones sensibles.
 - Ajustes de negocio, impuestos, facturación fiscal, recibos, hardware, usuarios, respaldos, tema e idioma.
+- Instancia única por carpeta de datos y validación de integridad al restaurar respaldos.
 - Copias de seguridad locales automáticas/manuales, restauración y retención configurable.
 
 ### Experiencia

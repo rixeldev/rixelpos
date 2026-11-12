@@ -32,6 +32,13 @@ public partial class App : Avalonia.Application
 
         _desktop = desktop;
 
+        if (SingleInstance.IsSecondary)
+        {
+            ShowAlreadyRunning();
+            base.OnFrameworkInitializationCompleted();
+            return;
+        }
+
         try
         {
             Services = AppServices.Build();
@@ -189,6 +196,56 @@ public partial class App : Avalonia.Application
             {
                 // ignore
             }
+        }
+    }
+
+    private void ShowAlreadyRunning()
+    {
+        try
+        {
+            var panel = new StackPanel { Margin = new Avalonia.Thickness(28), Spacing = 12 };
+            panel.Children.Add(new TextBlock
+            {
+                Text = "RixelPOS",
+                FontSize = 22,
+                FontWeight = Avalonia.Media.FontWeight.Bold
+            });
+            panel.Children.Add(new TextBlock
+            {
+                Text = "RixelPOS ya está abierto.\nRixelPOS is already running.",
+                FontSize = 16,
+                TextWrapping = Avalonia.Media.TextWrapping.Wrap
+            });
+            panel.Children.Add(new TextBlock
+            {
+                Text = $"Carpeta de datos / Data folder:\n{AppPaths.DataDirectory}",
+                FontSize = 12,
+                TextWrapping = Avalonia.Media.TextWrapping.Wrap
+            });
+            var button = new Button
+            {
+                Content = "Cerrar / Close",
+                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right
+            };
+            button.Click += (_, _) => _desktop?.Shutdown();
+            panel.Children.Add(button);
+
+            var window = new Window
+            {
+                Title = "RixelPOS",
+                Width = 520,
+                Height = 280,
+                WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                Content = panel
+            };
+            WindowSizing.ClampOnOpened(window);
+            _desktop!.MainWindow = window;
+            window.Show();
+        }
+        catch
+        {
+            // Never leave a headless second process running.
+            _desktop?.Shutdown();
         }
     }
 

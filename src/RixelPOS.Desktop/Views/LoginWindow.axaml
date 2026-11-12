@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="using:RixelPOS.Desktop.Localization"
+        xmlns:domain="using:RixelPOS.Domain.Common"
         x:Class="RixelPOS.Desktop.Views.LoginWindow"
         Title="RixelPOS"
         Icon="avares://RixelPOS/Assets/rixelpos.png"
@@ -48,9 +49,10 @@
         </StackPanel>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8">
-          <TextBlock Text="RixelPOS 1.0" Foreground="#5F7182" FontSize="12" />
+          <TextBlock Text="{x:Static domain:Branding.ProductName}" Foreground="#5F7182" FontSize="12" />
+          <TextBlock Text="{x:Static domain:Branding.Version}" Foreground="#5F7182" FontSize="12" />
           <TextBlock Text="·" Foreground="#5F7182" FontSize="12" />
-          <TextBlock Text="RixelDev" Foreground="#5F7182" FontSize="12" />
+          <TextBlock Text="{x:Static domain:Branding.Company}" Foreground="#5F7182" FontSize="12" />
         </StackPanel>
       </Grid>
     </Border>

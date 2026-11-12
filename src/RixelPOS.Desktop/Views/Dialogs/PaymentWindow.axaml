@@ -55,13 +55,20 @@
           <TextBlock Text="{Binding MethodHint}" Classes="caption" />
           <TextBox Text="{Binding AmountText}" Classes="big" x:Name="AmountBox" />
         </StackPanel>
-        <WrapPanel>
-          <Button Classes="chip" Content="{loc:Tr checkout.exact}" Command="{Binding QuickAmountCommand}" CommandParameter="exact" Margin="0,0,6,4" />
-          <Button Classes="chip" Content="RD$ 100" Command="{Binding QuickAmountCommand}" CommandParameter="100" Margin="0,0,6,4" />
-          <Button Classes="chip" Content="RD$ 500" Command="{Binding QuickAmountCommand}" CommandParameter="500" Margin="0,0,6,4" />
-          <Button Classes="chip" Content="RD$ 1,000" Command="{Binding QuickAmountCommand}" CommandParameter="1000" Margin="0,0,6,4" />
-          <Button Classes="chip" Content="RD$ 2,000" Command="{Binding QuickAmountCommand}" CommandParameter="2000" Margin="0,0,6,4" />
-        </WrapPanel>
+        <ItemsControl ItemsSource="{Binding QuickAmounts}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Button Classes="chip" Content="{Binding Label}" Margin="0,0,6,4"
+                      Command="{Binding $parent[Window].DataContext.QuickAmountCommand}"
+                      CommandParameter="{Binding Value}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
         <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="8" RowSpacing="6">
           <Button Grid.Row="0" Grid.Column="0" Content="1" Classes="key" Command="{Binding KeypadCommand}" CommandParameter="1" />
           <Button Grid.Row="0" Grid.Column="1" Content="2" Classes="key" Command="{Binding KeypadCommand}" CommandParameter="2" />

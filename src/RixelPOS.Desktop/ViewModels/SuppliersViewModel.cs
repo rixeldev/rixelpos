@@ -240,7 +240,7 @@ public sealed partial class PurchaseEditorViewModel : DialogViewModelBase
         }
         else
         {
-            Lines.Add(new PurchaseLineItem(product, product.CostCents, 1, Recalculate));
+            Lines.Add(new PurchaseLineItem(product, product.CostCents, 1, Recalculate, _settings.FormatMoney));
         }
 
         ProductSearch = "";

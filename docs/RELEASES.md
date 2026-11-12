@@ -144,6 +144,9 @@ Get-FileHash .\RixelPOS-Setup-*.exe -Algorithm SHA256
 - **.deb**: `sudo apt install ./rixelpos_<nueva>_amd64.deb`.
 - **Windows**: ejecuta el nuevo instalador sobre la versión anterior.
 - Los datos y ajustes se conservan; los respaldos automáticos siguen activos.
+- **Desde 1.1.0** los precios se interpretan con impuesto incluido: la migración `002`
+  marca el catálogo existente como inclusivo para que el total a pagar sea el precio
+  registrado. Si antes usabas impuesto exclusivo, revisa tus precios tras actualizar.
 
 ## 7. Versionado
 

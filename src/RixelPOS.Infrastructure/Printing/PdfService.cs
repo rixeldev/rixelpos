@@ -20,7 +20,18 @@ public sealed class PdfService : IPdfService
     private static readonly SKColor Line = new(0xD8, 0xDE, 0xE5);
     private static readonly SKColor Light = new(0xF4, 0xF7, 0xF9);
 
+    private readonly object _sync = new();
+    private string _symbol = "RD$";
+
     public string GenerateInvoicePdf(ReceiptData data, string outputPath)
+    {
+        lock (_sync)
+        {
+            return GenerateInvoicePdfCore(data, outputPath);
+        }
+    }
+
+    private string GenerateInvoicePdfCore(ReceiptData data, string outputPath)
     {
         _symbol = data.CurrencySymbol;
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(outputPath))!);
@@ -71,6 +82,14 @@ public sealed class PdfService : IPdfService
     }
 
     public string GenerateReportPdf(SalesReport report, string businessName, string outputPath, string currencySymbol)
+    {
+        lock (_sync)
+        {
+            return GenerateReportPdfCore(report, businessName, outputPath, currencySymbol);
+        }
+    }
+
+    private string GenerateReportPdfCore(SalesReport report, string businessName, string outputPath, string currencySymbol)
     {
         _symbol = currencySymbol;
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(outputPath))!);
@@ -210,7 +229,7 @@ public sealed class PdfService : IPdfService
         return y + 20;
     }
 
-    private static float DrawInvoiceLine(PdfPage page, float y, SaleLine line, float rowHeight)
+    private float DrawInvoiceLine(PdfPage page, float y, SaleLine line, float rowHeight)
     {
         var c = page.Canvas;
         var lines = WrapLines(line.Name, 280f, 9.5f);
@@ -231,7 +250,7 @@ public sealed class PdfService : IPdfService
         return bottom + 6;
     }
 
-    private static float DrawTotals(PdfPage page, float y, ReceiptData data)
+    private float DrawTotals(PdfPage page, float y, ReceiptData data)
     {
         var c = page.Canvas;
         var left = PageWidth - Margin - 230;
@@ -260,7 +279,7 @@ public sealed class PdfService : IPdfService
         return y + 16;
     }
 
-    private static float DrawPayments(PdfPage page, float y, ReceiptData data)
+    private float DrawPayments(PdfPage page, float y, ReceiptData data)
     {
         DrawText(page.Canvas, "Pagos", Margin, y, 9, true, Ink);
         y += 13;
@@ -452,8 +471,7 @@ public sealed class PdfService : IPdfService
         return lines.Count == 0 ? new List<string> { "" } : lines;
     }
 
-    private static string _symbol = "RD$";
-    private static string Money(long cents) => $"{_symbol} {cents / 100m:N2}";
+    private string Money(long cents) => $"{_symbol} {cents / 100m:N2}";
 
     private static string PaymentName(PaymentMethod method) => method switch
     {

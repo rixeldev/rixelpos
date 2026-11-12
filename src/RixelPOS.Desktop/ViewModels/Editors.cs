@@ -436,19 +436,19 @@ public sealed partial class ProductEditorViewModel : DialogViewModelBase
 
         if (!TryDecimal(TaxPercentText, out var taxPercent) || taxPercent is < 0 or > 100)
         {
-            ErrorMessage = "El impuesto debe estar entre 0 y 100.";
+            ErrorMessage = _loc.Get("dialogs.taxRange");
             return;
         }
 
         if (!TryDecimal(StockText, out var stock) || !TryDecimal(MinStockText, out var minStock))
         {
-            ErrorMessage = "Revisa las existencias.";
+            ErrorMessage = _loc.Get("inventory.checkStock");
             return;
         }
 
         if (stock < 0 || minStock < 0)
         {
-            ErrorMessage = "Las existencias no pueden ser negativas.";
+            ErrorMessage = _loc.Get("inventory.stockNegative");
             return;
         }
 

@@ -83,6 +83,8 @@ public sealed class SqliteBackupService : IBackupService
             throw new BusinessRuleException("backup.not_found", "The selected backup file does not exist.");
         }
 
+        ValidateBackup(backupPath);
+
         try
         {
             var safety = CreateBackup("antes-de-restaurar");
@@ -132,6 +134,54 @@ public sealed class SqliteBackupService : IBackupService
         catch (Exception ex)
         {
             _logger.Warn($"Could not prune backups: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Verifies the file is a healthy SQLite database created by RixelPOS before it
+    /// replaces the live database. A corrupt or unrelated file must never be restored.
+    /// </summary>
+    private static void ValidateBackup(string backupPath)
+    {
+        try
+        {
+            var connectionString = new SqliteConnectionStringBuilder
+            {
+                DataSource = backupPath,
+                Mode = SqliteOpenMode.ReadOnly,
+                Pooling = false
+            }.ToString();
+
+            using var connection = new SqliteConnection(connectionString);
+            connection.Open();
+
+            using var integrity = connection.CreateCommand();
+            integrity.CommandText = "PRAGMA integrity_check;";
+            var result = integrity.ExecuteScalar()?.ToString();
+            if (!string.Equals(result, "ok", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new BusinessRuleException("backup.invalid",
+                    "La copia de seguridad está dañada y no se puede restaurar.");
+            }
+
+            using var tables = connection.CreateCommand();
+            tables.CommandText =
+                "SELECT COUNT(1) FROM sqlite_master WHERE type = 'table' AND name IN ('products', 'sales', 'settings');";
+            var required = Convert.ToInt64(tables.ExecuteScalar());
+            if (required < 3)
+            {
+                throw new BusinessRuleException("backup.invalid",
+                    "El archivo seleccionado no es una copia de seguridad de RixelPOS.");
+            }
+        }
+        catch (BusinessRuleException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new BusinessRuleException("backup.invalid",
+                $"No se pudo validar la copia de seguridad: {ex.Message}");
         }
     }
 

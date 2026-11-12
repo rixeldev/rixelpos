@@ -133,7 +133,7 @@ public sealed partial class DiscountDialogViewModel : DialogViewModelBase
         {
             if (value > 100)
             {
-                ErrorMessage = "El porcentaje no puede superar 100%.";
+                ErrorMessage = LocalizationService.Instance.Get("dialogs.discountMaxPercent");
                 return;
             }
 
@@ -144,7 +144,7 @@ public sealed partial class DiscountDialogViewModel : DialogViewModelBase
             var cents = (long)Math.Round(value * 100m, MidpointRounding.AwayFromZero);
             if (cents > _baseCents)
             {
-                ErrorMessage = "El descuento no puede superar el total.";
+                ErrorMessage = LocalizationService.Instance.Get("dialogs.discountMaxTotal");
                 return;
             }
 

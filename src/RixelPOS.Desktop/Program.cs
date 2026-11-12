@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using RixelPOS.Desktop.Services;
 using RixelPOS.Infrastructure;
 
 namespace RixelPOS.Desktop;
@@ -11,6 +12,7 @@ internal static class Program
         AppPaths.EnsureDirectories();
         try
         {
+            SingleInstance.TryAcquire();
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
         }
         catch (Exception ex)

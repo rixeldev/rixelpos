@@ -37,6 +37,48 @@ public sealed class DatabaseTests
     }
 
     [Fact]
+    public void Default_Settings_Use_Tax_Inclusive_Prices()
+    {
+        using var app = new TestApp();
+        Assert.True(app.Settings.Current.PricesIncludeTax);
+        Assert.True(app.Store.LoadSettings().PricesIncludeTax);
+    }
+
+    [Fact]
+    public void Migration_Makes_Existing_Products_Tax_Inclusive()
+    {
+        using var app = new TestApp();
+        var product = app.CreateProduct("Producto anterior", 1000, 1);
+
+        using (var connection = app.Db.Open())
+        {
+            using (var updateProduct = connection.CreateCommand())
+            {
+                updateProduct.CommandText = "UPDATE products SET tax_inclusive = 0 WHERE id = @id";
+                updateProduct.Parameters.AddWithValue("@id", product.Id.ToString());
+                updateProduct.ExecuteNonQuery();
+            }
+
+            using (var updateSetting = connection.CreateCommand())
+            {
+                updateSetting.CommandText = "UPDATE settings SET value = 'False' WHERE key = 'tax.inclusive'";
+                updateSetting.ExecuteNonQuery();
+            }
+
+            using (var forgetMigration = connection.CreateCommand())
+            {
+                forgetMigration.CommandText = "DELETE FROM schema_migrations WHERE version = 2";
+                forgetMigration.ExecuteNonQuery();
+            }
+        }
+
+        app.Db.Initialize();
+
+        Assert.True(app.Store.GetProduct(product.Id)!.TaxInclusive);
+        Assert.True(app.Store.LoadSettings().PricesIncludeTax);
+    }
+
+    [Fact]
     public void Settings_RoundTrip()
     {
         using var app = new TestApp();
@@ -95,6 +137,30 @@ public sealed class CheckoutTests
         var second = app.Sell(secondCart);
         Assert.Equal("A-000002", second.Invoice!.Number);
         Assert.Equal(7, app.Store.GetProduct(product.Id)!.Stock);
+    }
+
+    [Fact]
+    public void Inclusive_Product_Charges_The_Entered_Price()
+    {
+        using var app = new TestApp();
+        app.OpenRegister(50000);
+        var product = app.CreateProduct("Precio final", 10000, 5, taxInclusive: true);
+
+        var cart = new Cart();
+        cart.AddProduct(product, 2);
+
+        Assert.Equal(20000, cart.Totals.TotalCents);
+        Assert.Equal(3051, cart.Totals.TaxCents); // 18% extracted from 200.00
+
+        var sale = app.Sell(cart, new Payment
+        {
+            Method = PaymentMethod.Cash,
+            AmountCents = 20000,
+            TenderedCents = 20000
+        });
+
+        Assert.Equal(20000, sale.TotalCents);
+        Assert.Equal(0, sale.ChangeCents);
     }
 
     [Fact]
@@ -361,6 +427,37 @@ public sealed class PrintingTests
         app.Backups.Restore(backup.Path);
         app.Db.Initialize();
         Assert.Null(app.Store.GetProduct(afterBackup.Id));
+    }
+
+    [Fact]
+    public void Restore_Rejects_An_Invalid_Backup()
+    {
+        using var app = new TestApp();
+        var bogus = Path.Combine(app.Directory, "not-a-backup.db");
+        File.WriteAllText(bogus, "this is not a sqlite database");
+
+        var ex = Assert.Throws<BusinessRuleException>(() => app.Backups.Restore(bogus));
+        Assert.Equal("backup.invalid", ex.Code);
+        Assert.NotNull(app.Store.LoadSettings()); // live database is untouched
+    }
+
+    [Fact]
+    public void Csv_Import_Accepts_Currency_And_Thousands_Separators()
+    {
+        using var app = new TestApp();
+        var path = Path.Combine(app.Directory, "currency.csv");
+        File.WriteAllLines(path, new[]
+        {
+            "sku,name,barcode,category,cost,price,tax_percent,tax_inclusive,stock,min_stock,unit,favorite,active",
+            "CSV-1,Producto importado,,,US$ 10.00,\"US$ 1,234.56\",18,1,5,1,unit,0,1"
+        });
+
+        var result = app.Csv.Import(path, updateExisting: false);
+
+        Assert.Equal(1, result.Created);
+        var product = app.Store.GetProducts().Single(p => p.Sku == "CSV-1");
+        Assert.Equal(123456, product.PriceCents);
+        Assert.True(product.TaxInclusive);
     }
 
     [Fact]

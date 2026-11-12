@@ -634,7 +634,14 @@ public sealed partial class StockCountTabViewModel : ViewModelBase, IActivatable
         }
 
         var sb = new StringBuilder();
-        sb.AppendLine("Producto,SKU,Sistema,Contado,Diferencia");
+        sb.AppendLine(string.Join(",", new[]
+        {
+            _loc.Get("inventory.product"),
+            _loc.Get("common.sku"),
+            _loc.Get("inventory.system"),
+            _loc.Get("inventory.counted"),
+            _loc.Get("inventory.difference")
+        }));
         foreach (var line in CurrentCount.Lines)
         {
             sb.AppendLine($"\"{line.ProductName}\",\"{line.Sku}\",{line.SystemQuantity:0.###},{line.CountedQuantity:0.###},{line.Difference:0.###}");

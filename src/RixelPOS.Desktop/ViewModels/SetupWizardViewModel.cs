@@ -31,7 +31,7 @@ public sealed partial class SetupWizardViewModel : ViewModelBase
     [ObservableProperty] private string _currencySymbol = "RD$";
     [ObservableProperty] private string _taxName = "ITBIS";
     [ObservableProperty] private string _taxPercent = "18";
-    [ObservableProperty] private bool _pricesIncludeTax;
+    [ObservableProperty] private bool _pricesIncludeTax = true;
     [ObservableProperty] private string _invoicePrefix = "A";
     [ObservableProperty] private int _receiptWidthIndex;
     [ObservableProperty] private string _printerConnection = "";

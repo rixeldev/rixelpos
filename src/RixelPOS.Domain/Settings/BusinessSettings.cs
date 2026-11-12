@@ -21,7 +21,13 @@ public sealed class BusinessSettings
 
     public string TaxName { get; set; } = "ITBIS";
     public int DefaultTaxRateBasisPoints { get; set; } = Defaults.DefaultTaxRateBasisPoints;
-    public bool PricesIncludeTax { get; set; }
+
+    /// <summary>
+    /// Sale prices already contain tax. The tax is extracted from the entered price
+    /// instead of being added on top of the total, which is how most small businesses
+    /// price their products.
+    /// </summary>
+    public bool PricesIncludeTax { get; set; } = true;
 
     public string InvoicePrefix { get; set; } = Defaults.InvoicePrefix;
     public int InvoicePadding { get; set; } = Defaults.InvoicePadding;

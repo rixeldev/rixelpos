@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RixelPOS.Application.Cash;
@@ -30,6 +31,7 @@ public sealed partial class CheckoutViewModel : ViewModelBase, IActivatable, ISc
     private readonly DialogService _dialogs;
     private readonly SoundService _sound;
     private readonly LocalizationService _loc;
+    private readonly DispatcherTimer _autoAddTimer;
     private Cart _cart = new();
     private Customer? _customer;
 
@@ -76,6 +78,15 @@ public sealed partial class CheckoutViewModel : ViewModelBase, IActivatable, ISc
         _cart.Changed += OnCartChanged;
         CustomerName = _loc.Get("checkout.walkIn");
 
+        // Keyboard-wedge scanners usually send Enter, but some are configured without a
+        // suffix. If the typed text exactly matches a barcode/SKU, add it automatically
+        // after the configured idle delay so no button press is required.
+        _autoAddTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(Math.Max(150, _settings.Current.ScannerDebounceMs))
+        };
+        _autoAddTimer.Tick += (_, _) => TryAutoAddScannedCode();
+
         ErrorMessage = null;
     }
 
@@ -116,6 +127,43 @@ public sealed partial class CheckoutViewModel : ViewModelBase, IActivatable, ISc
             }
 
             IsSearchOpen = SearchResults.Count > 0;
+            ScheduleAutoAdd(value);
+        }
+        catch (Exception ex)
+        {
+            ReportError(ex);
+        }
+    }
+
+    private void ScheduleAutoAdd(string value)
+    {
+        _autoAddTimer.Stop();
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        _autoAddTimer.Interval = TimeSpan.FromMilliseconds(Math.Max(150, _settings.Current.ScannerDebounceMs));
+        _autoAddTimer.Start();
+    }
+
+    private void TryAutoAddScannedCode()
+    {
+        _autoAddTimer.Stop();
+        var code = SearchText.Trim();
+        if (code.Length < 2)
+        {
+            return;
+        }
+
+        try
+        {
+            // Only auto-add an exact code, never a partial name search.
+            var product = _inventory.FindByCode(code);
+            if (product is not null)
+            {
+                AddToCart(product);
+            }
         }
         catch (Exception ex)
         {

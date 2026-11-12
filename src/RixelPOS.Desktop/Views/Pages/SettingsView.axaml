@@ -96,8 +96,12 @@
                 </StackPanel>
               </Grid>
             </Border>
-            <CheckBox Content="{loc:Tr settings.pricesIncludeTax}"
-              IsChecked="{Binding PricesIncludeTax}" />
+            <StackPanel Spacing="2">
+              <CheckBox Content="{loc:Tr settings.pricesIncludeTax}"
+                IsChecked="{Binding PricesIncludeTax}" />
+              <TextBlock Text="{loc:Tr settings.pricesIncludeTaxHint}" Classes="caption"
+                         TextWrapping="Wrap" Margin="28,0,0,0" />
+            </StackPanel>
             <Border Classes="card">
               <StackPanel Spacing="12">
                 <TextBlock Text="{loc:Tr settings.fiscal}" Classes="h3" />
@@ -401,9 +405,9 @@
           </Border>
           <Border Classes="soft">
             <StackPanel Spacing="4">
-              <TextBlock Text="Carpeta de datos" Classes="caption" />
+              <TextBlock Text="{loc:Tr settings.dataFolder}" Classes="caption" />
               <SelectableTextBlock Text="{Binding DataFolder}" FontSize="12" TextWrapping="Wrap" />
-              <TextBlock Text="Registros" Classes="caption" Margin="0,8,0,0" />
+              <TextBlock Text="{loc:Tr settings.logsFolder}" Classes="caption" Margin="0,8,0,0" />
               <SelectableTextBlock Text="{Binding LogFolder}" FontSize="12" TextWrapping="Wrap" />
             </StackPanel>
           </Border>

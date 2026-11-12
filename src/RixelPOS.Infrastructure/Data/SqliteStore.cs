@@ -187,7 +187,7 @@ public sealed partial class SqliteStore : IPosStore
         s.Locale = Str("currency.locale", Branding.DefaultLocale);
         s.TaxName = Str("tax.name", "ITBIS");
         s.DefaultTaxRateBasisPoints = Int("tax.default_bp", Defaults.DefaultTaxRateBasisPoints);
-        s.PricesIncludeTax = Bool("tax.inclusive", false);
+        s.PricesIncludeTax = Bool("tax.inclusive", true);
         s.InvoicePrefix = Str("invoice.prefix", Defaults.InvoicePrefix);
         s.InvoicePadding = Int("invoice.padding", Defaults.InvoicePadding);
         s.ReceiptFooter = Str("receipt.footer", "¡Gracias por su compra!");
