@@ -43,7 +43,7 @@ jobs:
 
       - name: Upload Linux artifact
         if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: RixelPOS-linux-x64
           path: dist/ci/linux
@@ -51,7 +51,7 @@ jobs:
 
       - name: Upload Windows artifact
         if: runner.os == 'Windows'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: RixelPOS-win-x64
           path: dist/ci/windows
@@ -71,7 +71,7 @@ jobs:
         run: |
           chmod +x packaging/linux/build.sh
           ./packaging/linux/build.sh "${{ github.ref_name }}"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: RixelPOS-linux-packages
           path: dist/linux
