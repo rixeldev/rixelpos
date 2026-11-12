@@ -8,12 +8,15 @@
                      ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
                      Background="{DynamicResource SurfaceBrush}">
   <dialogs:DialogWindow.KeyBindings>
+    <KeyBinding Gesture="Enter" Command="{Binding PrintCommand}" />
     <KeyBinding Gesture="Escape" Command="{Binding ClosePreviewCommand}" />
   </dialogs:DialogWindow.KeyBindings>
   <Grid RowDefinitions="Auto,*,Auto" Margin="22" RowSpacing="12">
     <StackPanel Spacing="2">
       <TextBlock Text="{loc:Tr receipt.preview}" Classes="h2" />
       <TextBlock Text="{loc:Tr receipt.previewHint}" Classes="caption" />
+      <TextBlock Text="{loc:Tr receipt.enterToPrint}" Classes="caption"
+                 Foreground="{DynamicResource AccentBrush}" />
     </StackPanel>
 
     <Border Grid.Row="1" Background="#FFFFFF" CornerRadius="8" Padding="18"

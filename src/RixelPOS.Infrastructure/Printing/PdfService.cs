@@ -45,9 +45,11 @@ public sealed class PdfService : IPdfService
         var y = page.Y;
         y = DrawTableHeader(page, y, "Descripción", "Cant.", "Precio", "Imp.", "Total");
 
+        var lineIndex = 0;
         foreach (var line in data.Sale.Lines)
         {
-            var rowHeight = Math.Max(24f, 14f * (WrapLines(line.Name, 220f, 9.5f).Count + 1));
+            var extra = line.DiscountCents > 0 ? 1 : 0;
+            var rowHeight = Math.Max(26f, 14f * (WrapLines(line.Name, 270f, 9.5f).Count + extra));
             if (page.NeedsPageBreak(y + rowHeight))
             {
                 page.EndPage();
@@ -56,13 +58,13 @@ public sealed class PdfService : IPdfService
                 y = DrawTableHeader(page, page.Y, "Descripción", "Cant.", "Precio", "Imp.", "Total");
             }
 
-            y = DrawInvoiceLine(page, y, line, rowHeight);
+            y = DrawInvoiceLine(page, y, line, rowHeight, lineIndex++);
         }
 
         y = DrawLine(page, y);
         y += 10;
 
-        if (page.NeedsPageBreak(y + 190))
+        if (page.NeedsPageBreak(y + 330))
         {
             page.EndPage();
             page = new PdfPage(document, "Factura " + (data.Invoice?.Number ?? "") + " (cont.)");
@@ -157,7 +159,10 @@ public sealed class PdfService : IPdfService
         var business = data.Business;
         var x = Margin;
 
-        if (!string.IsNullOrWhiteSpace(business.LogoPath) && File.Exists(business.LogoPath))
+        c.DrawRect(new SKRect(0, 0, PageWidth, 6), new SKPaint { Color = Accent });
+
+        var hasLogo = !string.IsNullOrWhiteSpace(business.LogoPath) && File.Exists(business.LogoPath);
+        if (hasLogo)
         {
             try
             {
@@ -165,7 +170,7 @@ public sealed class PdfService : IPdfService
                 if (logo is not null)
                 {
                     var scale = Math.Min(64f / logo.Height, 150f / logo.Width);
-                    c.DrawBitmap(logo, new SKRect(x, 38, x + logo.Width * scale, 38 + logo.Height * scale));
+                    c.DrawBitmap(logo, new SKRect(x, 40, x + logo.Width * scale, 40 + logo.Height * scale));
                 }
             }
             catch
@@ -174,40 +179,66 @@ public sealed class PdfService : IPdfService
             }
         }
 
-        var textX = string.IsNullOrWhiteSpace(business.LogoPath) ? x : x + 160;
-        DrawText(c, business.Name, textX, 58, 18, true, Ink);
-        var meta = new[] { business.LegalName, business.TaxId.Length > 0 ? "RNC: " + business.TaxId : "", business.Address, business.Phone, business.Email }
+        var textX = hasLogo ? x + 160 : x;
+        DrawText(c, business.Name, textX, 62, 19, true, Ink);
+        var meta = new[]
+            {
+                business.LegalName,
+                business.TaxId.Length > 0 ? "RNC: " + business.TaxId : "",
+                business.Address,
+                business.Phone.Length > 0 ? "Tel: " + business.Phone : "",
+                business.Email
+            }
             .Where(s => !string.IsNullOrWhiteSpace(s));
-        var metaY = 76f;
+        var metaY = 80f;
         foreach (var item in meta)
         {
-            DrawText(c, item, textX, metaY, 8.7f, false, Muted);
+            DrawText(c, item, textX, metaY, 8.5f, false, Muted);
             metaY += 12;
         }
 
-        DrawTextRight(c, "FACTURA", PageWidth - Margin, 58, 22, true, Accent);
-        DrawTextRight(c, data.Invoice?.Number ?? "—", PageWidth - Margin, 78, 12, true, Ink);
+        DrawTextRight(c, "FACTURA", PageWidth - Margin, 60, 22, true, Accent);
+        DrawTextRight(c, data.Invoice?.Number ?? "—", PageWidth - Margin, 82, 13, true, Ink);
         if (!string.IsNullOrWhiteSpace(data.Invoice?.Ncf))
         {
-            DrawTextRight(c, "NCF: " + data.Invoice.Ncf, PageWidth - Margin, 94, 8.5f, false, Muted);
+            DrawTextRight(c, "NCF: " + data.Invoice.Ncf, PageWidth - Margin, 96, 8.3f, false, Muted);
         }
 
-        DrawTextRight(c, (data.Sale.CompletedAt ?? data.Sale.CreatedAt).ToLocalTime().ToString("dd/MM/yyyy HH:mm"),
-            PageWidth - Margin, 110, 8.5f, false, Muted);
+        DrawTextRight(c, "Emitida: " + (data.Sale.CompletedAt ?? data.Sale.CreatedAt).ToLocalTime().ToString("dd/MM/yyyy HH:mm"),
+            PageWidth - Margin, 112, 8.3f, false, Muted);
 
-        var infoY = 150f;
-        DrawText(c, "Cliente", Margin, infoY, 8, true, Muted);
-        DrawText(c, string.IsNullOrWhiteSpace(data.Sale.CustomerName) ? "Consumidor final" : data.Sale.CustomerName,
-            Margin, infoY + 14, 10, false, Ink);
-        if (!string.IsNullOrWhiteSpace(data.CustomerTaxId))
+        c.DrawLine(Margin, 130, PageWidth - Margin, 130, new SKPaint { Color = Line, StrokeWidth = 0.8f });
+
+        var infoY = 142f;
+        var gap = 8f;
+        var boxWidth = (PageWidth - Margin * 2 - gap * 3) / 4;
+        DrawInfoBox(c, Margin, infoY, boxWidth, "Cliente",
+            string.IsNullOrWhiteSpace(data.Sale.CustomerName) ? "Consumidor final" : data.Sale.CustomerName);
+        DrawInfoBox(c, Margin + boxWidth + gap, infoY, boxWidth, "Cajero",
+            string.IsNullOrWhiteSpace(data.CashierName) ? "—" : data.CashierName);
+        DrawInfoBox(c, Margin + (boxWidth + gap) * 2, infoY, boxWidth, "Fecha",
+            (data.Sale.CompletedAt ?? data.Sale.CreatedAt).ToLocalTime().ToString("dd/MM/yyyy"));
+        DrawInfoBox(c, Margin + (boxWidth + gap) * 3, infoY, boxWidth, "Pago", PaymentSummary(data));
+
+        page.Y = 208;
+    }
+
+    private static void DrawInfoBox(SKCanvas canvas, float x, float y, float width, string label, string value)
+    {
+        canvas.DrawRoundRect(new SKRect(x, y, x + width, y + 48), 7, 7, new SKPaint { Color = Light });
+        DrawText(canvas, label, x + 10, y + 16, 7.3f, true, Muted);
+        DrawText(canvas, Truncate(value, 22), x + 10, y + 34, 9.4f, false, Ink);
+    }
+
+    private static string PaymentSummary(ReceiptData data)
+    {
+        var methods = data.Sale.Payments.Select(p => p.Method).Distinct().ToList();
+        return methods.Count switch
         {
-            DrawText(c, "RNC: " + data.CustomerTaxId, Margin, infoY + 27, 8.5f, false, Muted);
-        }
-
-        DrawText(c, "Cajero", PageWidth / 2 + 30, infoY, 8, true, Muted);
-        DrawText(c, data.CashierName, PageWidth / 2 + 30, infoY + 14, 10, false, Ink);
-
-        page.Y = 190;
+            0 => "—",
+            1 => PaymentName(methods[0]),
+            _ => "Mixto"
+        };
     }
 
     private static void DrawContinuationHeader(PdfPage page, ReceiptData data)
@@ -219,31 +250,40 @@ public sealed class PdfService : IPdfService
     private static float DrawTableHeader(PdfPage page, float y, string desc, string qty, string price, string tax, string total)
     {
         var c = page.Canvas;
-        var rect = new SKRect(Margin, y - 12, PageWidth - Margin, y + 8);
-        c.DrawRect(rect, new SKPaint { Color = Light });
-        DrawText(c, desc, Margin + 6, y, 8, true, Muted);
-        DrawTextRight(c, qty, Margin + 310, y, 8, true, Muted);
-        DrawTextRight(c, price, Margin + 390, y, 8, true, Muted);
-        DrawTextRight(c, tax, Margin + 440, y, 8, true, Muted);
-        DrawTextRight(c, total, PageWidth - Margin - 6, y, 8, true, Muted);
-        return y + 20;
+        c.DrawRoundRect(new SKRect(Margin, y - 13, PageWidth - Margin, y + 9), 4, 4, new SKPaint { Color = Accent });
+        DrawText(c, desc, Margin + 8, y, 8, true, SKColors.White);
+        DrawTextRight(c, qty, Margin + 300, y, 8, true, SKColors.White);
+        DrawTextRight(c, price, Margin + 380, y, 8, true, SKColors.White);
+        DrawTextRight(c, tax, Margin + 440, y, 8, true, SKColors.White);
+        DrawTextRight(c, total, PageWidth - Margin - 8, y, 8, true, SKColors.White);
+        return y + 23;
     }
 
-    private float DrawInvoiceLine(PdfPage page, float y, SaleLine line, float rowHeight)
+    private float DrawInvoiceLine(PdfPage page, float y, SaleLine line, float rowHeight, int index)
     {
         var c = page.Canvas;
-        var lines = WrapLines(line.Name, 280f, 9.5f);
+        if (index % 2 == 0)
+        {
+            c.DrawRect(new SKRect(Margin, y - 4, PageWidth - Margin, y + rowHeight - 2), new SKPaint { Color = Light });
+        }
+
+        var lines = WrapLines(line.Name, 270f, 9.5f);
         var nameY = y + 10;
         foreach (var text in lines)
         {
-            DrawText(c, text, Margin + 6, nameY, 9.5f, false, Ink);
+            DrawText(c, text, Margin + 8, nameY, 9.5f, false, Ink);
             nameY += 13;
         }
 
-        DrawTextRight(c, line.Quantity.ToString("0.###"), Margin + 310, y + 10, 9, false, Ink);
-        DrawTextRight(c, Money(line.UnitPriceCents), Margin + 390, y + 10, 9, false, Ink);
+        if (line.DiscountCents > 0)
+        {
+            DrawText(c, "  Desc. -" + Money(line.DiscountCents), Margin + 8, nameY, 8.2f, false, Muted);
+        }
+
+        DrawTextRight(c, line.Quantity.ToString("0.###"), Margin + 300, y + 10, 9, false, Ink);
+        DrawTextRight(c, Money(line.UnitPriceCents), Margin + 380, y + 10, 9, false, Ink);
         DrawTextRight(c, TaxLabel(line), Margin + 440, y + 10, 9, false, Muted);
-        DrawTextRight(c, Money(line.TotalCents), PageWidth - Margin - 6, y + 10, 9.5f, true, Ink);
+        DrawTextRight(c, Money(line.TotalCents), PageWidth - Margin - 8, y + 10, 9.5f, true, Ink);
 
         var bottom = y + rowHeight;
         c.DrawLine(Margin, bottom, PageWidth - Margin, bottom, new SKPaint { Color = Line, StrokeWidth = 0.5f });
@@ -253,23 +293,33 @@ public sealed class PdfService : IPdfService
     private float DrawTotals(PdfPage page, float y, ReceiptData data)
     {
         var c = page.Canvas;
-        var left = PageWidth - Margin - 230;
-        var valueX = PageWidth - Margin - 6;
-        y = DrawTotalRow(c, left, valueX, y, "Subtotal", Money(data.Sale.SubtotalCents), false);
-        if (data.Sale.DiscountCents > 0)
-        {
-            y = DrawTotalRow(c, left, valueX, y, "Descuento", "-" + Money(data.Sale.DiscountCents), false);
-        }
+        var left = PageWidth - Margin - 240;
+        var valueX = PageWidth - Margin - 8;
+
+        c.DrawRoundRect(new SKRect(left - 12, y - 6, PageWidth - Margin, y + 18 + 16 * (3 + data.Sale.Lines.Where(l => l.TaxCents != 0).Select(l => l.TaxRateBasisPoints).Distinct().Count())),
+            8, 8, new SKPaint { Color = Light });
+
+        y = DrawTotalRow(c, left, valueX, y, data.Sale.TaxCents > 0 ? "Subtotal (sin impuesto)" : "Subtotal",
+            Money(data.Sale.SubtotalCents), false);
 
         foreach (var group in data.Sale.Lines.Where(l => l.TaxCents != 0).GroupBy(l => l.TaxRateBasisPoints))
         {
             y = DrawTotalRow(c, left, valueX, y, $"{data.TaxName} {group.Key / 100m:0.##}%", Money(group.Sum(l => l.TaxCents)), false);
         }
 
-        c.DrawRect(new SKRect(left - 10, y, PageWidth - Margin, y + 32), new SKPaint { Color = Light });
-        DrawText(c, "TOTAL", left, y + 21, 11, true, Ink);
-        DrawTextRight(c, Money(data.Sale.TotalCents), valueX, y + 22, 15, true, Accent);
-        return y + 42;
+        c.DrawRoundRect(new SKRect(left - 12, y + 2, PageWidth - Margin, y + 40), 8, 8, new SKPaint { Color = Accent });
+        DrawText(c, "TOTAL", left, y + 26, 11, true, SKColors.White);
+        DrawTextRight(c, Money(data.Sale.TotalCents), valueX, y + 27, 15, true, SKColors.White);
+        y += 58;
+
+        if (data.Sale.DiscountCents > 0)
+        {
+            DrawText(c, "Descuento aplicado", left, y, 8.5f, false, Muted);
+            DrawTextRight(c, Money(data.Sale.DiscountCents), valueX, y, 9, false, Muted);
+            y += 14;
+        }
+
+        return y;
     }
 
     private static float DrawTotalRow(SKCanvas canvas, float left, float valueX, float y, string label, string value, bool bold)
@@ -281,20 +331,59 @@ public sealed class PdfService : IPdfService
 
     private float DrawPayments(PdfPage page, float y, ReceiptData data)
     {
-        DrawText(page.Canvas, "Pagos", Margin, y, 9, true, Ink);
-        y += 13;
+        if (page.NeedsPageBreak(y + 120))
+        {
+            page.EndPage();
+            page.NewPage();
+            y = 60;
+        }
+
+        var c = page.Canvas;
+        var paid = data.Sale.Payments.Sum(p => p.AmountCents);
+        var received = data.Sale.Payments
+            .Where(p => p.Method is PaymentMethod.Cash or PaymentMethod.Card or PaymentMethod.Transfer)
+            .Sum(p => p.TenderedCents);
+
+        DrawText(c, "Pagos", Margin, y, 10, true, Ink);
+        y += 16;
         foreach (var payment in data.Sale.Payments)
         {
-            DrawText(page.Canvas, PaymentName(payment.Method), Margin, y, 9, false, Muted);
-            DrawTextRight(page.Canvas, Money(payment.AmountCents), PageWidth - Margin, y, 9, false, Ink);
-            y += 13;
+            DrawText(c, PaymentName(payment.Method), Margin, y, 9, false, Muted);
+            DrawTextRight(c, Money(payment.AmountCents), PageWidth - Margin, y, 9.5f, false, Ink);
+            y += 14;
+        }
+
+        y += 2;
+        c.DrawLine(Margin, y, PageWidth - Margin, y, new SKPaint { Color = Line, StrokeWidth = 0.5f });
+        y += 14;
+
+        DrawText(c, "Pagado", Margin, y, 9, false, Muted);
+        DrawTextRight(c, Money(paid), PageWidth - Margin, y, 9.5f, false, Ink);
+        y += 15;
+
+        if (received > 0)
+        {
+            DrawText(c, "Recibido", Margin, y, 9, false, Muted);
+            DrawTextRight(c, Money(received), PageWidth - Margin, y, 9.5f, false, Ink);
+            y += 15;
         }
 
         if (data.Sale.ChangeCents > 0)
         {
-            DrawText(page.Canvas, "Cambio", Margin, y, 9, true, Ink);
-            DrawTextRight(page.Canvas, Money(data.Sale.ChangeCents), PageWidth - Margin, y, 9.5f, true, Accent);
-            y += 13;
+            DrawText(c, "Cambio", Margin, y, 9, true, Ink);
+            DrawTextRight(c, Money(data.Sale.ChangeCents), PageWidth - Margin, y, 10.5f, true, Accent);
+            y += 16;
+        }
+
+        var itemCount = data.Sale.Lines.Sum(l => l.Quantity);
+        DrawText(c, $"Artículos: {itemCount:0.###}", Margin, y + 12, 8.5f, false, Muted);
+        y += 22;
+
+        if (!string.IsNullOrWhiteSpace(data.Sale.Note))
+        {
+            c.DrawRoundRect(new SKRect(Margin, y, PageWidth - Margin, y + 34), 6, 6, new SKPaint { Color = Light });
+            DrawText(c, "Nota: " + Truncate(data.Sale.Note, 90), Margin + 10, y + 21, 8.5f, false, Muted);
+            y += 42;
         }
 
         return y;
@@ -303,6 +392,10 @@ public sealed class PdfService : IPdfService
     private static void DrawFooter(PdfPage page, float y, ReceiptData data)
     {
         var c = page.Canvas;
+        var lineY = Math.Min(y + 10, PageHeight - 100);
+        c.DrawLine(Margin, lineY, PageWidth - Margin, lineY, new SKPaint { Color = Line, StrokeWidth = 0.6f });
+
+        var qrY = lineY + 12;
         if (data.ShowQr && !string.IsNullOrWhiteSpace(data.QrPayload))
         {
             try
@@ -313,7 +406,7 @@ public sealed class PdfService : IPdfService
                 using var bitmap = SKBitmap.Decode(png);
                 if (bitmap is not null)
                 {
-                    c.DrawBitmap(bitmap, new SKRect(Margin, y, Margin + 74, y + 74));
+                    c.DrawBitmap(bitmap, new SKRect(Margin, qrY, Margin + 70, qrY + 70));
                 }
             }
             catch
@@ -322,9 +415,10 @@ public sealed class PdfService : IPdfService
             }
         }
 
-        DrawText(c, data.Footer, Margin + 88, y + 18, 9, false, Muted);
-        DrawText(c, "Gracias por su compra", Margin + 88, y + 34, 8, false, Muted);
-        DrawText(c, "RixelPOS · RixelDev", Margin + 88, y + 50, 8, false, Muted);
+        DrawText(c, data.Footer, Margin + 84, qrY + 14, 9, false, Muted);
+        DrawText(c, "Gracias por su compra", Margin + 84, qrY + 30, 8, false, Muted);
+        DrawText(c, "RixelPOS · RixelDev", Margin + 84, qrY + 46, 8, false, Muted);
+        DrawTextRight(c, "Documento generado por RixelPOS", PageWidth - Margin, PageHeight - 22, 7.5f, false, Muted);
     }
 
     private static float DrawSummaryBoxes(PdfPage page, float y, IReadOnlyList<(string Label, string Value)> items)
@@ -419,7 +513,7 @@ public sealed class PdfService : IPdfService
             TextSize = size,
             Typeface = bold ? BoldFace : RegularFace
         };
-        canvas.DrawText(EscPosBuilder.AsciiText(text), x, y, paint);
+        canvas.DrawText(text, x, y, paint);
     }
 
     private static void DrawTextRight(SKCanvas canvas, string text, float right, float y, float size, bool bold, SKColor color)
@@ -431,7 +525,7 @@ public sealed class PdfService : IPdfService
             TextSize = size,
             Typeface = bold ? BoldFace : RegularFace
         };
-        var value = EscPosBuilder.AsciiText(text);
+        var value = text;
         canvas.DrawText(value, right - paint.MeasureText(value), y, paint);
     }
 
@@ -441,7 +535,7 @@ public sealed class PdfService : IPdfService
 
     private static List<string> WrapLines(string text, float maxWidth, float fontSize)
     {
-        var words = EscPosBuilder.AsciiText(text).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var words = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         var lines = new List<string>();
         var current = "";
         using var paint = new SKPaint { TextSize = fontSize, Typeface = RegularFace };
@@ -484,13 +578,10 @@ public sealed class PdfService : IPdfService
     };
 
     private static string TaxLabel(SaleLine line) =>
-        line.TaxRateBasisPoints == 0 ? "—" : $"{line.TaxRateBasisPoints / 100m:0.##}%";
+        line.TaxRateBasisPoints == 0 ? "" : $"{line.TaxRateBasisPoints / 100m:0.##}%";
 
-    private static string Truncate(string text, int max)
-    {
-        text = EscPosBuilder.AsciiText(text);
-        return text.Length <= max ? text : text[..max] + "...";
-    }
+    private static string Truncate(string text, int max) =>
+        text.Length <= max ? text : text[..max] + "...";
 
     private sealed class PdfPage
     {

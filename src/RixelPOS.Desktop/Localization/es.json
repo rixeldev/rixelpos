@@ -699,5 +699,6 @@
   "shortcuts.body": "NAVEGACIÓN\nF1  Panel de inicio\nF2  Venta / caja\nF3  Inventario\nF4  Clientes\nF5  Caja\nF6  Reportes\nF7  Ajustes\nF8  Proveedores\n\nVENTA\nCtrl+F  Buscar producto\nEnter   Agregar producto o cobrar\nF9      Cobrar\nEsc     Limpiar búsqueda\n\nPAGO\nF1–F5  Elegir método de pago\nCtrl+Enter  Agregar pago\nEnter   Confirmar cobro\nEsc     Cancelar\n\nSISTEMA\nCtrl+L  Cerrar sesión\nCtrl+Shift+L  Bloquear ahora\nF12     Esta ayuda",
   "inventory.skuHint": "Se genera automáticamente a partir del nombre y el código de barras.",
   "shortcuts.open": "Atajos de teclado (F12)",
-  "shortcuts.charge": "Cobrar (F9)"
+  "shortcuts.charge": "Cobrar (F9)",
+  "receipt.enterToPrint": "Pulsa Enter para imprimir y cerrar."
 }

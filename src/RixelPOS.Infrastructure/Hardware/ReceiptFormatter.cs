@@ -33,12 +33,9 @@ public static class ReceiptFormatter
             b.Line($"RNC: {data.Business.TaxId}");
         }
 
-        if (!string.IsNullOrWhiteSpace(data.Business.Address))
+        foreach (var line in Wrap(data.Business.Address, width))
         {
-            foreach (var line in Wrap(data.Business.Address, width))
-            {
-                b.Line(line);
-            }
+            b.Line(line);
         }
 
         if (!string.IsNullOrWhiteSpace(data.Business.Phone))
@@ -52,8 +49,7 @@ public static class ReceiptFormatter
         }
 
         b.Separator('=', width);
-        var title = data.Invoice is not null ? "FACTURA" : "RECIBO";
-        b.Bold().Line(title);
+        b.Bold().Line(data.Invoice is not null ? "FACTURA" : "RECIBO");
         if (data.Invoice is not null)
         {
             b.Line($"No. {data.Invoice.Number}");
@@ -64,18 +60,19 @@ public static class ReceiptFormatter
         }
 
         b.Bold(false);
-        b.Line($"Fecha: {(sale.CompletedAt ?? sale.CreatedAt).ToLocalTime():dd/MM/yyyy HH:mm}");
-        b.Line($"Cajero: {data.CashierName}");
-        if (!string.IsNullOrWhiteSpace(sale.CustomerName))
-        {
-            b.Line($"Cliente: {sale.CustomerName}");
-        }
-
+        b.Line((sale.CompletedAt ?? sale.CreatedAt).ToLocalTime().ToString("dd/MM/yyyy HH:mm"));
+        b.Align(EscPosBuilder.TextAlign.Left);
+        b.Separator('-', width);
+        b.Line(Columns("Cliente", string.IsNullOrWhiteSpace(sale.CustomerName) ? "Consumidor final" : sale.CustomerName, width));
+        b.Line(Columns("Cajero", data.CashierName, width));
+        b.Line(Columns("Pago", PaymentSummary(data), width));
         if (!string.IsNullOrWhiteSpace(data.CustomerTaxId))
         {
-            b.Line($"RNC cliente: {data.CustomerTaxId}");
+            b.Line(Columns("RNC cliente", data.CustomerTaxId, width));
         }
 
+        b.Separator('-', width);
+        b.Bold().Line(Columns("CANT / DESCRIPCION", "TOTAL", width)).Bold(false);
         b.Separator('-', width);
 
         foreach (var line in sale.Lines)
@@ -97,12 +94,8 @@ public static class ReceiptFormatter
         }
 
         b.Separator('-', width);
-        b.Line(Columns("Subtotal", FormatMoney(sale.SubtotalCents, data.CurrencySymbol), width));
-
-        if (sale.DiscountCents > 0)
-        {
-            b.Line(Columns("Descuento", "-" + FormatMoney(sale.DiscountCents, data.CurrencySymbol), width));
-        }
+        b.Line(Columns(sale.TaxCents > 0 ? "Subtotal (sin imp.)" : "Subtotal",
+            FormatMoney(sale.SubtotalCents, data.CurrencySymbol), width));
 
         foreach (var taxGroup in sale.Lines
                      .Where(l => l.TaxCents != 0)
@@ -113,20 +106,18 @@ public static class ReceiptFormatter
             b.Line(Columns(label, FormatMoney(taxGroup.Sum(l => l.TaxCents), data.CurrencySymbol), width));
         }
 
-        b.Separator('=', width);
-        b.Align(EscPosBuilder.TextAlign.Left).Bold().DoubleSize();
-        b.Line(Columns("TOTAL", FormatMoney(sale.TotalCents, data.CurrencySymbol), width / 2));
-        b.DoubleSize(false).Bold(false);
-        b.Separator('=', width);
+        var paid = sale.Payments.Sum(p => p.AmountCents);
+        var received = sale.Payments
+            .Where(p => p.Method is PaymentMethod.Cash or PaymentMethod.Card or PaymentMethod.Transfer)
+            .Sum(p => p.TenderedCents);
 
-        foreach (var payment in sale.Payments)
+        b.Separator('=', width);
+        b.Bold().Line(Columns("TOTAL", FormatMoney(sale.TotalCents, data.CurrencySymbol), width)).Bold(false);
+        b.Separator('=', width);
+        b.Line(Columns("Pagado", FormatMoney(paid, data.CurrencySymbol), width));
+        if (received > 0)
         {
-            var label = PaymentLabel(payment.Method);
-            b.Line(Columns(label, FormatMoney(payment.AmountCents, data.CurrencySymbol), width));
-            if (payment.Method == PaymentMethod.Cash && payment.TenderedCents > payment.AmountCents)
-            {
-                b.Line(Columns("  Recibido", FormatMoney(payment.TenderedCents, data.CurrencySymbol), width));
-            }
+            b.Line(Columns("Recibido", FormatMoney(received, data.CurrencySymbol), width));
         }
 
         if (sale.ChangeCents > 0)
@@ -134,8 +125,27 @@ public static class ReceiptFormatter
             b.Bold().Line(Columns("CAMBIO", FormatMoney(sale.ChangeCents, data.CurrencySymbol), width)).Bold(false);
         }
 
+        if (sale.DiscountCents > 0)
+        {
+            b.Line(Columns("Descuento aplicado", FormatMoney(sale.DiscountCents, data.CurrencySymbol), width));
+        }
+
+        if (sale.Payments.Count > 1 || sale.Payments.Any(p => p.Method == PaymentMethod.Cash && p.TenderedCents > p.AmountCents))
+        {
+            b.Separator('-', width);
+            b.Bold().Line("Pagos").Bold(false);
+            foreach (var payment in sale.Payments)
+            {
+                b.Line(Columns(PaymentLabel(payment.Method), FormatMoney(payment.AmountCents, data.CurrencySymbol), width));
+                if (payment.Method == PaymentMethod.Cash && payment.TenderedCents > payment.AmountCents)
+                {
+                    b.Line(Columns("  Recibido", FormatMoney(payment.TenderedCents, data.CurrencySymbol), width));
+                }
+            }
+        }
+
         var itemCount = sale.Lines.Sum(l => l.Quantity);
-        b.Line($"Artículos: {(itemCount == Math.Truncate(itemCount) ? itemCount.ToString("0") : itemCount.ToString("0.###"))}");
+        b.Line($"Articulos: {(itemCount == Math.Truncate(itemCount) ? itemCount.ToString("0") : itemCount.ToString("0.###"))}");
 
         if (!string.IsNullOrWhiteSpace(sale.Note))
         {
@@ -166,7 +176,7 @@ public static class ReceiptFormatter
             b.BarcodeCode128(data.Invoice.Number, 50);
         }
 
-        b.Feed(2).Cut();
+        b.Feed(3).Cut();
         return b.Build();
     }
 
@@ -226,12 +236,17 @@ public static class ReceiptFormatter
         }
 
         Center((sale.CompletedAt ?? sale.CreatedAt).ToLocalTime().ToString("dd/MM/yyyy HH:mm"));
+        Separator();
+        Row("Cliente", string.IsNullOrWhiteSpace(sale.CustomerName) ? "Consumidor final" : sale.CustomerName);
         Row("Cajero", data.CashierName);
-        if (!string.IsNullOrWhiteSpace(sale.CustomerName))
+        Row("Pago", PaymentSummary(data));
+        if (!string.IsNullOrWhiteSpace(data.CustomerTaxId))
         {
-            Row("Cliente", sale.CustomerName);
+            Row("RNC cliente", data.CustomerTaxId);
         }
 
+        Separator();
+        sb.AppendLine(Columns("CANT / DESCRIPCION", "TOTAL", width));
         Separator();
         foreach (var line in sale.Lines)
         {
@@ -242,36 +257,71 @@ public static class ReceiptFormatter
 
             Row($"  {line.Quantity:0.###} x {FormatMoney(line.UnitPriceCents, symbol)}",
                 FormatMoney(line.TotalCents, symbol));
+            if (line.DiscountCents > 0)
+            {
+                Row("  Descuento", "-" + FormatMoney(line.DiscountCents, symbol));
+            }
         }
 
         Separator();
-        Row("Subtotal", FormatMoney(sale.SubtotalCents, symbol));
-        if (sale.DiscountCents > 0)
+        Row(sale.TaxCents > 0 ? "Subtotal (sin imp.)" : "Subtotal", FormatMoney(sale.SubtotalCents, symbol));
+
+        foreach (var group in sale.Lines.Where(l => l.TaxCents != 0).GroupBy(l => l.TaxRateBasisPoints).OrderBy(g => g.Key))
         {
-            Row("Descuento", "-" + FormatMoney(sale.DiscountCents, symbol));
+            Row($"{data.TaxName} {group.Key / 100m:0.##}%", FormatMoney(group.Sum(l => l.TaxCents), symbol));
         }
 
-        if (sale.TaxCents > 0)
-        {
-            Row(data.TaxName, FormatMoney(sale.TaxCents, symbol));
-        }
+        var paid = sale.Payments.Sum(p => p.AmountCents);
+        var received = sale.Payments
+            .Where(p => p.Method is PaymentMethod.Cash or PaymentMethod.Card or PaymentMethod.Transfer)
+            .Sum(p => p.TenderedCents);
 
         Separator('=');
         Row("TOTAL", FormatMoney(sale.TotalCents, symbol));
         Separator('=');
-        foreach (var payment in sale.Payments)
+        Row("Pagado", FormatMoney(paid, symbol));
+        if (received > 0)
         {
-            Row(PaymentLabel(payment.Method), FormatMoney(payment.AmountCents, symbol));
+            Row("Recibido", FormatMoney(received, symbol));
         }
 
         if (sale.ChangeCents > 0)
         {
-            Row("Cambio", FormatMoney(sale.ChangeCents, symbol));
+            Row("CAMBIO", FormatMoney(sale.ChangeCents, symbol));
         }
 
-        if (!string.IsNullOrWhiteSpace(data.Footer))
+        if (sale.DiscountCents > 0)
+        {
+            Row("Descuento aplicado", FormatMoney(sale.DiscountCents, symbol));
+        }
+
+        if (sale.Payments.Count > 1 || sale.Payments.Any(p => p.Method == PaymentMethod.Cash && p.TenderedCents > p.AmountCents))
         {
             Separator();
+            sb.AppendLine("Pagos");
+            foreach (var payment in sale.Payments)
+            {
+                Row(PaymentLabel(payment.Method), FormatMoney(payment.AmountCents, symbol));
+                if (payment.Method == PaymentMethod.Cash && payment.TenderedCents > payment.AmountCents)
+                {
+                    Row("  Recibido", FormatMoney(payment.TenderedCents, symbol));
+                }
+            }
+        }
+
+        sb.AppendLine($"Articulos: {sale.Lines.Sum(l => l.Quantity):0.###}");
+        if (!string.IsNullOrWhiteSpace(sale.Note))
+        {
+            sb.AppendLine();
+            foreach (var line in Wrap("Nota: " + sale.Note, width))
+            {
+                sb.AppendLine(line);
+            }
+        }
+
+        sb.AppendLine();
+        if (!string.IsNullOrWhiteSpace(data.Footer))
+        {
             foreach (var line in Wrap(data.Footer, width))
             {
                 Center(line);
@@ -284,6 +334,17 @@ public static class ReceiptFormatter
         }
 
         return sb.ToString();
+    }
+
+    public static string PaymentSummary(ReceiptData data)
+    {
+        var methods = data.Sale.Payments.Select(p => p.Method).Distinct().ToList();
+        return methods.Count switch
+        {
+            0 => "—",
+            1 => PaymentLabel(methods[0]),
+            _ => "Mixto"
+        };
     }
 
     public static string FormatMoney(long cents, string symbol) =>

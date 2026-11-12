@@ -699,5 +699,6 @@
   "shortcuts.body": "NAVIGATION\nF1  Dashboard\nF2  Checkout\nF3  Inventory\nF4  Customers\nF5  Cash register\nF6  Reports\nF7  Settings\nF8  Suppliers\n\nSALE\nCtrl+F  Focus product search\nEnter   Add product or charge\nF9      Charge\nEsc     Clear search\n\nPAYMENT\nF1–F5  Choose payment method\nCtrl+Enter  Add payment\nEnter   Confirm payment\nEsc     Cancel\n\nSYSTEM\nCtrl+L  Sign out\nCtrl+Shift+L  Lock now\nF12     This help",
   "inventory.skuHint": "Generated automatically from the name and barcode.",
   "shortcuts.open": "Keyboard shortcuts (F12)",
-  "shortcuts.charge": "Charge (F9)"
+  "shortcuts.charge": "Charge (F9)",
+  "receipt.enterToPrint": "Press Enter to print and close."
 }

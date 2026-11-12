@@ -460,7 +460,10 @@ public sealed class PrintingTests
         Assert.Contains("Producto sin impuesto", preview);
         Assert.Contains("TOTAL", preview);
         Assert.Contains("200.00", preview);
-        Assert.Contains("300.00", preview); // change
+        Assert.Contains("Recibido", preview);
+        Assert.Contains("500.00", preview);
+        Assert.Contains("CAMBIO", preview);
+        Assert.Contains("300.00", preview);
         Assert.DoesNotContain("ITBIS", preview);
     }
 

@@ -150,6 +150,9 @@ Get-FileHash .\RixelPOS-Setup-*.exe -Algorithm SHA256
 - **Desde 1.2.0** no hay tasa de impuesto por defecto y la migración `003` pone a 0% los
   productos que conservaban el 18% implícito. Si tu negocio cobra impuesto, vuelve a
   configurar la tasa en Ajustes después de actualizar.
+- **Desde 1.2.1** la factura muestra `Pagado`, `Recibido` y `Cambio`, conserva tildes en
+  el PDF y el descuento se informa sin restarse dos veces. En la vista previa, `Enter`
+  imprime y cierra.
 
 ## 7. Versionado
 
