@@ -43,7 +43,10 @@
 8. **Todo cambio de UI debe cumplir la sección 7 (UI/UX).**
 9. Antes de commit: `dotnet build RixelPOS.sln -c Release` y
    `dotnet test RixelPOS.sln -c Release` deben pasar.
-10. No hagas `git push` ni publiques releases sin autorización explícita del usuario.
+10. **Push autónomo autorizado (política permanente).** Cuando acumules varios cambios
+    importantes: sube `<Version>` en `Directory.Build.props`, actualiza docs/AGENTS,
+    verifica build + tests, haz commit y `git push origin main`; después crea y sube el tag
+    `vX.Y.Z`. No publiques desde un fork ni reescribas releases ya publicadas.
 
 ## 3. Comandos esenciales
 
@@ -178,6 +181,15 @@ dotnet test RixelPOS.sln -c Release
 - No subas releases a mano si el workflow puede hacerlo. No publiques desde un fork.
 - Si cambias nombres de artefactos o el repo pacman, actualiza
   `docs/RELEASES.md`, este archivo y los scripts.
+- **Flujo del agente al cerrar un lote de cambios importantes:**
+  1. Subir `<Version>` en `Directory.Build.props` (parche para correcciones, minor para
+     funciones o cambios de comportamiento).
+  2. `dotnet build RixelPOS.sln -c Release` y `dotnet test RixelPOS.sln -c Release`.
+  3. Actualizar `README.md`, `docs/` y este archivo si cambió algo visible.
+  4. Commit descriptivo y `git push origin main` → publica la release `latest`.
+  5. `git tag vX.Y.Z && git push origin vX.Y.Z` → publica la release versionada.
+- El job `pacman-repo` está serializado (`concurrency: pacman-repo`) para que dos pushes
+  seguidos no compitan por la rama `gh-pages`.
 
 ## 10. Seguridad y datos
 
@@ -199,7 +211,7 @@ dotnet test RixelPOS.sln -c Release
 - [ ] Migración aditiva si cambió la DB.
 - [ ] README/docs/AGENTS actualizados si cambió arquitectura, comandos o releases.
 - [ ] Sin secretos, DBs, logs ni artefactos `bin/obj/dist` en el commit.
-- [ ] Commit claro y local; push solo si el usuario lo pide.
+- [ ] Commit claro; push a `main` y tag `vX.Y.Z` cuando el lote de cambios sea importante.
 
 ## 12. Limitaciones actuales (actualizar si se implementan)
 

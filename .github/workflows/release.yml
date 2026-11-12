@@ -180,6 +180,9 @@ jobs:
     name: Update pacman repository
     needs: [ version, quality, linux ]
     runs-on: ubuntu-latest
+    concurrency:
+      group: pacman-repo
+      cancel-in-progress: false
     permissions:
       contents: write
     steps:

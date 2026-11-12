@@ -387,6 +387,9 @@ y publica artefactos self-contained de cada plataforma.
 - Antes de un cambio grande: `dotnet build` + `dotnet test`; después, actualiza docs y
   AGENTS si cambia la estructura o el empaquetado.
 - El repositorio se mantiene privado y sin secretos; ver `.gitignore` y `SECURITY.md`.
+- **Política de publicación:** tras un lote de cambios importantes, el agente sube la
+  versión en `Directory.Build.props`, hace commit, `git push origin main` y publica el tag
+  `vX.Y.Z`. Esto genera la release `latest` y la versionada con todos los artefactos.
 
 ## 12. Licencia
 

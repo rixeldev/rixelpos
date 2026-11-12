@@ -101,6 +101,10 @@ Linux incluye `rixelpos-install-dotnet`.
 powershell -ExecutionPolicy Bypass -File packaging/windows/build.ps1 -Version 1.0.0
 ```
 
+Al cerrar un lote de cambios importantes, sube la versión en `Directory.Build.props`, haz
+commit, `git push origin main` y publica el tag `vX.Y.Z`; el workflow genera `latest` y la
+release versionada.
+
 Los scripts no firman binarios. La firma se realiza con el certificado del cliente en el
 entorno de release. No subas certificados ni contraseñas al repositorio.
 
