@@ -12,7 +12,8 @@ public static class Branding
     public const string DefaultCurrencyCode = "DOP";
     public const string DefaultCurrencySymbol = "RD$";
     public const string DefaultLocale = "es-DO";
-    public const string Version = "1.0.0";
+    public static string Version =>
+        typeof(Branding).Assembly.GetName().Version?.ToString(3) ?? "1.0.0";
 }
 
 public static class Defaults
