@@ -40,7 +40,6 @@ Name: "dotnet"; Description: "Instalar .NET SDK 8 si falta (requiere internet)";
 
 [Files]
 Source: "..\..\dist\windows\RixelPOS\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\..\packaging\prerequisites\install-dotnet.ps1"; DestDir: "{app}\prerequisites"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
