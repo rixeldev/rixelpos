@@ -48,7 +48,6 @@ Name: "{group}\Desinstalar {#AppName}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\prerequisites\install-dotnet.ps1"" -Channel 8.0 -Quiet"; StatusMsg: "Verificando/instalando .NET SDK 8 (opcional)..."; Flags: waituntilterminated ignoreerrors; Tasks: dotnet
 Filename: "{app}\{#AppExeName}"; Description: "Abrir {#AppName}"; Flags: nowait postinstall skipifsilent
 
 [UninstallDelete]
@@ -58,4 +57,26 @@ Type: filesandordirs; Name: "{app}"
 function InitializeSetup(): Boolean;
 begin
   Result := True;
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+  ResultCode: Integer;
+  ScriptPath: String;
+begin
+  if CurStep = ssPostInstall then
+  begin
+    if WizardIsTaskSelected('dotnet') then
+    begin
+      ScriptPath := ExpandConstant('{app}\prerequisites\install-dotnet.ps1');
+      if FileExists(ScriptPath) then
+      begin
+        // Optional SDK bootstrap. Exec's boolean result is intentionally ignored:
+        // RixelPOS is self-contained and must install even without internet.
+        Exec('powershell.exe',
+          '-NoProfile -ExecutionPolicy Bypass -File "' + ScriptPath + '" -Channel 8.0 -Quiet',
+          '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+      end;
+    end;
+  end;
 end;
