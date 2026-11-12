@@ -1,0 +1,32 @@
+<dialogs:DialogWindow xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:dialogs="using:RixelPOS.Desktop.Views.Dialogs"
+                     xmlns:loc="using:RixelPOS.Desktop.Localization"
+                     x:Class="RixelPOS.Desktop.Views.Dialogs.UserEditorWindow"
+                     Title="{Binding Title}" Width="560" Height="620" MinWidth="460" MinHeight="440" ShowInTaskbar="False"
+                     WindowStartupLocation="CenterOwner" Background="{DynamicResource SurfaceBrush}">
+  <Grid RowDefinitions="Auto,*,Auto" Margin="24" RowSpacing="14">
+    <TextBlock Text="{Binding Title}" Classes="h2" />
+    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+    <StackPanel Spacing="14">
+    <StackPanel Spacing="6"><TextBlock Text="{loc:Tr users.fullName}" Classes="caption" /><TextBox Text="{Binding FullName}" /></StackPanel>
+    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+      <StackPanel Spacing="6"><TextBlock Text="{loc:Tr common.username}" Classes="caption" /><TextBox Text="{Binding Username}" /></StackPanel>
+      <StackPanel Grid.Column="1" Spacing="6"><TextBlock Text="{loc:Tr users.role}" Classes="caption" /><ComboBox ItemsSource="{Binding Roles}" SelectedIndex="{Binding RoleIndex}" HorizontalAlignment="Stretch" /></StackPanel>
+    </Grid>
+    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+      <StackPanel Spacing="6"><TextBlock Text="{loc:Tr users.pin}" Classes="caption" /><TextBox Text="{Binding Pin}" PasswordChar="●" MaxLength="8" /><TextBlock Text="{loc:Tr users.pinHint}" Classes="caption" TextWrapping="Wrap" /></StackPanel>
+      <StackPanel Grid.Column="1" Spacing="6"><TextBlock Text="{loc:Tr users.password}" Classes="caption" /><TextBox Text="{Binding Password}" PasswordChar="●" /><TextBlock Text="{loc:Tr users.passwordHint}" Classes="caption" TextWrapping="Wrap" /></StackPanel>
+    </Grid>
+    <CheckBox Content="{loc:Tr users.active}" IsChecked="{Binding IsActive}" IsVisible="{Binding !IsNew}" />
+    <Border Classes="dangerCard" IsVisible="{Binding HasErrorMessage}">
+      <TextBlock Text="{Binding ErrorMessage}" Classes="danger" TextWrapping="Wrap" />
+    </Border>
+    </StackPanel>
+    </ScrollViewer>
+    <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto">
+      <Button Grid.Column="1" Classes="ghost" Content="{loc:Tr common.cancel}" Command="{Binding CancelCommand}" />
+      <Button Grid.Column="2" Classes="primary" Content="{loc:Tr common.save}" Command="{Binding SaveCommand}" />
+    </Grid>
+  </Grid>
+</dialogs:DialogWindow>

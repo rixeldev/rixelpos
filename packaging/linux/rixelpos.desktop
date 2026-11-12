@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=RixelPOS
+GenericName=Point of Sale
+Comment=Offline-first billing and point of sale by RixelDev
+Exec=rixelpos
+Icon=rixelpos
+Terminal=false
+Categories=Office;Finance;PointOfSale;
+Keywords=pos;billing;invoice;sale;caja;factura;venta;
+StartupWMClass=RixelPOS
+StartupNotify=true

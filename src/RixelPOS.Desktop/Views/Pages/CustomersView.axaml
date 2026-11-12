@@ -1,0 +1,107 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:RixelPOS.Desktop.Localization"
+             x:Class="RixelPOS.Desktop.Views.Pages.CustomersView">
+  <Grid ColumnDefinitions="1.15*,*" ColumnSpacing="14">
+    <!-- List -->
+    <Border Classes="card" Padding="16">
+      <Grid RowDefinitions="Auto,*" RowSpacing="12">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+          <TextBox Text="{Binding SearchText}" Watermark="{loc:Tr customers.searchPlaceholder}" />
+          <Button Grid.Column="1" Classes="primary" Content="{loc:Tr customers.newCustomer}" Command="{Binding NewCustomerCommand}" />
+        </Grid>
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}"
+                  Background="Transparent" BorderThickness="0" IsReadOnly="True">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="{loc:Tr common.name}" Binding="{Binding Name}" Width="2*" MinWidth="140" />
+            <DataGridTextColumn Header="{loc:Tr common.phone}" Binding="{Binding Phone}" Width="1.2*" MinWidth="100" />
+            <DataGridTextColumn Header="Balance" Binding="{Binding BalanceText}" Width="1*" MinWidth="90" />
+            <DataGridTextColumn Header="Crédito" Binding="{Binding StoreCreditText}" Width="1*" MinWidth="90" />
+          </DataGrid.Columns>
+        </DataGrid>
+      </Grid>
+    </Border>
+
+    <!-- Detail -->
+    <Border Grid.Column="1" Classes="card" Padding="18">
+      <Grid>
+      <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12" IsVisible="{Binding HasSelection}">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+          <StackPanel Spacing="3">
+            <TextBlock Text="{Binding DetailName}" Classes="h2" />
+            <TextBlock Text="{Binding DetailPhone}" Classes="muted" />
+            <TextBlock Text="{Binding DetailTaxId}" Classes="caption" />
+            <TextBlock Text="{Binding DetailAddress}" Classes="caption" TextWrapping="Wrap" />
+          </StackPanel>
+          <Button Grid.Column="1" Classes="ghost" Content="{loc:Tr common.edit}" Command="{Binding EditCustomerCommand}" />
+        </Grid>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="12">
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+            <Border Classes="soft">
+              <StackPanel Spacing="2">
+                <TextBlock Text="{loc:Tr customers.balance}" Classes="caption" />
+                <TextBlock Text="{Binding BalanceText}" Classes="money" FontSize="20" />
+              </StackPanel>
+            </Border>
+            <Border Grid.Column="1" Classes="soft">
+              <StackPanel Spacing="2">
+                <TextBlock Text="{loc:Tr customers.storeCredit}" Classes="caption" />
+                <TextBlock Text="{Binding StoreCreditText}" Classes="money" FontSize="20" Foreground="{DynamicResource AccentBrush}" />
+              </StackPanel>
+            </Border>
+          </Grid>
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+            <Button Classes="soft" Content="{loc:Tr customers.addCredit}" Command="{Binding AddCreditCommand}" />
+            <Button Grid.Column="1" Classes="soft" Content="{loc:Tr customers.payBalance}" Command="{Binding PayBalanceCommand}" />
+          </Grid>
+
+          <TextBlock Text="{Binding HistoryTitle}" Classes="h3" Margin="0,4,0,0" />
+          <Border Classes="soft" Padding="0">
+            <ScrollViewer MaxHeight="330">
+              <ItemsControl ItemsSource="{Binding History}" IsVisible="{Binding HasHistory}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8" Margin="12,7">
+                      <StackPanel Spacing="1">
+                        <TextBlock Text="{Binding InvoiceNumber}" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding DateText}" Classes="caption" />
+                      </StackPanel>
+                      <TextBlock Grid.Column="1" Text="{Binding TotalText}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                      <Button Grid.Column="2" Classes="icon ghost" Width="30" Height="30" MinWidth="30" MinHeight="30"
+                              Command="{Binding $parent[UserControl].DataContext.ReprintCommand}" CommandParameter="{Binding}">
+                        <PathIcon Data="{DynamicResource IconPrint}" Width="13" Height="13" />
+                      </Button>
+                      <Button Grid.Column="3" Classes="icon ghost" Width="30" Height="30" MinWidth="30" MinHeight="30"
+                              Command="{Binding $parent[UserControl].DataContext.ExportPdfCommand}" CommandParameter="{Binding}">
+                        <PathIcon Data="{DynamicResource IconReceipt}" Width="13" Height="13" />
+                      </Button>
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+          </Border>
+          <TextBlock Text="{loc:Tr customers.noHistory}" Classes="muted" IsVisible="{Binding !HasHistory}" />
+            <TextBlock Text="{Binding TotalSpentText}" Classes="caption" />
+        </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2" Spacing="4">
+          <Border Classes="dangerCard" IsVisible="{Binding StatusIsError}">
+            <TextBlock Text="{Binding StatusMessage}" Classes="danger" />
+          </Border>
+          <TextBlock Text="{Binding StatusMessage}" Classes="caption" Foreground="{DynamicResource AccentBrush}" IsVisible="{Binding !StatusIsError}" />
+        </StackPanel>
+      </Grid>
+
+      <StackPanel IsVisible="{Binding !HasSelection}" VerticalAlignment="Center" Spacing="8" HorizontalAlignment="Center">
+        <PathIcon Data="{DynamicResource IconUsers}" Width="38" Height="38" Foreground="{DynamicResource MutedBrush}" />
+        <TextBlock Text="{loc:Tr customers.noCustomers}" Classes="h3" />
+        <TextBlock Text="{loc:Tr customers.searchPlaceholder}" Classes="muted" />
+      </StackPanel>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

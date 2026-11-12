@@ -1,0 +1,26 @@
+<dialogs:DialogWindow xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:dialogs="using:RixelPOS.Desktop.Views.Dialogs"
+                     xmlns:loc="using:RixelPOS.Desktop.Localization"
+                     x:Class="RixelPOS.Desktop.Views.Dialogs.MessageDialogWindow"
+                     Title="{Binding Title}"
+                     Width="480" SizeToContent="Height"
+                     CanResize="False" ShowInTaskbar="False"
+                     WindowStartupLocation="CenterOwner"
+                     Background="{DynamicResource SurfaceBrush}"
+                     Icon="avares://RixelPOS/Assets/rixelpos.png">
+  <StackPanel Margin="24" Spacing="18">
+    <StackPanel Orientation="Horizontal" Spacing="12">
+      <Border Width="40" Height="40" CornerRadius="12" Background="{DynamicResource AccentSoftBrush}">
+        <PathIcon Data="{DynamicResource IconAlert}" Width="20" Height="20" Foreground="{DynamicResource AccentBrush}"
+                  HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </Border>
+      <TextBlock Text="{Binding Title}" Classes="h2" VerticalAlignment="Center" TextWrapping="Wrap" />
+    </StackPanel>
+    <TextBlock Text="{Binding Message}" TextWrapping="Wrap" LineHeight="21" />
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+      <Button Content="{Binding CancelText}" Classes="ghost" Command="{Binding CancelCommand}" IsVisible="{Binding IsConfirm}" />
+      <Button Content="{Binding OkText}" Classes="primary" Command="{Binding OkCommand}" />
+    </StackPanel>
+  </StackPanel>
+</dialogs:DialogWindow>

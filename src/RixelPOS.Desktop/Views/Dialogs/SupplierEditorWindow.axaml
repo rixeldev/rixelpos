@@ -1,0 +1,34 @@
+<dialogs:DialogWindow xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:dialogs="using:RixelPOS.Desktop.Views.Dialogs"
+                     xmlns:loc="using:RixelPOS.Desktop.Localization"
+                     x:Class="RixelPOS.Desktop.Views.Dialogs.SupplierEditorWindow"
+                     Title="{Binding Title}" Width="640" Height="760" MinWidth="500" MinHeight="500" ShowInTaskbar="False"
+                     WindowStartupLocation="CenterOwner" Background="{DynamicResource SurfaceBrush}">
+  <Grid RowDefinitions="Auto,*,Auto" Margin="24" RowSpacing="14">
+    <TextBlock Text="{Binding Title}" Classes="h2" />
+    <ScrollViewer Grid.Row="1">
+      <StackPanel Spacing="12">
+        <StackPanel Spacing="6"><TextBlock Text="{loc:Tr common.name}" Classes="caption" /><TextBox Text="{Binding Name}" Classes="big" /></StackPanel>
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+          <StackPanel Spacing="6"><TextBlock Text="{loc:Tr suppliers.contactName}" Classes="caption" /><TextBox Text="{Binding ContactName}" /></StackPanel>
+          <StackPanel Grid.Column="1" Spacing="6"><TextBlock Text="{loc:Tr common.phone}" Classes="caption" /><TextBox Text="{Binding Phone}" /></StackPanel>
+        </Grid>
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+          <StackPanel Spacing="6"><TextBlock Text="{loc:Tr common.email}" Classes="caption" /><TextBox Text="{Binding Email}" /></StackPanel>
+          <StackPanel Grid.Column="1" Spacing="6"><TextBlock Text="{loc:Tr settings.taxId}" Classes="caption" /><TextBox Text="{Binding TaxId}" /></StackPanel>
+        </Grid>
+        <StackPanel Spacing="6"><TextBlock Text="{loc:Tr common.address}" Classes="caption" /><TextBox Text="{Binding Address}" /></StackPanel>
+        <StackPanel Spacing="6"><TextBlock Text="{loc:Tr common.notes}" Classes="caption" /><TextBox Text="{Binding Notes}" AcceptsReturn="True" Height="90" /></StackPanel>
+        <CheckBox Content="{loc:Tr common.active}" IsChecked="{Binding IsActive}" />
+        <Border Classes="dangerCard" IsVisible="{Binding HasErrorMessage}">
+          <TextBlock Text="{Binding ErrorMessage}" Classes="danger" TextWrapping="Wrap" />
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+    <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto">
+      <Button Grid.Column="1" Classes="ghost" Content="{loc:Tr common.cancel}" Command="{Binding CancelCommand}" />
+      <Button Grid.Column="2" Classes="primary big" Content="{loc:Tr common.save}" Command="{Binding SaveCommand}" />
+    </Grid>
+  </Grid>
+</dialogs:DialogWindow>

@@ -1,0 +1,7 @@
+# RixelPOS: USB receipt printers and serial devices.
+# Allow the active user (member of the lp group) to write directly to USB printers.
+# Adjust idVendor/idProduct to your hardware if you use the direct USB transport.
+SUBSYSTEM=="usb", ATTRS{idVendor}=="04b8", MODE="0660", GROUP="lp"
+KERNEL=="lp[0-9]*", SUBSYSTEM=="usb", MODE="0660", GROUP="lp"
+KERNEL=="ttyUSB*", MODE="0660", GROUP="uucp"
+KERNEL=="ttyACM*", MODE="0660", GROUP="uucp"

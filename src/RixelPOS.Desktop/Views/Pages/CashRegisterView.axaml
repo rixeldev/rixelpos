@@ -1,0 +1,140 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:RixelPOS.Desktop.Localization"
+             x:Class="RixelPOS.Desktop.Views.Pages.CashRegisterView">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+  <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="14">
+    <!-- Open session header -->
+    <StackPanel Spacing="14" IsVisible="{Binding HasOpenSession}">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Spacing="3">
+          <TextBlock Text="{loc:Tr cash.currentShift}" Classes="h2" />
+          <TextBlock Text="{loc:Tr cash.openedAt}" Classes="caption" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+          <Button Classes="soft" Content="{loc:Tr cash.cashIn}" Command="{Binding CashInCommand}" />
+          <Button Classes="softDanger" Content="{loc:Tr cash.cashOut}" Command="{Binding CashOutCommand}" />
+          <Button Classes="primary" Content="{loc:Tr cash.closeRegister}" Command="{Binding CloseRegisterCommand}" />
+        </StackPanel>
+      </Grid>
+
+      <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="12">
+        <Border Classes="card">
+          <StackPanel Spacing="4">
+            <TextBlock Text="{loc:Tr cash.opening}" Classes="caption" />
+            <TextBlock Text="{Binding OpeningText}" Classes="money" FontSize="22" />
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="1" Classes="accentCard">
+          <StackPanel Spacing="4">
+            <TextBlock Text="{loc:Tr cash.expectedCash}" Classes="caption" />
+            <TextBlock Text="{Binding ExpectedText}" Classes="money" FontSize="22" Foreground="{DynamicResource AccentBrush}" />
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="2" Classes="card">
+          <StackPanel Spacing="4">
+            <TextBlock Text="{loc:Tr cash.salesCount}" Classes="caption" />
+            <TextBlock Text="{Binding SalesCountText}" Classes="money" FontSize="22" />
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="3" Classes="card">
+          <StackPanel Spacing="4">
+            <TextBlock Text="{loc:Tr cash.totalSales}" Classes="caption" />
+            <TextBlock Text="{Binding SalesTotalText}" Classes="money" FontSize="22" />
+          </StackPanel>
+        </Border>
+      </Grid>
+    </StackPanel>
+
+    <!-- Closed session header -->
+    <Border Classes="card" IsVisible="{Binding !HasOpenSession}">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Spacing="4">
+          <TextBlock Text="{loc:Tr cash.registerClosed}" Classes="h2" />
+          <TextBlock Text="{loc:Tr cash.openHint}" Classes="muted" />
+        </StackPanel>
+        <Button Grid.Column="1" Classes="primary big" Content="{loc:Tr cash.openRegister}" Command="{Binding OpenRegisterCommand}" />
+      </Grid>
+    </Border>
+
+    <!-- Detail -->
+    <Grid Grid.Row="1" ColumnDefinitions="1.2*,*" ColumnSpacing="14">
+      <Border Classes="card" Padding="0">
+        <Grid RowDefinitions="Auto,*">
+          <TextBlock Text="{loc:Tr cash.movements}" Classes="h3" Margin="16,14" />
+          <ScrollViewer Grid.Row="1">
+            <ItemsControl ItemsSource="{Binding Movements}" IsVisible="{Binding HasMovements}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10" Margin="16,7">
+                    <StackPanel Spacing="2">
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="{Binding Type}" FontWeight="SemiBold" FontSize="12" />
+                        <TextBlock Text="{Binding Reason}" FontSize="12" />
+                      </StackPanel>
+                      <TextBlock Text="{Binding TimeText}" Classes="caption" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Text="{Binding AmountText}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+          <TextBlock Grid.Row="1" Text="{loc:Tr cash.noMovements}" Classes="muted" IsVisible="{Binding !HasMovements}"
+                     HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Grid>
+      </Border>
+
+      <Border Grid.Column="1" Classes="card" Padding="0">
+        <Grid RowDefinitions="Auto,*">
+          <TextBlock Text="{loc:Tr cash.byPayment}" Classes="h3" Margin="16,14" />
+          <ItemsControl Grid.Row="1" ItemsSource="{Binding Payments}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Grid ColumnDefinitions="*,Auto" Margin="16,7">
+                  <TextBlock Text="{Binding Method}" />
+                  <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                    <TextBlock Text="{Binding Count}" Classes="caption" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding TotalText}" FontWeight="SemiBold" />
+                  </StackPanel>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </Grid>
+      </Border>
+    </Grid>
+
+    <!-- History -->
+    <Border Grid.Row="2" Classes="card" Padding="0">
+      <Grid RowDefinitions="Auto,*">
+        <TextBlock Text="{loc:Tr cash.sessionHistory}" Classes="h3" Margin="16,14" />
+        <DataGrid Grid.Row="1" ItemsSource="{Binding History}" SelectedItem="{Binding SelectedHistory}"
+                  Background="Transparent" BorderThickness="0" MaxHeight="240">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="{loc:Tr cash.openedAt}" Binding="{Binding DateText}" Width="1.6*" />
+            <DataGridTextColumn Header="{loc:Tr cash.openedBy}" Binding="{Binding OpenedBy}" Width="1.5*" />
+            <DataGridTextColumn Header="{loc:Tr cash.countedCash}" Binding="{Binding ClosingText}" Width="1*" />
+            <DataGridTextColumn Header="{loc:Tr cash.difference}" Binding="{Binding DifferenceText}" Width="1*" />
+            <DataGridTemplateColumn Header="{loc:Tr common.actions}" Width="Auto">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <Button Classes="ghost" Content="{loc:Tr cash.zReport}"
+                          Command="{Binding $parent[DataGrid].DataContext.ViewSessionReportCommand}" CommandParameter="{Binding}" />
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+        </DataGrid>
+      </Grid>
+    </Border>
+
+    <StackPanel Grid.Row="3" Spacing="4">
+      <Border Classes="dangerCard" IsVisible="{Binding StatusIsError}">
+        <TextBlock Text="{Binding StatusMessage}" Classes="danger" />
+      </Border>
+      <TextBlock Text="{Binding StatusMessage}" Classes="caption" Foreground="{DynamicResource AccentBrush}" IsVisible="{Binding !StatusIsError}" />
+    </StackPanel>
+  </Grid>
+  </ScrollViewer>
+</UserControl>

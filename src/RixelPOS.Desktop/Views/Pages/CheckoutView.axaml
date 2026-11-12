@@ -1,0 +1,226 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:RixelPOS.Desktop.Localization"
+             x:Class="RixelPOS.Desktop.Views.Pages.CheckoutView">
+  <Grid RowDefinitions="Auto,*" RowSpacing="14">
+
+    <!-- Search + status -->
+    <Grid Grid.Row="0" ColumnDefinitions="*" ColumnSpacing="14">
+      <Border Classes="card" Padding="8" CornerRadius="16">
+        <Grid ColumnDefinitions="Auto,*">
+          <Path Data="{DynamicResource IconSearch}" Stroke="{DynamicResource MutedBrush}" StrokeThickness="1.8"
+                Stretch="Uniform" Width="20" Height="20" Margin="12,0" VerticalAlignment="Center" />
+          <TextBox x:Name="SearchBox" Grid.Column="1" Classes="big" Text="{Binding SearchText, Mode=TwoWay}"
+                   Watermark="{loc:Tr checkout.searchPlaceholder}"
+                   KeyDown="OnSearchKeyDown" BorderThickness="0" Background="Transparent" />
+        </Grid>
+      </Border>
+    </Grid>
+
+    <!-- Search results overlay -->
+    <Border Grid.Row="0" Grid.RowSpan="2" ZIndex="20" IsVisible="{Binding IsSearchOpen}"
+            VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="0,76,0,0"
+            Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="1" CornerRadius="16" Padding="10" MaxHeight="420">
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ItemsControl ItemsSource="{Binding SearchResults}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Button Classes="searchResult" Command="{Binding $parent[UserControl].DataContext.SelectSearchResultCommand}" CommandParameter="{Binding}">
+                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12" Margin="4,2">
+                  <StackPanel Spacing="2">
+                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Barcode}" Classes="caption" />
+                  </StackPanel>
+                  <Border Grid.Column="1" Classes="soft" Padding="8,4" CornerRadius="8" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding StockText}" Classes="caption" />
+                  </Border>
+                  <TextBlock Grid.Column="2" Text="{Binding PriceText}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                </Grid>
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+
+    <!-- Main content -->
+    <Grid Grid.Row="1" ColumnDefinitions="1.25*,0.95*" ColumnSpacing="14">
+
+      <!-- Products -->
+      <Border Classes="card" Padding="16">
+        <Grid RowDefinitions="Auto,*">
+          <StackPanel Spacing="2" Margin="0,0,0,12">
+            <TextBlock Text="{loc:Tr checkout.favorites}" Classes="h3" />
+            <TextBlock Text="{loc:Tr checkout.scanHint}" Classes="caption" />
+          </StackPanel>
+          <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Favorites}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Button Classes="productTile" Command="{Binding $parent[UserControl].DataContext.AddProductCommand}" CommandParameter="{Binding}">
+                    <StackPanel Spacing="2">
+                      <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2" FontSize="13" />
+                      <TextBlock Text="{Binding Category}" Classes="caption" />
+                      <TextBlock Text="{Binding PriceText}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="0,6,0,0" />
+                      <TextBlock Text="{Binding StockText}" Classes="caption" FontSize="10.5" />
+                    </StackPanel>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </Grid>
+      </Border>
+
+      <!-- Cart -->
+      <Border Grid.Column="1" Classes="card" Padding="16">
+        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
+
+          <!-- Customer / actions -->
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <Button Classes="ghost" HorizontalAlignment="Left" Command="{Binding PickCustomerCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <PathIcon Data="{DynamicResource IconUser}" Width="16" Height="16" />
+                <TextBlock Text="{Binding CustomerName}" />
+              </StackPanel>
+            </Button>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+              <Button Classes="ghost" Content="↺" FontSize="17" Width="36" Height="34" MinHeight="34" Padding="0" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                      ToolTip.Tip="{loc:Tr checkout.resumeSale}" Command="{Binding ResumeHeldCommand}" />
+              <Button Classes="ghost" Content="{loc:Tr checkout.clear}" FontSize="11" Padding="8,4" MinHeight="32"
+                      ToolTip.Tip="{loc:Tr checkout.clear}" Command="{Binding ClearCartCommand}" />
+            </StackPanel>
+          </Grid>
+
+          <!-- Lines -->
+          <Grid Grid.Row="1">
+            <ListBox ItemsSource="{Binding CartLines}" Background="Transparent" IsVisible="{Binding HasItems}">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" Margin="0,2">
+                    <StackPanel Spacing="3">
+                      <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="{Binding UnitPriceText}" Classes="caption" />
+                        <TextBlock Text="×" Classes="caption" />
+                        <TextBlock Text="{Binding QuantityText}" Classes="caption" />
+                        <TextBlock Text="{Binding DiscountText}" Classes="caption" Foreground="{DynamicResource AccentBrush}" IsVisible="{Binding HasDiscount}" />
+                      </StackPanel>
+                      <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,3,0,0">
+                        <Button Classes="ghost" Content="−" FontSize="17" Width="32" Height="32" MinHeight="32" Padding="0"
+                                Command="{Binding $parent[UserControl].DataContext.DecrementCommand}" CommandParameter="{Binding}" />
+                        <Button Classes="ghost" Content="{Binding QuantityText}" FontWeight="SemiBold" MinHeight="32" Padding="8,3"
+                                ToolTip.Tip="{loc:Tr checkout.quantity}"
+                                Command="{Binding $parent[UserControl].DataContext.EditQuantityCommand}" CommandParameter="{Binding}" />
+                        <Button Classes="ghost" Content="+" FontSize="17" Width="32" Height="32" MinHeight="32" Padding="0"
+                                Command="{Binding $parent[UserControl].DataContext.IncrementCommand}" CommandParameter="{Binding}" />
+                        <Button Classes="ghost" Content="%" FontSize="14" Width="32" Height="32" MinHeight="32" Padding="0"
+                                ToolTip.Tip="{loc:Tr checkout.discountLine}"
+                                Command="{Binding $parent[UserControl].DataContext.ApplyLineDiscountCommand}" CommandParameter="{Binding}" />
+                        <Button Classes="ghost" Content="×" FontSize="18" Width="32" Height="32" MinHeight="32" Padding="0"
+                                Foreground="{DynamicResource DangerBrush}"
+                                Command="{Binding $parent[UserControl].DataContext.RemoveLineCommand}" CommandParameter="{Binding}" />
+                      </StackPanel>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Text="{Binding TotalText}" FontWeight="SemiBold" VerticalAlignment="Top" />
+                  </Grid>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+            <StackPanel IsVisible="{Binding !HasItems}" VerticalAlignment="Center" Spacing="8">
+              <Border Width="56" Height="56" CornerRadius="18" Background="{DynamicResource Surface2Brush}" HorizontalAlignment="Center">
+                <PathIcon Data="{DynamicResource IconCart}" Width="26" Height="26" Foreground="{DynamicResource MutedBrush}"
+                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+              </Border>
+              <TextBlock Text="{loc:Tr checkout.cartEmpty}" FontWeight="SemiBold" HorizontalAlignment="Center" />
+              <TextBlock Text="{loc:Tr checkout.cartEmptyHint}" Classes="muted" TextWrapping="Wrap" TextAlignment="Center" />
+            </StackPanel>
+          </Grid>
+
+          <!-- Totals and actions -->
+          <StackPanel Grid.Row="2" Spacing="8">
+            <Border Classes="dangerCard" IsVisible="{Binding !IsCashOpen}">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="1">
+                  <TextBlock Text="{loc:Tr checkout.cashRegisterClosed}" FontWeight="SemiBold" />
+                  <TextBlock Text="{loc:Tr checkout.registerClosedHint}" Classes="muted" FontSize="11" TextWrapping="Wrap" />
+                </StackPanel>
+                <Button Grid.Column="1" Classes="primary" Content="{loc:Tr checkout.openRegister}" Command="{Binding OpenRegisterCommand}" />
+              </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="*,Auto" Margin="0,4">
+              <StackPanel Spacing="2">
+                <TextBlock Text="{loc:Tr common.subtotal}" Classes="caption" />
+                <TextBlock Text="{Binding SubtotalText}" />
+              </StackPanel>
+              <StackPanel Grid.Column="1" Spacing="2" HorizontalAlignment="Right">
+                <TextBlock Text="{loc:Tr common.tax}" Classes="caption" HorizontalAlignment="Right" />
+                <TextBlock Text="{Binding TaxText}" HorizontalAlignment="Right" />
+              </StackPanel>
+            </Grid>
+
+            <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding HasDiscount}">
+              <TextBlock Text="{loc:Tr common.discount}" Classes="muted" />
+              <TextBlock Grid.Column="1" Text="{Binding DiscountText}" Foreground="{DynamicResource AccentBrush}" />
+            </Grid>
+
+            <Separator />
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel Spacing="1">
+                <TextBlock Text="{loc:Tr common.total}" Classes="caption" />
+                <TextBlock Text="{Binding ItemCountText}" Classes="caption" />
+              </StackPanel>
+              <TextBlock Grid.Column="1" Text="{Binding TotalText}" Classes="bigMoney" VerticalAlignment="Center" />
+            </Grid>
+
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8">
+              <Button Classes="ghost" Content="{loc:Tr common.discount}" Padding="8,9" HorizontalAlignment="Stretch" Command="{Binding ApplySaleDiscountCommand}" />
+              <Button Grid.Column="1" Classes="ghost" Content="{loc:Tr checkout.hold}" Padding="8,9" HorizontalAlignment="Stretch" Command="{Binding HoldCommand}" />
+              <Button Grid.Row="1" Grid.ColumnSpan="2" Classes="primary big" Content="{loc:Tr checkout.charge}" HorizontalAlignment="Stretch" Command="{Binding ChargeCommand}" IsEnabled="{Binding HasItems}" />
+            </Grid>
+
+            <Border Classes="dangerCard" IsVisible="{Binding StatusIsError}">
+              <TextBlock Text="{Binding StatusMessage}" Classes="danger" TextWrapping="Wrap" FontSize="12" />
+            </Border>
+            <TextBlock Text="{Binding StatusMessage}" Classes="caption" Foreground="{DynamicResource AccentBrush}" IsVisible="{Binding !StatusIsError}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+    </Grid>
+  </Grid>
+
+  <UserControl.Styles>
+    <Style Selector="Button.productTile">
+      <Setter Property="Width" Value="154" />
+      <Setter Property="Height" Value="122" />
+      <Setter Property="Margin" Value="0,0,8,8" />
+      <Setter Property="Padding" Value="12" />
+      <Setter Property="Background" Value="{DynamicResource Surface2Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+      <Setter Property="CornerRadius" Value="14" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    </Style>
+    <Style Selector="Button.productTile:pointerover">
+      <Setter Property="Background" Value="{DynamicResource Surface3Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="Button.searchResult">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="10" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+    <Style Selector="Button.searchResult:pointerover">
+      <Setter Property="Background" Value="{DynamicResource Surface2Brush}" />
+    </Style>
+  </UserControl.Styles>
+</UserControl>

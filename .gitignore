@@ -1,0 +1,60 @@
+# Build output
+bin/
+obj/
+publish/
+dist/
+artifacts/
+*.user
+*.suo
+*.userprefs
+
+# IDEs
+.vs/
+.vscode/
+.idea/
+*.swp
+
+# Test and coverage output
+TestResults/
+coverage/
+*.coverage
+*.trx
+
+# Local runtime data (never commit a real store database, backups or logs)
+data/
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+backups/
+logs/
+documents/
+startup-error.txt
+
+# Packaging output
+*.AppImage
+*.deb
+*.msi
+*.msix
+*.pkg.tar.zst
+*.zip
+*.tar.gz
+*.nupkg
+
+# Signing material / secrets
+*.pfx
+*.p12
+*.snk
+*.key
+*.pem
+secrets.json
+appsettings.Development.json
+.env
+.env.*
+!.env.example
+
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini

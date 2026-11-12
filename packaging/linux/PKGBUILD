@@ -1,0 +1,41 @@
+# Maintainer: RixelDev <soporte@rixeldev.com>
+# AUR-ready PKGBUILD. Replace @VERSION@ (the Linux build script does it) and
+# fill the checksum for a real release.
+pkgname=rixelpos
+pkgver=@VERSION@
+pkgrel=1
+pkgdesc="Offline-first billing and point of sale by RixelDev"
+arch=('x86_64')
+url="https://rixeldev.com"
+license=('custom')
+depends=('glibc' 'icu' 'fontconfig' 'freetype2' 'harfbuzz' 'zlib'
+         'libx11' 'libice' 'libsm' 'libxext' 'libxrandr' 'libxi'
+         'libxcursor' 'libxrender' 'libxcb' 'mesa' 'libglvnd')
+makedepends=('dotnet-sdk')
+install=rixelpos.install
+source=("$pkgname-$pkgver.tar.gz::https://github.com/rixeldev/rixelpos/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+  cd "$srcdir/rixelpos-$pkgver"
+  dotnet publish src/RixelPOS.Desktop/RixelPOS.Desktop.csproj \
+    -c Release -r linux-x64 --self-contained true \
+    -p:DebugType=None -p:DebugSymbols=false \
+    -o "$srcdir/app"
+}
+
+package() {
+  install -d "$pkgdir/usr/bin" "$pkgdir/usr/lib/rixelpos" \
+    "$pkgdir/usr/share/applications" "$pkgdir/usr/share/icons/hicolor/256x256/apps" \
+    "$pkgdir/lib/udev/rules.d"
+
+  cp -a "$srcdir/app/." "$pkgdir/usr/lib/rixelpos/"
+  ln -s /usr/lib/rixelpos/RixelPOS "$pkgdir/usr/bin/rixelpos"
+  install -m644 "$srcdir/rixelpos-$pkgver/packaging/linux/rixelpos.desktop" \
+    "$pkgdir/usr/share/applications/rixelpos.desktop"
+  install -m644 "$srcdir/rixelpos-$pkgver/src/RixelPOS.Desktop/Assets/rixelpos-256.png" \
+    "$pkgdir/usr/share/icons/hicolor/256x256/apps/rixelpos.png"
+  install -m644 "$srcdir/rixelpos-$pkgver/packaging/linux/udev/99-rixelpos.rules" \
+    "$pkgdir/lib/udev/rules.d/99-rixelpos.rules"
+  install -m644 "$srcdir/rixelpos-$pkgver/LICENSE" "$pkgdir/usr/lib/rixelpos/LICENSE"
+}

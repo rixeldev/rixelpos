@@ -1,0 +1,162 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:RixelPOS.Desktop.Localization"
+             x:Class="RixelPOS.Desktop.Views.Pages.ReportsView">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Spacing="14" Margin="0,0,6,16">
+      <!-- Filters -->
+      <Border Classes="card">
+        <Grid RowDefinitions="Auto,Auto" RowSpacing="8">
+          <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*" ColumnSpacing="8">
+            <Button Classes="chip" Content="{loc:Tr reports.today}" Command="{Binding TodayCommand}" />
+            <Button Grid.Column="1" Classes="chip" Content="{loc:Tr reports.last7}" Command="{Binding LastWeekCommand}" />
+            <Button Grid.Column="2" Classes="chip" Content="{loc:Tr reports.thisMonth}" Command="{Binding ThisMonthCommand}" />
+            <DatePicker Grid.Column="3" SelectedDate="{Binding FromDate}" Width="125" />
+            <DatePicker Grid.Column="4" SelectedDate="{Binding ToDate}" Width="125" />
+            <Button Grid.Column="5" Classes="primary" Content="{loc:Tr reports.apply}" Command="{Binding GenerateCommand}" HorizontalAlignment="Left" />
+          </Grid>
+          <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
+            <Button Classes="ghost" Content="{loc:Tr reports.exportCsv}" Command="{Binding ExportCsvCommand}" />
+            <Button Classes="ghost" Content="{loc:Tr reports.exportPdf}" Command="{Binding ExportPdfCommand}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!-- Summary -->
+      <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="12">
+        <Border Classes="card"><StackPanel Spacing="3"><TextBlock Text="{loc:Tr reports.gross}" Classes="caption" /><TextBlock Text="{Binding TotalText}" Classes="money" FontSize="21" /></StackPanel></Border>
+        <Border Grid.Column="1" Classes="card"><StackPanel Spacing="3"><TextBlock Text="{loc:Tr reports.sales}" Classes="caption" /><TextBlock Text="{Binding CountText}" Classes="money" FontSize="21" /></StackPanel></Border>
+        <Border Grid.Column="2" Classes="card"><StackPanel Spacing="3"><TextBlock Text="{loc:Tr reports.tax}" Classes="caption" /><TextBlock Text="{Binding TaxText}" Classes="money" FontSize="21" /></StackPanel></Border>
+        <Border Grid.Column="3" Classes="card"><StackPanel Spacing="3"><TextBlock Text="{loc:Tr reports.profit}" Classes="caption" /><TextBlock Text="{Binding ProfitText}" Classes="money" FontSize="21" Foreground="{DynamicResource SuccessBrush}" /></StackPanel></Border>
+        <Border Grid.Column="4" Classes="card"><StackPanel Spacing="3"><TextBlock Text="{loc:Tr reports.averageTicket}" Classes="caption" /><TextBlock Text="{Binding AverageText}" Classes="money" FontSize="21" /></StackPanel></Border>
+      </Grid>
+
+      <!-- Charts -->
+      <Grid ColumnDefinitions="1.15*,*" ColumnSpacing="14">
+        <Border Classes="card">
+          <StackPanel Spacing="10">
+            <Grid ColumnDefinitions="*,Auto"><TextBlock Text="{loc:Tr reports.byDay}" Classes="h3" /><TextBlock Grid.Column="1" Text="{Binding RangeText}" Classes="caption" /></Grid>
+            <ScrollViewer MaxHeight="360">
+              <ItemsControl ItemsSource="{Binding Daily}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="52,*,Auto" ColumnSpacing="8" Margin="0,3">
+                      <TextBlock Text="{Binding DateText}" Classes="caption" VerticalAlignment="Center" />
+                      <ProgressBar Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding Percent}" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="2" Text="{Binding TotalText}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="1" Classes="card" Padding="0">
+          <Grid RowDefinitions="Auto,*">
+            <TextBlock Text="{loc:Tr reports.byProduct}" Classes="h3" Margin="16,14" />
+            <DataGrid Grid.Row="1" ItemsSource="{Binding TopProducts}" Background="Transparent" BorderThickness="0" MaxHeight="360">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="{loc:Tr suppliers.product}" Binding="{Binding Name}" Width="2*" MinWidth="150" />
+                <DataGridTextColumn Header="" Binding="{Binding QuantityText}" Width="0.6*" MinWidth="45" />
+                <DataGridTextColumn Header="{loc:Tr common.total}" Binding="{Binding TotalText}" Width="1*" MinWidth="95" />
+                <DataGridTextColumn Header="Ganancia" Binding="{Binding ProfitText}" Width="1*" MinWidth="95" />
+              </DataGrid.Columns>
+            </DataGrid>
+          </Grid>
+        </Border>
+      </Grid>
+
+      <Grid ColumnDefinitions="*,*,*" ColumnSpacing="14">
+        <Border Classes="card" Padding="0">
+          <Grid RowDefinitions="Auto,*">
+            <TextBlock Text="{loc:Tr reports.byPayment}" Classes="h3" Margin="16,14" />
+            <ItemsControl Grid.Row="1" ItemsSource="{Binding Payments}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="*,Auto" Margin="16,6">
+                    <TextBlock Text="{Binding Method}" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                      <TextBlock Text="{Binding CountText}" Classes="caption" VerticalAlignment="Center" />
+                      <TextBlock Text="{Binding TotalText}" FontWeight="SemiBold" />
+                    </StackPanel>
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </Grid>
+        </Border>
+
+        <Border Grid.Column="1" Classes="card" Padding="0">
+          <Grid RowDefinitions="Auto,*">
+            <TextBlock Text="{loc:Tr reports.byCashier}" Classes="h3" Margin="16,14" />
+            <ItemsControl Grid.Row="1" ItemsSource="{Binding Cashiers}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="*,Auto" Margin="16,6">
+                    <TextBlock Text="{Binding Name}" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                      <TextBlock Text="{Binding CountText}" Classes="caption" VerticalAlignment="Center" />
+                      <TextBlock Text="{Binding TotalText}" FontWeight="SemiBold" />
+                    </StackPanel>
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </Grid>
+        </Border>
+
+        <Border Grid.Column="2" Classes="card" Padding="0">
+          <Grid RowDefinitions="Auto,*">
+            <TextBlock Text="{loc:Tr reports.byCategory}" Classes="h3" Margin="16,14" />
+            <ItemsControl Grid.Row="1" ItemsSource="{Binding Categories}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="*,Auto" Margin="16,6">
+                    <TextBlock Text="{Binding Name}" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                      <TextBlock Text="{Binding QuantityText}" Classes="caption" VerticalAlignment="Center" />
+                      <TextBlock Text="{Binding TotalText}" FontWeight="SemiBold" />
+                    </StackPanel>
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </Grid>
+        </Border>
+      </Grid>
+
+      <StackPanel Spacing="4">
+        <Border Classes="dangerCard" IsVisible="{Binding StatusIsError}">
+          <TextBlock Text="{Binding StatusMessage}" Classes="danger" />
+        </Border>
+        <TextBlock Text="{Binding StatusMessage}" Classes="caption" Foreground="{DynamicResource AccentBrush}" IsVisible="{Binding !StatusIsError}" />
+      </StackPanel>
+
+      <!-- Invoice lookup / reprint -->
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Text="{loc:Tr checkout.reprint}" Classes="h3" />
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <TextBox Text="{Binding InvoiceSearch}" Watermark="A-000123" />
+            <Button Grid.Column="1" Classes="primary" Content="{loc:Tr common.search}" Command="{Binding SearchInvoiceCommand}" />
+          </Grid>
+          <Border Classes="soft" IsVisible="{Binding HasFoundInvoice}">
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+              <StackPanel Spacing="2">
+                <TextBlock Text="{Binding FoundInvoiceNumber}" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding FoundInvoiceDate}" Classes="caption" />
+              </StackPanel>
+              <TextBlock Grid.Column="1" Text="{Binding FoundInvoiceTotal}" FontWeight="Bold" VerticalAlignment="Center" />
+              <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6">
+                <Button Classes="ghost" Content="{loc:Tr receipt.reprint}" Command="{Binding ReprintInvoiceCommand}" />
+                <Button Classes="ghost" Content="{loc:Tr receipt.invoicePdf}" Command="{Binding ExportInvoicePdfCommand}" />
+              </StackPanel>
+            </Grid>
+          </Border>
+          <TextBlock Text="{Binding InvoiceSearchMessage}" Classes="caption" />
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

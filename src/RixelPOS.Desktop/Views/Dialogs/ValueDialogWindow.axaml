@@ -1,0 +1,25 @@
+<dialogs:DialogWindow xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:dialogs="using:RixelPOS.Desktop.Views.Dialogs"
+                     x:Class="RixelPOS.Desktop.Views.Dialogs.ValueDialogWindow"
+                     Title="{Binding Title}"
+                     Width="460" SizeToContent="Height"
+                     CanResize="False" ShowInTaskbar="False"
+                     WindowStartupLocation="CenterOwner"
+                     Background="{DynamicResource SurfaceBrush}">
+  <StackPanel Margin="24" Spacing="16">
+    <TextBlock Text="{Binding Title}" Classes="h2" />
+    <StackPanel Spacing="6">
+      <TextBlock Text="{Binding Label}" Classes="caption" />
+      <TextBox x:Name="ValueBox" Text="{Binding ValueText}" Classes="big" />
+      <TextBlock Text="{Binding Hint}" Classes="caption" />
+    </StackPanel>
+    <Border Classes="dangerCard" IsVisible="{Binding HasErrorMessage}">
+      <TextBlock Text="{Binding ErrorMessage}" Classes="danger" TextWrapping="Wrap" />
+    </Border>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+      <Button Content="Cancelar" Classes="ghost" Command="{Binding CancelCommand}" />
+      <Button Content="Aceptar" Classes="primary" Command="{Binding ConfirmCommand}" />
+    </StackPanel>
+  </StackPanel>
+</dialogs:DialogWindow>

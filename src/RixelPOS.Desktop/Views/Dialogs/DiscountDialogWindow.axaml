@@ -1,0 +1,43 @@
+<dialogs:DialogWindow xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:dialogs="using:RixelPOS.Desktop.Views.Dialogs"
+                     xmlns:loc="using:RixelPOS.Desktop.Localization"
+                     x:Class="RixelPOS.Desktop.Views.Dialogs.DiscountDialogWindow"
+                     Title="{Binding Title}"
+                     Width="480" SizeToContent="Height" CanResize="False" ShowInTaskbar="False"
+                     WindowStartupLocation="CenterOwner" Background="{DynamicResource SurfaceBrush}">
+  <StackPanel Margin="24" Spacing="16">
+    <TextBlock Text="{Binding Title}" Classes="h2" />
+    <Grid ColumnDefinitions="*,Auto">
+      <TextBlock Text="{loc:Tr common.subtotal}" Classes="caption" />
+      <TextBlock Grid.Column="1" Text="{Binding BaseText}" FontWeight="SemiBold" />
+    </Grid>
+    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+      <StackPanel Spacing="6">
+        <TextBlock Text="{loc:Tr checkout.discountPercent} / {loc:Tr checkout.discountFixed}" Classes="caption" />
+        <ComboBox SelectedIndex="{Binding TypeIndex}" HorizontalAlignment="Stretch">
+          <ComboBoxItem Content="{loc:Tr checkout.discountPercent}" />
+          <ComboBoxItem Content="{loc:Tr checkout.discountFixed}" />
+        </ComboBox>
+      </StackPanel>
+      <StackPanel Grid.Column="1" Spacing="6">
+        <TextBlock Text="{loc:Tr common.amount}" Classes="caption" />
+        <TextBox Text="{Binding ValueText}" Classes="big" />
+      </StackPanel>
+    </Grid>
+    <Border Classes="accentCard">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Text="{loc:Tr common.discount}" FontWeight="SemiBold" />
+        <TextBlock Grid.Column="1" Text="{Binding PreviewText}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" />
+      </Grid>
+    </Border>
+    <Border Classes="dangerCard" IsVisible="{Binding HasErrorMessage}">
+      <TextBlock Text="{Binding ErrorMessage}" Classes="danger" TextWrapping="Wrap" />
+    </Border>
+    <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8">
+      <Button Content="{loc:Tr common.clear}" Classes="ghost" Command="{Binding ClearCommand}" />
+      <Button Grid.Column="2" Content="{loc:Tr common.cancel}" Classes="ghost" Command="{Binding CancelCommand}" />
+      <Button Grid.Column="3" Content="{loc:Tr checkout.applyDiscount}" Classes="primary" Command="{Binding ConfirmCommand}" />
+    </Grid>
+  </StackPanel>
+</dialogs:DialogWindow>

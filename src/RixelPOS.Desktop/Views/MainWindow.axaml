@@ -1,0 +1,122 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:RixelPOS.Desktop.Localization"
+        xmlns:vm="using:RixelPOS.Desktop.ViewModels"
+        xmlns:pages="using:RixelPOS.Desktop.Views.Pages"
+        x:Class="RixelPOS.Desktop.Views.MainWindow"
+        Title="{Binding BusinessName}"
+        Icon="avares://RixelPOS/Assets/rixelpos.png"
+        Width="1280" Height="800"
+        MinWidth="1050" MinHeight="620"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource AppBgBrush}">
+
+  <Window.DataTemplates>
+    <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+      <pages:DashboardView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:CheckoutViewModel}">
+      <pages:CheckoutView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:InventoryViewModel}">
+      <pages:InventoryView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:CustomersViewModel}">
+      <pages:CustomersView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:SuppliersViewModel}">
+      <pages:SuppliersView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:CashRegisterViewModel}">
+      <pages:CashRegisterView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:ReportsViewModel}">
+      <pages:ReportsView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+      <pages:SettingsView />
+    </DataTemplate>
+  </Window.DataTemplates>
+
+  <Grid ColumnDefinitions="244,*">
+    <!-- Sidebar -->
+    <Border Grid.Column="0" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="0,0,1,0" Padding="14,18">
+      <Grid RowDefinitions="Auto,*,Auto">
+        <StackPanel Orientation="Horizontal" Spacing="10" Margin="6,0,0,22">
+          <Image Source="avares://RixelPOS/Assets/rixelpos.png" Width="38" Height="38" />
+          <StackPanel VerticalAlignment="Center" Spacing="1">
+            <TextBlock Text="RixelPOS" FontSize="18" FontWeight="Bold" />
+            <TextBlock Text="RixelDev" FontSize="10" Foreground="{DynamicResource AccentBrush}" />
+          </StackPanel>
+        </StackPanel>
+
+        <ListBox Grid.Row="1" Classes="nav" ItemsSource="{Binding NavItems}" SelectedItem="{Binding SelectedNavItem}"
+                 Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                <Path Data="{Binding Icon}" Stroke="{Binding $parent[ListBoxItem].Foreground}"
+                      StrokeThickness="1.8" Stretch="Uniform" Width="19" Height="19" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="{Binding Label}" FontSize="13.5" VerticalAlignment="Center" />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+
+        <StackPanel Grid.Row="2" Spacing="10">
+          <Separator Margin="4,0" />
+          <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Margin="2,0">
+            <Border Width="38" Height="38" CornerRadius="12" Background="{DynamicResource AccentSoftBrush}">
+              <TextBlock Text="{Binding Initials}" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <StackPanel Grid.Column="1" Spacing="1" VerticalAlignment="Center">
+              <TextBlock Text="{Binding UserName}" FontSize="12.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+              <TextBlock Text="{Binding RoleLabel}" Classes="caption" />
+            </StackPanel>
+            <Button Grid.Column="2" Classes="icon ghost" ToolTip.Tip="{loc:Tr nav.logout}" Command="{Binding LogoutCommand}">
+              <PathIcon Data="{DynamicResource IconLogout}" Width="17" Height="17" />
+            </Button>
+          </Grid>
+          <TextBlock Text="{Binding BusinessName}" Classes="caption" TextTrimming="CharacterEllipsis" Margin="4,0" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- Main area -->
+    <Grid Grid.Column="1" RowDefinitions="Auto,*" Margin="22,18,22,0">
+      <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+        <StackPanel Spacing="2">
+          <TextBlock Text="{Binding PageTitle}" Classes="h1" />
+          <TextBlock Text="{Binding DateText}" Classes="caption" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <Border Classes="soft" Padding="14,7" CornerRadius="20" MinWidth="154" VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+              <Ellipse Width="8" Height="8" VerticalAlignment="Center" Classes="statusDot" Classes.open="{Binding IsCashOpen}" />
+              <TextBlock Text="{Binding CashStatus}" FontSize="12" VerticalAlignment="Center" />
+            </StackPanel>
+          </Border>
+          <Button Classes="icon ghost" ToolTip.Tip="{loc:Tr settings.theme}" Command="{Binding ToggleThemeCommand}">
+            <PathIcon Data="{DynamicResource IconMoon}" Width="18" Height="18" />
+          </Button>
+          <Button Classes="icon ghost" ToolTip.Tip="{loc:Tr nav.logout}" Command="{Binding LogoutCommand}">
+            <PathIcon Data="{DynamicResource IconLock}" Width="18" Height="18" />
+          </Button>
+        </StackPanel>
+      </Grid>
+
+      <ContentControl Grid.Row="1" Content="{Binding CurrentPage}" />
+    </Grid>
+  </Grid>
+
+  <Window.Styles>
+    <Style Selector="Ellipse.statusDot">
+      <Setter Property="Fill" Value="{DynamicResource DangerBrush}" />
+    </Style>
+    <Style Selector="Ellipse.statusDot.open">
+      <Setter Property="Fill" Value="{DynamicResource SuccessBrush}" />
+    </Style>
+  </Window.Styles>
+</Window>

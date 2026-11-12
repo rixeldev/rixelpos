@@ -1,0 +1,182 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:RixelPOS.Desktop.Localization"
+             x:Class="RixelPOS.Desktop.Views.Pages.DashboardView">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Spacing="20" Margin="0,0,6,16">
+
+      <!-- Header -->
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Spacing="4">
+          <TextBlock Text="{Binding Greeting}" Classes="h1" />
+          <TextBlock Text="{loc:Tr dashboard.quickActions}" Classes="muted" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+          <Button Classes="ghost" Content="{loc:Tr dashboard.receiveStock}" Command="{Binding ReceiveStockCommand}" />
+          <Button Classes="ghost" Content="{loc:Tr dashboard.viewReports}" Command="{Binding ViewReportsCommand}" />
+          <Button Classes="primary big" Content="{loc:Tr dashboard.newSale}" Command="{Binding NewSaleCommand}" />
+        </StackPanel>
+      </Grid>
+
+      <!-- Cash alert -->
+      <Border Classes="dangerCard" IsVisible="{Binding !IsCashOpen}">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Spacing="2">
+            <TextBlock Text="{loc:Tr dashboard.cashClosedHint}" FontWeight="SemiBold" />
+            <TextBlock Text="{loc:Tr checkout.registerClosedHint}" Classes="muted" FontSize="12" />
+          </StackPanel>
+          <Button Grid.Column="1" Classes="primary" Content="{loc:Tr dashboard.openRegisterNow}" Command="{Binding OpenRegisterCommand}" />
+        </Grid>
+      </Border>
+
+      <!-- Metrics -->
+      <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="14">
+        <Border Classes="card">
+          <StackPanel Spacing="6">
+            <TextBlock Text="{loc:Tr dashboard.todaySales}" Classes="caption" />
+            <TextBlock Text="{Binding TodayTotal}" Classes="money" FontSize="26" />
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="1" Classes="card">
+          <StackPanel Spacing="4">
+            <TextBlock Text="{loc:Tr dashboard.todayCount}" Classes="caption" />
+            <TextBlock Text="{Binding TodayCount}" Classes="money" FontSize="26" />
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <TextBlock Text="{loc:Tr dashboard.averageTicket}" Classes="caption" />
+              <TextBlock Text="{Binding AverageTicket}" Classes="caption" FontWeight="SemiBold" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="2" Classes="card">
+          <StackPanel Spacing="6">
+            <TextBlock Text="{loc:Tr dashboard.monthSales}" Classes="caption" />
+            <TextBlock Text="{Binding MonthTotal}" Classes="money" FontSize="26" />
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="3" Classes="card">
+          <StackPanel Spacing="4">
+            <TextBlock Text="{loc:Tr dashboard.lowStock}" Classes="caption" />
+            <TextBlock Text="{Binding LowStockCount}" Classes="money" FontSize="26"
+                       Foreground="{DynamicResource WarningBrush}" />
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <TextBlock Text="{loc:Tr dashboard.products}" Classes="caption" />
+              <TextBlock Text="{Binding ProductCount}" Classes="caption" FontWeight="SemiBold" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- Lower grid -->
+      <Grid ColumnDefinitions="1.4*,*" ColumnSpacing="14">
+        <Border Classes="card">
+          <StackPanel Spacing="10">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="{loc:Tr dashboard.recentSales}" Classes="h3" />
+            </Grid>
+            <ItemsControl ItemsSource="{Binding RecentSales}" IsVisible="{Binding HasSales}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Classes="soft" Margin="0,3" Padding="12,9" CornerRadius="10">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                      <StackPanel Spacing="2">
+                        <TextBlock Text="{Binding InvoiceNumber}" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding CustomerName}" Classes="caption" />
+                      </StackPanel>
+                      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                        <StackPanel Spacing="2" VerticalAlignment="Center">
+                          <TextBlock Text="{Binding TotalText}" FontWeight="SemiBold" HorizontalAlignment="Right" />
+                          <TextBlock Text="{Binding DateText}" Classes="caption" HorizontalAlignment="Right" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+                          <Button Classes="ghost" Width="34" Height="32" MinHeight="32" Padding="0"
+                                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                                  ToolTip.Tip="{loc:Tr receipt.reprint}"
+                                  Command="{Binding $parent[UserControl].DataContext.ReprintCommand}" CommandParameter="{Binding}">
+                            <Path Data="{DynamicResource IconRefresh}" Stroke="{DynamicResource TextBrush}" StrokeThickness="1.7"
+                                  Width="16" Height="16" Stretch="Uniform" />
+                          </Button>
+                          <Button Classes="ghost" Width="34" Height="32" MinHeight="32" Padding="0"
+                                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                                  ToolTip.Tip="{loc:Tr receipt.invoicePdf}"
+                                  Command="{Binding $parent[UserControl].DataContext.ExportPdfCommand}" CommandParameter="{Binding}">
+                            <Path Data="{DynamicResource IconReceipt}" Stroke="{DynamicResource TextBrush}" StrokeThickness="1.7"
+                                  Width="16" Height="16" Stretch="Uniform" />
+                          </Button>
+                          <Button Classes="ghost" Width="34" Height="32" MinHeight="32" Padding="0"
+                                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                                  Foreground="{DynamicResource DangerBrush}" ToolTip.Tip="{loc:Tr checkout.voidSale}"
+                                  IsVisible="{Binding !IsVoided}"
+                                  Command="{Binding $parent[UserControl].DataContext.VoidSaleCommand}" CommandParameter="{Binding}">
+                            <Path Data="{DynamicResource IconClose}" Stroke="{DynamicResource DangerBrush}" StrokeThickness="1.8"
+                                  Width="14" Height="14" Stretch="Uniform" />
+                          </Button>
+                        </StackPanel>
+                      </StackPanel>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <StackPanel IsVisible="{Binding !HasSales}" Spacing="6" Margin="0,20">
+              <TextBlock Text="{loc:Tr dashboard.noSales}" FontWeight="SemiBold" HorizontalAlignment="Center" />
+              <TextBlock Text="{loc:Tr dashboard.noSalesHint}" Classes="muted" HorizontalAlignment="Center" />
+              <Button Classes="primary" Content="{loc:Tr dashboard.newSale}" Command="{Binding NewSaleCommand}" HorizontalAlignment="Center" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Column="1" Spacing="14">
+          <Border Classes="card">
+            <StackPanel Spacing="10">
+              <TextBlock Text="{loc:Tr dashboard.topProducts}" Classes="h3" />
+              <ItemsControl ItemsSource="{Binding TopProducts}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,5">
+                      <StackPanel Spacing="1">
+                        <TextBlock Text="{Binding Name}" FontSize="13" />
+                        <TextBlock Text="{Binding QuantityText}" Classes="caption" />
+                      </StackPanel>
+                      <TextBlock Grid.Column="1" Text="{Binding TotalText}" FontWeight="SemiBold" FontSize="13" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <TextBlock Text="{loc:Tr dashboard.noSales}" Classes="muted" IsVisible="{Binding !HasSales}" />
+            </StackPanel>
+          </Border>
+
+          <Border Classes="card">
+            <StackPanel Spacing="10">
+              <TextBlock Text="{loc:Tr dashboard.lowStockProducts}" Classes="h3" />
+              <ItemsControl ItemsSource="{Binding LowStockItems}" IsVisible="{Binding HasLowStock}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,5">
+                      <StackPanel Spacing="1">
+                        <TextBlock Text="{Binding Name}" FontSize="13" />
+                        <TextBlock Text="{Binding MinText}" Classes="caption" />
+                      </StackPanel>
+                      <Border Grid.Column="1" Background="{DynamicResource WarningSoftBrush}" CornerRadius="8" Padding="8,3" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding StockText}" Foreground="{DynamicResource WarningBrush}" FontWeight="SemiBold" FontSize="12" />
+                      </Border>
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <StackPanel IsVisible="{Binding !HasLowStock}" Spacing="4">
+                <TextBlock Text="{loc:Tr dashboard.noLowStock}" FontWeight="SemiBold" />
+                <TextBlock Text="{loc:Tr dashboard.noLowStockHint}" Classes="caption" TextWrapping="Wrap" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </Grid>
+
+      <Border Classes="dangerCard" IsVisible="{Binding StatusIsError}">
+        <TextBlock Text="{Binding StatusMessage}" Classes="danger" TextWrapping="Wrap" />
+      </Border>
+      <TextBlock Text="{Binding StatusMessage}" Classes="muted" IsVisible="{Binding !StatusIsError}" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,0 +1,225 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:RixelPOS.Desktop.Localization"
+             x:Class="RixelPOS.Desktop.Views.Pages.InventoryView">
+  <TabControl SelectedIndex="{Binding SelectedTabIndex}" SelectionChanged="OnTabChanged">
+    <!-- ================= PRODUCTS ================= -->
+    <TabItem Header="{loc:Tr inventory.tabProducts}">
+      <Grid DataContext="{Binding Products}" RowDefinitions="Auto,*" RowSpacing="12" Margin="0,12,0,0">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+            <TextBox Text="{Binding SearchText}" Watermark="{loc:Tr common.search}" />
+            <CheckBox Grid.Column="1" Content="{loc:Tr inventory.lowStockOnly}" IsChecked="{Binding LowStockOnly}" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="2" Text="{Binding CountText}" Classes="caption" VerticalAlignment="Center" />
+          </Grid>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+            <Button Classes="ghost" Content="{loc:Tr inventory.importCsv}" Command="{Binding ImportCsvCommand}" />
+            <Button Classes="ghost" Content="{loc:Tr inventory.exportCsv}" Command="{Binding ExportCsvCommand}" />
+            <Button Classes="ghost" Content="{loc:Tr inventory.template}" Command="{Binding DownloadTemplateCommand}" />
+            <Button Classes="primary" Content="{loc:Tr inventory.newProduct}" Command="{Binding NewProductCommand}" />
+          </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="1" Classes="card" Padding="0">
+          <DataGrid ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedProduct}"
+                    BorderThickness="0" Background="Transparent" IsReadOnly="True"
+                    ScrollViewer.HorizontalScrollBarVisibility="Auto">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="{loc:Tr common.name}" Binding="{Binding Name}" Width="165" />
+              <DataGridTextColumn Header="{loc:Tr common.sku}" Binding="{Binding Sku}" Width="80" />
+              <DataGridTextColumn Header="{loc:Tr inventory.code}" Binding="{Binding Barcode}" Width="145" />
+              <DataGridTextColumn Header="{loc:Tr common.category}" Binding="{Binding Category}" Width="125" />
+              <DataGridTextColumn Header="{loc:Tr common.price}" Binding="{Binding PriceText}" Width="110" />
+              <DataGridTextColumn Header="Stock" Binding="{Binding StockText}" Width="80" />
+              <DataGridTextColumn Header="{loc:Tr common.status}" Binding="{Binding Status}" Width="100" />
+              <DataGridTemplateColumn Header="{loc:Tr common.actions}" Width="165">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Spacing="2">
+                      <Button Classes="icon ghost" Width="32" Height="32" MinWidth="32" MinHeight="32" ToolTip.Tip="{loc:Tr common.edit}"
+                              Command="{Binding $parent[DataGrid].DataContext.EditProductCommand}" CommandParameter="{Binding}">
+                        <TextBlock Text="✎" FontSize="15" Foreground="{DynamicResource TextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      </Button>
+                      <Button Classes="icon ghost" Width="32" Height="32" MinWidth="32" MinHeight="32" ToolTip.Tip="{loc:Tr inventory.adjustStock}"
+                              Command="{Binding $parent[DataGrid].DataContext.AdjustStockCommand}" CommandParameter="{Binding}">
+                        <TextBlock Text="±" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      </Button>
+                      <Button Classes="icon ghost" Width="32" Height="32" MinWidth="32" MinHeight="32" ToolTip.Tip="{loc:Tr inventory.printLabel}"
+                              Command="{Binding $parent[DataGrid].DataContext.PrintLabelCommand}" CommandParameter="{Binding}">
+                        <TextBlock Text="▤" FontSize="15" Foreground="{DynamicResource TextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      </Button>
+                      <Button Classes="icon ghost" Width="32" Height="32" MinWidth="32" MinHeight="32" ToolTip.Tip="{loc:Tr inventory.archiveProduct}"
+                              Command="{Binding $parent[DataGrid].DataContext.ArchiveProductCommand}" CommandParameter="{Binding}">
+                        <TextBlock Text="×" FontSize="19" Foreground="{DynamicResource DangerBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      </Button>
+                    </StackPanel>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+            </DataGrid.Columns>
+          </DataGrid>
+        </Border>
+        <Border Grid.Row="1" Classes="dangerCard" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="12" IsVisible="{Binding StatusIsError}">
+          <TextBlock Text="{Binding StatusMessage}" Classes="danger" />
+        </Border>
+        <TextBlock Grid.Row="1" Text="{Binding StatusMessage}" Classes="caption" Margin="14,8" VerticalAlignment="Bottom"
+                   Foreground="{DynamicResource AccentBrush}" IsVisible="{Binding !StatusIsError}" />
+      </Grid>
+    </TabItem>
+
+    <!-- ================= RECEIVE ================= -->
+    <TabItem Header="{loc:Tr inventory.tabReceive}">
+      <Grid DataContext="{Binding Receive}" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12" Margin="0,12,0,0">
+        <StackPanel Spacing="4">
+          <TextBlock Text="{loc:Tr inventory.receiveTitle}" Classes="h2" />
+          <TextBlock Text="{loc:Tr inventory.receiveHint}" Classes="muted" TextWrapping="Wrap" />
+        </StackPanel>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="10">
+          <TextBox x:Name="ReceiveScanBox" Classes="big" Text="{Binding ScanText}" KeyDown="OnReceiveKeyDown"
+                   Watermark="{loc:Tr inventory.scanPlaceholder}" />
+          <Button Grid.Column="1" Classes="primary big" Content="{loc:Tr common.add}" Command="{Binding CommitScanCommand}" />
+        </Grid>
+
+        <Grid Grid.Row="2" ColumnDefinitions="1.6*,*" ColumnSpacing="14">
+          <Border Classes="card" Padding="0">
+            <Grid RowDefinitions="Auto,*">
+              <Grid ColumnDefinitions="*,Auto" Margin="16,14">
+                <TextBlock Text="{loc:Tr inventory.pending}" Classes="h3" />
+                <TextBlock Grid.Column="1" Text="{Binding Items.Count, StringFormat='{}{0} items'}" Classes="caption" />
+              </Grid>
+              <ScrollViewer Grid.Row="1">
+                <ItemsControl ItemsSource="{Binding Items}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Border Classes="soft" Margin="12,3" Padding="12">
+                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                          <StackPanel Spacing="2">
+                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                              <TextBlock Text="{Binding Code}" Classes="caption" />
+                              <TextBlock Text="{Binding KindText}" Classes="caption" Foreground="{DynamicResource AccentBrush}" />
+                              <TextBlock Text="{Binding StockText}" Classes="caption" />
+                            </StackPanel>
+                          </StackPanel>
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="3" VerticalAlignment="Center">
+                            <Button Classes="icon ghost" Width="28" Height="28" MinWidth="28" MinHeight="28"
+                                    Command="{Binding $parent[UserControl].DataContext.Receive.DecrementCommand}" CommandParameter="{Binding}">
+                              <PathIcon Data="{DynamicResource IconMinus}" Width="11" Height="11" />
+                            </Button>
+                            <Border Width="48" Classes="soft" Padding="4" CornerRadius="8">
+                              <TextBlock Text="{Binding QuantityText}" HorizontalAlignment="Center" FontWeight="SemiBold" />
+                            </Border>
+                            <Button Classes="icon ghost" Width="28" Height="28" MinWidth="28" MinHeight="28"
+                                    Command="{Binding $parent[UserControl].DataContext.Receive.IncrementCommand}" CommandParameter="{Binding}">
+                              <PathIcon Data="{DynamicResource IconPlus}" Width="11" Height="11" />
+                            </Button>
+                          </StackPanel>
+                          <Button Grid.Column="2" Classes="icon ghost" Width="30" Height="30" MinWidth="30" MinHeight="30"
+                                  Command="{Binding $parent[UserControl].DataContext.Receive.RemoveCommand}" CommandParameter="{Binding}">
+                            <PathIcon Data="{DynamicResource IconTrash}" Width="13" Height="13" />
+                          </Button>
+                        </Grid>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </ScrollViewer>
+            </Grid>
+          </Border>
+
+          <StackPanel Grid.Column="1" Spacing="12">
+            <Border Classes="card">
+              <StackPanel Spacing="6">
+                <TextBlock Text="{loc:Tr inventory.lastScan}" Classes="caption" />
+                <TextBlock Text="{Binding LastScanName}" Classes="h3" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding LastScanDetail}" Classes="muted" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+            <Border Classes="accentCard">
+              <StackPanel Spacing="8">
+                <TextBlock Text="{loc:Tr inventory.receiveHint}" TextWrapping="Wrap" FontSize="12" />
+                <Button Classes="primary big" Content="{loc:Tr inventory.confirmReceive}" Command="{Binding ConfirmCommand}"
+                        HorizontalAlignment="Stretch" IsEnabled="{Binding HasItems}" />
+                <Button Classes="ghost" Content="{loc:Tr inventory.clearBatch}" Command="{Binding ClearBatchCommand}" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </Grid>
+
+        <StackPanel Grid.Row="3" Spacing="4">
+          <Border Classes="dangerCard" IsVisible="{Binding StatusIsError}">
+            <TextBlock Text="{Binding StatusMessage}" Classes="danger" />
+          </Border>
+          <TextBlock Text="{Binding StatusMessage}" Classes="caption" Foreground="{DynamicResource AccentBrush}" IsVisible="{Binding !StatusIsError}" />
+        </StackPanel>
+      </Grid>
+    </TabItem>
+
+    <!-- ================= COUNT ================= -->
+    <TabItem Header="{loc:Tr inventory.tabCount}">
+      <Grid DataContext="{Binding Count}" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12" Margin="0,12,0,0">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Spacing="4">
+            <TextBlock Text="{loc:Tr inventory.countTitle}" Classes="h2" />
+            <TextBlock Text="{loc:Tr inventory.countHint}" Classes="muted" TextWrapping="Wrap" />
+          </StackPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+            <Button Classes="primary" Content="{loc:Tr inventory.startCount}" Command="{Binding StartCountCommand}" IsVisible="{Binding !HasOpenCount}" />
+            <Button Classes="ghost" Content="{loc:Tr inventory.exportCsv}" Command="{Binding ExportCommand}" IsVisible="{Binding HasOpenCount}" />
+            <Button Classes="primary" Content="{loc:Tr inventory.finishCount}" Command="{Binding FinishCommand}" IsVisible="{Binding HasOpenCount}" />
+          </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="10" IsVisible="{Binding HasOpenCount}">
+          <TextBox x:Name="CountScanBox" Classes="big" Text="{Binding ScanText}" KeyDown="OnCountKeyDown"
+                   Watermark="{loc:Tr inventory.scanCount}" />
+          <Border Grid.Column="1" Classes="soft" Padding="12,8" CornerRadius="10">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock Text="{loc:Tr inventory.countItems}" Classes="caption" />
+              <TextBlock Text="{Binding CountedText}" FontWeight="SemiBold" />
+            </StackPanel>
+          </Border>
+          <Border Grid.Column="2" Classes="soft" Padding="12,8" CornerRadius="10">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock Text="{loc:Tr inventory.differenceItems}" Classes="caption" />
+              <TextBlock Text="{Binding DifferenceText}" FontWeight="SemiBold" />
+            </StackPanel>
+          </Border>
+          <CheckBox Grid.Column="3" Content="{loc:Tr inventory.applyAdjustments}" IsChecked="{Binding ApplyAdjustments}" VerticalAlignment="Center" />
+        </Grid>
+
+        <Border Grid.Row="2" Classes="card" Padding="0" IsVisible="{Binding HasOpenCount}">
+          <DataGrid ItemsSource="{Binding Items}" IsReadOnly="True" Background="Transparent" BorderThickness="0">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="{loc:Tr common.name}" Binding="{Binding Name}" Width="2*" />
+              <DataGridTextColumn Header="{loc:Tr common.sku}" Binding="{Binding Sku}" Width="1*" />
+              <DataGridTextColumn Header="{loc:Tr inventory.system}" Binding="{Binding SystemText}" Width="0.8*" />
+              <DataGridTextColumn Header="{loc:Tr inventory.counted}" Binding="{Binding CountedText}" Width="0.8*" />
+              <DataGridTemplateColumn Header="{loc:Tr inventory.difference}" Width="0.8*">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <TextBlock Text="{Binding DifferenceText}" FontWeight="SemiBold"
+                               Classes.success="{Binding IsPositive}" Classes.danger="{Binding IsNegative}" />
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+            </DataGrid.Columns>
+          </DataGrid>
+        </Border>
+
+        <StackPanel Grid.Row="2" IsVisible="{Binding !HasOpenCount}" VerticalAlignment="Center" Spacing="8">
+          <TextBlock Text="{loc:Tr inventory.noOpenCount}" Classes="h3" HorizontalAlignment="Center" />
+          <TextBlock Text="{loc:Tr inventory.countHint}" Classes="muted" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="3" Spacing="4">
+          <Border Classes="dangerCard" IsVisible="{Binding StatusIsError}">
+            <TextBlock Text="{Binding StatusMessage}" Classes="danger" />
+          </Border>
+          <TextBlock Text="{Binding StatusMessage}" Classes="caption" Foreground="{DynamicResource AccentBrush}" IsVisible="{Binding !StatusIsError}" />
+        </StackPanel>
+      </Grid>
+    </TabItem>
+  </TabControl>
+</UserControl>

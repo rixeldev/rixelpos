@@ -1,0 +1,65 @@
+<dialogs:DialogWindow xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:dialogs="using:RixelPOS.Desktop.Views.Dialogs"
+                     xmlns:loc="using:RixelPOS.Desktop.Localization"
+                     x:Class="RixelPOS.Desktop.Views.Dialogs.ZReportWindow"
+                     Title="{loc:Tr cash.zReport}"
+                     Width="760" Height="800" MinWidth="600" MinHeight="500" ShowInTaskbar="False"
+                     WindowStartupLocation="CenterOwner" Background="{DynamicResource SurfaceBrush}">
+  <Grid RowDefinitions="Auto,*,Auto" Margin="24" RowSpacing="14">
+    <Grid ColumnDefinitions="*,Auto">
+      <StackPanel Spacing="3">
+        <TextBlock Text="{loc:Tr cash.zReport}" Classes="h2" />
+        <TextBlock Text="{Binding OpenedText}" Classes="caption" />
+      </StackPanel>
+      <Border Grid.Column="1" Classes="soft" Padding="12,8" CornerRadius="10">
+        <TextBlock Text="{Binding SalesCountText}" FontWeight="SemiBold" />
+      </Border>
+    </Grid>
+
+    <ScrollViewer Grid.Row="1">
+      <StackPanel Spacing="14">
+        <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
+          <Border Classes="soft"><StackPanel Spacing="2"><TextBlock Text="{loc:Tr cash.opening}" Classes="caption" /><TextBlock Text="{Binding OpeningText}" FontWeight="Bold" /></StackPanel></Border>
+          <Border Grid.Column="1" Classes="soft"><StackPanel Spacing="2"><TextBlock Text="{loc:Tr cash.expectedCash}" Classes="caption" /><TextBlock Text="{Binding ExpectedText}" FontWeight="Bold" /></StackPanel></Border>
+          <Border Grid.Column="2" Classes="soft"><StackPanel Spacing="2"><TextBlock Text="{loc:Tr cash.countedCash}" Classes="caption" /><TextBlock Text="{Binding CountedText}" FontWeight="Bold" /></StackPanel></Border>
+          <Border Grid.Column="3" Classes="soft"><StackPanel Spacing="2"><TextBlock Text="{loc:Tr cash.difference}" Classes="caption" /><TextBlock Text="{Binding DifferenceText}" FontWeight="Bold" /></StackPanel></Border>
+        </Grid>
+
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+          <Border Classes="soft"><StackPanel Spacing="2"><TextBlock Text="{loc:Tr cash.totalSales}" Classes="caption" /><TextBlock Text="{Binding GrossText}" Classes="money" FontSize="20" /></StackPanel></Border>
+          <Border Grid.Column="1" Classes="soft"><StackPanel Spacing="2"><TextBlock Text="{loc:Tr checkout.cash}" Classes="caption" /><TextBlock Text="{Binding CashText}" Classes="money" FontSize="20" /></StackPanel></Border>
+        </Grid>
+
+        <TextBlock Text="{loc:Tr cash.byPayment}" Classes="h3" />
+        <ItemsControl ItemsSource="{Binding Payments}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12" Margin="0,4">
+                <TextBlock Text="{Binding Method}" />
+                <TextBlock Grid.Column="1" Text="{Binding Count}" Classes="caption" />
+                <TextBlock Grid.Column="2" Text="{Binding TotalText}" FontWeight="SemiBold" />
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <TextBlock Text="{loc:Tr cash.movements}" Classes="h3" />
+        <ItemsControl ItemsSource="{Binding Movements}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Margin="0,3">
+                <TextBlock Text="{Binding TimeText}" Classes="caption" />
+                <TextBlock Grid.Column="1" Text="{Binding Reason}" />
+                <TextBlock Grid.Column="2" Text="{Binding AmountText}" FontWeight="SemiBold" />
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBlock Text="{loc:Tr cash.noMovements}" Classes="muted" IsVisible="{Binding !HasMovements}" />
+      </StackPanel>
+    </ScrollViewer>
+
+    <Button Grid.Row="2" Content="{loc:Tr common.close}" Classes="primary" Command="{Binding CloseReportCommand}" HorizontalAlignment="Right" />
+  </Grid>
+</dialogs:DialogWindow>

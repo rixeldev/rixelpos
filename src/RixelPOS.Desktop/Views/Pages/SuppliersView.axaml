@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:RixelPOS.Desktop.Localization"
+             x:Class="RixelPOS.Desktop.Views.Pages.SuppliersView">
+  <Grid RowDefinitions="*,Auto" RowSpacing="8">
+    <TabControl Grid.Row="0" SelectedIndex="{Binding SelectedTabIndex}">
+      <TabItem Header="{loc:Tr suppliers.suppliers}">
+        <Grid RowDefinitions="Auto,*" RowSpacing="12" Margin="0,12,0,0">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <TextBox Text="{Binding SearchText}" Watermark="{loc:Tr common.search}" />
+            <Button Grid.Column="1" Classes="primary" Content="{loc:Tr suppliers.newSupplier}" Command="{Binding NewSupplierCommand}" />
+          </Grid>
+          <Border Grid.Row="1" Classes="card" Padding="0">
+            <DataGrid ItemsSource="{Binding Suppliers}" SelectedItem="{Binding SelectedSupplier}" Background="Transparent" BorderThickness="0">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="{loc:Tr common.name}" Binding="{Binding Name}" Width="2*" />
+                <DataGridTextColumn Header="{loc:Tr suppliers.contactName}" Binding="{Binding ContactName}" Width="1.4*" />
+                <DataGridTextColumn Header="{loc:Tr common.phone}" Binding="{Binding Phone}" Width="1.2*" />
+                <DataGridTextColumn Header="{loc:Tr common.email}" Binding="{Binding Email}" Width="1.4*" />
+                <DataGridTemplateColumn Header="{loc:Tr common.actions}" Width="Auto">
+                  <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                      <Button Classes="ghost" Content="{loc:Tr common.edit}"
+                              Command="{Binding $parent[DataGrid].DataContext.EditSupplierCommand}" CommandParameter="{Binding}" />
+                    </DataTemplate>
+                  </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+              </DataGrid.Columns>
+            </DataGrid>
+          </Border>
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="{loc:Tr suppliers.purchaseOrders}">
+        <Grid RowDefinitions="Auto,*" RowSpacing="12" Margin="0,12,0,0">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="{loc:Tr suppliers.purchaseOrders}" Classes="h3" VerticalAlignment="Center" />
+            <Button Grid.Column="1" Classes="primary" Content="{loc:Tr suppliers.newPurchase}" Command="{Binding NewOrderCommand}" />
+          </Grid>
+          <Border Grid.Row="1" Classes="card" Padding="0">
+            <DataGrid ItemsSource="{Binding Orders}" SelectedItem="{Binding SelectedOrder}" Background="Transparent" BorderThickness="0">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="{loc:Tr suppliers.orderNumber}" Binding="{Binding Number}" Width="1*" />
+                <DataGridTextColumn Header="{loc:Tr suppliers.suppliers}" Binding="{Binding SupplierName}" Width="2*" />
+                <DataGridTextColumn Header="{loc:Tr suppliers.orderedAt}" Binding="{Binding DateText}" Width="1.5*" />
+                <DataGridTextColumn Header="{loc:Tr common.total}" Binding="{Binding TotalText}" Width="1*" />
+                <DataGridTextColumn Header="{loc:Tr common.status}" Binding="{Binding StatusText}" Width="1*" />
+                <DataGridTemplateColumn Header="{loc:Tr common.actions}" Width="Auto">
+                  <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                      <Button Classes="primary" Content="{loc:Tr suppliers.receiveOrder}" IsVisible="{Binding CanReceive}"
+                              Command="{Binding $parent[DataGrid].DataContext.ReceiveOrderCommand}" CommandParameter="{Binding}" />
+                    </DataTemplate>
+                  </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+              </DataGrid.Columns>
+            </DataGrid>
+          </Border>
+          <TextBlock Grid.Row="1" Text="{loc:Tr suppliers.noOrders}" Classes="muted" IsVisible="{Binding !HasOrders}"
+                     HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Grid>
+      </TabItem>
+    </TabControl>
+
+    <StackPanel Grid.Row="1" Spacing="4">
+      <Border Classes="dangerCard" IsVisible="{Binding StatusIsError}">
+        <TextBlock Text="{Binding StatusMessage}" Classes="danger" />
+      </Border>
+      <TextBlock Text="{Binding StatusMessage}" Classes="caption" Foreground="{DynamicResource AccentBrush}" IsVisible="{Binding !StatusIsError}" />
+    </StackPanel>
+  </Grid>
+</UserControl>

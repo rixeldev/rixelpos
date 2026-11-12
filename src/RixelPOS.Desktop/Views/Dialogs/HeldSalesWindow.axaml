@@ -1,0 +1,36 @@
+<dialogs:DialogWindow xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:dialogs="using:RixelPOS.Desktop.Views.Dialogs"
+                     xmlns:loc="using:RixelPOS.Desktop.Localization"
+                     x:Class="RixelPOS.Desktop.Views.Dialogs.HeldSalesWindow"
+                     Title="{loc:Tr checkout.heldSales}"
+                     Width="540" Height="560" MinWidth="460" MinHeight="420" ShowInTaskbar="False"
+                     WindowStartupLocation="CenterOwner" Background="{DynamicResource SurfaceBrush}">
+  <Grid RowDefinitions="Auto,*,Auto" Margin="22" RowSpacing="12">
+    <StackPanel Spacing="4">
+      <TextBlock Text="{loc:Tr checkout.heldSales}" Classes="h2" />
+      <TextBlock Text="{loc:Tr checkout.saleHeld}" Classes="caption" />
+    </StackPanel>
+    <Border Grid.Row="1" Classes="soft" Padding="6">
+      <ListBox ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10" Margin="4,5">
+              <StackPanel Spacing="2">
+                <TextBlock Text="{Binding Label}" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding CustomerName}" Classes="caption" />
+                <TextBlock Text="{Binding DateText}" Classes="caption" />
+              </StackPanel>
+              <TextBlock Grid.Column="1" Text="{Binding TotalText}" FontWeight="Bold" VerticalAlignment="Center" />
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </Border>
+    <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+      <TextBlock Text="{loc:Tr checkout.noHeldSales}" Classes="muted" VerticalAlignment="Center" IsVisible="{Binding !HasItems}" />
+      <Button Grid.Column="1" Classes="ghost" Content="{loc:Tr common.cancel}" Command="{Binding CancelCommand}" />
+      <Button Grid.Column="2" Classes="primary" Content="{loc:Tr checkout.resumeSale}" Command="{Binding ResumeCommand}" />
+    </Grid>
+  </Grid>
+</dialogs:DialogWindow>

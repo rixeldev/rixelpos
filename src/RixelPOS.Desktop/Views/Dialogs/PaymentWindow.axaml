@@ -1,0 +1,140 @@
+<dialogs:DialogWindow xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:dialogs="using:RixelPOS.Desktop.Views.Dialogs"
+                     xmlns:loc="using:RixelPOS.Desktop.Localization"
+                     x:Class="RixelPOS.Desktop.Views.Dialogs.PaymentWindow"
+                     Title="{loc:Tr checkout.charge}"
+                     Width="900" Height="820" MinWidth="760" MinHeight="560" ShowInTaskbar="False"
+                     WindowStartupLocation="CenterOwner" Background="{DynamicResource SurfaceBrush}">
+  <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="24" RowSpacing="12">
+
+    <!-- Header -->
+    <Grid ColumnDefinitions="*,Auto">
+      <StackPanel Spacing="2">
+        <TextBlock Text="{loc:Tr checkout.totalToPay}" Classes="caption" />
+        <TextBlock Text="{Binding TotalText}" FontSize="34" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" />
+      </StackPanel>
+      <StackPanel Grid.Column="1" Spacing="2" HorizontalAlignment="Right">
+        <TextBlock Text="{loc:Tr checkout.remaining}" Classes="caption" HorizontalAlignment="Right" />
+        <TextBlock Text="{Binding RemainingText}" Classes="money" FontSize="24" HorizontalAlignment="Right" />
+      </StackPanel>
+    </Grid>
+
+    <!-- Customer -->
+    <Border Grid.Row="1" Classes="soft">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+        <ComboBox ItemsSource="{Binding Customers}" SelectedItem="{Binding SelectedCustomer}"
+                  PlaceholderText="{loc:Tr checkout.walkIn}" HorizontalAlignment="Stretch">
+          <ComboBox.ItemTemplate>
+            <DataTemplate>
+              <StackPanel Spacing="1"><TextBlock Text="{Binding Name}" /><TextBlock Text="{Binding Phone}" Classes="caption" /></StackPanel>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Button Grid.Column="1" Classes="icon ghost" Content="×" FontSize="18" ToolTip.Tip="{loc:Tr checkout.noCustomer}"
+                Command="{Binding ClearCustomerCommand}" />
+      </Grid>
+    </Border>
+
+    <!-- Body -->
+    <Grid Grid.Row="2" ColumnDefinitions="1.25*,*" ColumnSpacing="16">
+      <!-- Payment entry -->
+      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" VerticalContentAlignment="Top">
+      <StackPanel Spacing="8" VerticalAlignment="Top">
+        <TextBlock Text="{loc:Tr checkout.selectPayment}" Classes="h3" />
+        <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="6" RowSpacing="6">
+          <Button Classes="methodButton" Content="{loc:Tr checkout.cash}" Command="{Binding SelectMethodCommand}" CommandParameter="Cash" />
+          <Button Grid.Column="1" Classes="methodButton" Content="{loc:Tr checkout.card}" Command="{Binding SelectMethodCommand}" CommandParameter="Card" />
+          <Button Grid.Column="2" Classes="methodButton" Content="{loc:Tr checkout.transfer}" Command="{Binding SelectMethodCommand}" CommandParameter="Transfer" />
+          <Button Grid.Row="1" Classes="methodButton" Content="{loc:Tr checkout.storeCredit}" Command="{Binding SelectMethodCommand}" CommandParameter="StoreCredit" IsVisible="{Binding CanUseStoreCredit}" />
+          <Button Grid.Row="1" Grid.Column="1" Classes="methodButton" Content="{loc:Tr checkout.credit}" Command="{Binding SelectMethodCommand}" CommandParameter="Credit" IsVisible="{Binding CanUseCredit}" />
+        </Grid>
+        <TextBlock Text="{Binding CreditInfo}" Classes="caption" TextWrapping="Wrap" IsVisible="{Binding HasCreditInfo}" />
+        <StackPanel Spacing="4">
+          <TextBlock Text="{Binding SelectedMethodName}" FontWeight="SemiBold" />
+          <TextBlock Text="{Binding MethodHint}" Classes="caption" />
+          <TextBox Text="{Binding AmountText}" Classes="big" x:Name="AmountBox" />
+        </StackPanel>
+        <WrapPanel>
+          <Button Classes="chip" Content="{loc:Tr checkout.exact}" Command="{Binding QuickAmountCommand}" CommandParameter="exact" Margin="0,0,6,4" />
+          <Button Classes="chip" Content="RD$ 100" Command="{Binding QuickAmountCommand}" CommandParameter="100" Margin="0,0,6,4" />
+          <Button Classes="chip" Content="RD$ 500" Command="{Binding QuickAmountCommand}" CommandParameter="500" Margin="0,0,6,4" />
+          <Button Classes="chip" Content="RD$ 1,000" Command="{Binding QuickAmountCommand}" CommandParameter="1000" Margin="0,0,6,4" />
+          <Button Classes="chip" Content="RD$ 2,000" Command="{Binding QuickAmountCommand}" CommandParameter="2000" Margin="0,0,6,4" />
+        </WrapPanel>
+        <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="8" RowSpacing="6">
+          <Button Grid.Row="0" Grid.Column="0" Content="1" Classes="key" Command="{Binding KeypadCommand}" CommandParameter="1" />
+          <Button Grid.Row="0" Grid.Column="1" Content="2" Classes="key" Command="{Binding KeypadCommand}" CommandParameter="2" />
+          <Button Grid.Row="0" Grid.Column="2" Content="3" Classes="key" Command="{Binding KeypadCommand}" CommandParameter="3" />
+          <Button Grid.Row="1" Grid.Column="0" Content="4" Classes="key" Command="{Binding KeypadCommand}" CommandParameter="4" />
+          <Button Grid.Row="1" Grid.Column="1" Content="5" Classes="key" Command="{Binding KeypadCommand}" CommandParameter="5" />
+          <Button Grid.Row="1" Grid.Column="2" Content="6" Classes="key" Command="{Binding KeypadCommand}" CommandParameter="6" />
+          <Button Grid.Row="2" Grid.Column="0" Content="7" Classes="key" Command="{Binding KeypadCommand}" CommandParameter="7" />
+          <Button Grid.Row="2" Grid.Column="1" Content="8" Classes="key" Command="{Binding KeypadCommand}" CommandParameter="8" />
+          <Button Grid.Row="2" Grid.Column="2" Content="9" Classes="key" Command="{Binding KeypadCommand}" CommandParameter="9" />
+          <Button Grid.Row="3" Grid.Column="0" Content="0" Classes="key" Command="{Binding KeypadCommand}" CommandParameter="0" />
+          <Button Grid.Row="3" Grid.Column="1" Content="." Classes="key" Command="{Binding KeypadCommand}" CommandParameter="." />
+          <Button Grid.Row="3" Grid.Column="2" Content="⌫" Classes="key" Command="{Binding BackspaceCommand}" />
+        </Grid>
+        <Button Classes="primary big" Content="{loc:Tr checkout.addPayment}" Command="{Binding AddPaymentCommand}" HorizontalAlignment="Stretch" />
+      </StackPanel>
+      </ScrollViewer>
+
+      <!-- Summary -->
+      <Border Grid.Column="1" Classes="soft" Padding="16">
+        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
+          <TextBlock Text="{loc:Tr checkout.paymentSummary}" Classes="h3" />
+          <ScrollViewer Grid.Row="1">
+            <ItemsControl ItemsSource="{Binding Payments}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="*,Auto" Margin="0,5">
+                    <StackPanel Spacing="1">
+                      <TextBlock Text="{Binding MethodName}" FontWeight="SemiBold" />
+                      <TextBlock Text="{Binding Detail}" Classes="caption" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Text="{Binding AmountText}" FontWeight="SemiBold" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+          <StackPanel Grid.Row="2" Spacing="8">
+            <Button Classes="ghost" Content="{loc:Tr checkout.removePayment}" Command="{Binding RemoveLastCommand}" HorizontalAlignment="Stretch" />
+            <Separator />
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="{loc:Tr checkout.remaining}" FontWeight="SemiBold" />
+              <TextBlock Grid.Column="1" Text="{Binding RemainingText}" FontWeight="Bold" />
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="{loc:Tr checkout.change}" />
+              <TextBlock Grid.Column="1" Text="{Binding ChangeText}" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold" />
+            </Grid>
+            <Border Classes="dangerCard" IsVisible="{Binding HasErrorMessage}">
+              <TextBlock Text="{Binding ErrorMessage}" Classes="danger" TextWrapping="Wrap" FontSize="12" />
+            </Border>
+            <Button Classes="primary big" Content="{loc:Tr checkout.confirmPayment}" Command="{Binding ConfirmCommand}" IsEnabled="{Binding CanConfirm}" HorizontalAlignment="Stretch" />
+            <Button Classes="ghost" Content="{loc:Tr common.cancel}" Command="{Binding CancelCommand}" HorizontalAlignment="Stretch" />
+          </StackPanel>
+        </Grid>
+      </Border>
+    </Grid>
+
+    <Button Grid.Row="3" Classes="ghost" Content="{loc:Tr common.cancel}" Command="{Binding CancelCommand}" HorizontalAlignment="Left" IsVisible="False" />
+  </Grid>
+
+  <dialogs:DialogWindow.Styles>
+    <Style Selector="Button.key">
+      <Setter Property="Height" Value="40" />
+      <Setter Property="FontSize" Value="17" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+    </Style>
+    <Style Selector="Button.methodButton">
+      <Setter Property="Height" Value="46" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="Background" Value="{DynamicResource Surface2Brush}" />
+    </Style>
+  </dialogs:DialogWindow.Styles>
+</dialogs:DialogWindow>

@@ -1,0 +1,14 @@
+post_install() {
+  update-desktop-database -q /usr/share/applications 2>/dev/null || true
+  udevadm control --reload-rules 2>/dev/null || true
+  udevadm trigger 2>/dev/null || true
+  echo "RixelPOS instalado. Agrega tu usuario al grupo lp para impresoras USB: sudo usermod -aG lp $USER"
+}
+
+post_upgrade() {
+  post_install
+}
+
+pre_remove() {
+  echo "Los datos del usuario en ~/.local/share/rixelpos no se eliminan."
+}

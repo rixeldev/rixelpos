@@ -1,0 +1,230 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:RixelPOS.Desktop.Localization"
+        x:Class="RixelPOS.Desktop.Views.SetupWizardWindow"
+        Title="{loc:Tr setup.windowTitle}"
+        Icon="avares://RixelPOS/Assets/rixelpos.png"
+        Width="1120" Height="760"
+        MinWidth="980" MinHeight="680"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource AppBgBrush}">
+  <Grid ColumnDefinitions="320,*">
+    <!-- Steps sidebar -->
+    <Border Background="#0B1118" Padding="32">
+      <Grid RowDefinitions="Auto,*,Auto">
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <Image Source="avares://RixelPOS/Assets/rixelpos.png" Width="46" Height="46" />
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="RixelPOS" FontSize="20" FontWeight="Bold" Foreground="#F2F7FB" />
+            <TextBlock Text="{loc:Tr setup.subtitle}" FontSize="12" Foreground="#93A6BA" />
+          </StackPanel>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" VerticalAlignment="Center" Spacing="8">
+          <TextBlock Text="{Binding StepLabel}" Foreground="#00C2A8" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,14" />
+          <Border Classes="setupStep" Classes.active="{Binding IsStep0}">
+            <StackPanel Orientation="Horizontal" Spacing="12"><TextBlock Text="01" Foreground="#00C2A8" /><TextBlock Text="{loc:Tr setup.stepBusiness}" Foreground="#E6EEF5" /></StackPanel>
+          </Border>
+          <Border Classes="setupStep" Classes.active="{Binding IsStep1}">
+            <StackPanel Orientation="Horizontal" Spacing="12"><TextBlock Text="02" Foreground="#00C2A8" /><TextBlock Text="{loc:Tr setup.stepTax}" Foreground="#E6EEF5" /></StackPanel>
+          </Border>
+          <Border Classes="setupStep" Classes.active="{Binding IsStep2}">
+            <StackPanel Orientation="Horizontal" Spacing="12"><TextBlock Text="03" Foreground="#00C2A8" /><TextBlock Text="{loc:Tr setup.stepPrinter}" Foreground="#E6EEF5" /></StackPanel>
+          </Border>
+          <Border Classes="setupStep" Classes.active="{Binding IsStep3}">
+            <StackPanel Orientation="Horizontal" Spacing="12"><TextBlock Text="04" Foreground="#00C2A8" /><TextBlock Text="{loc:Tr setup.stepAdmin}" Foreground="#E6EEF5" /></StackPanel>
+          </Border>
+          <Border Classes="setupStep" Classes.active="{Binding IsStep4}">
+            <StackPanel Orientation="Horizontal" Spacing="12"><TextBlock Text="05" Foreground="#00C2A8" /><TextBlock Text="{loc:Tr setup.stepDone}" Foreground="#E6EEF5" /></StackPanel>
+          </Border>
+        </StackPanel>
+
+        <TextBlock Grid.Row="2" Text="RixelDev · 2026" Foreground="#5F7182" FontSize="11" />
+      </Grid>
+    </Border>
+
+    <!-- Content -->
+    <Grid Grid.Column="1" RowDefinitions="*,Auto" Margin="42,34,42,26">
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="20" MaxWidth="680" HorizontalAlignment="Left">
+
+          <!-- Step 0: Business -->
+          <StackPanel Spacing="18" IsVisible="{Binding IsStep0}">
+            <StackPanel Spacing="6">
+              <TextBlock Text="{loc:Tr setup.welcomeTitle}" Classes="h1" TextWrapping="Wrap" />
+              <TextBlock Text="{loc:Tr setup.welcomeText}" Classes="muted" TextWrapping="Wrap" LineHeight="22" />
+            </StackPanel>
+            <Separator />
+            <TextBlock Text="{loc:Tr setup.businessTitle}" Classes="h2" />
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="12">
+              <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
+                <TextBlock Text="{loc:Tr setup.businessName}" Classes="caption" />
+                <TextBox Text="{Binding BusinessName}" Watermark="Minimarket Ejemplo" />
+              </StackPanel>
+              <StackPanel Grid.Row="0" Grid.Column="1" Spacing="6">
+                <TextBlock Text="{loc:Tr setup.legalName}" Classes="caption" />
+                <TextBox Text="{Binding LegalName}" />
+              </StackPanel>
+              <StackPanel Grid.Row="1" Grid.Column="0" Spacing="6">
+                <TextBlock Text="{loc:Tr setup.taxId}" Classes="caption" />
+                <TextBox Text="{Binding TaxId}" />
+              </StackPanel>
+              <StackPanel Grid.Row="1" Grid.Column="1" Spacing="6">
+                <TextBlock Text="{loc:Tr setup.phone}" Classes="caption" />
+                <TextBox Text="{Binding Phone}" />
+              </StackPanel>
+              <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Spacing="6">
+                <TextBlock Text="{loc:Tr setup.address}" Classes="caption" />
+                <TextBox Text="{Binding Address}" />
+              </StackPanel>
+              <StackPanel Grid.Row="3" Grid.Column="0" Spacing="6">
+                <TextBlock Text="{loc:Tr setup.language}" Classes="caption" />
+                <ComboBox ItemsSource="{Binding Languages}" SelectedIndex="{Binding SelectedLanguageIndex}" HorizontalAlignment="Stretch" />
+              </StackPanel>
+              <StackPanel Grid.Row="3" Grid.Column="1" Spacing="6">
+                <TextBlock Text="{loc:Tr setup.theme}" Classes="caption" />
+                <ComboBox ItemsSource="{Binding Themes}" SelectedIndex="{Binding SelectedThemeIndex}" HorizontalAlignment="Stretch" />
+              </StackPanel>
+            </Grid>
+          </StackPanel>
+
+          <!-- Step 1: Tax -->
+          <StackPanel Spacing="18" IsVisible="{Binding IsStep1}">
+            <TextBlock Text="{loc:Tr setup.taxTitle}" Classes="h1" />
+            <TextBlock Text="{loc:Tr setup.taxText}" Classes="muted" TextWrapping="Wrap" />
+            <Separator />
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="12">
+              <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
+                <TextBlock Text="{loc:Tr setup.currencyCode}" Classes="caption" />
+                <TextBox Text="{Binding CurrencyCode}" />
+              </StackPanel>
+              <StackPanel Grid.Row="0" Grid.Column="1" Spacing="6">
+                <TextBlock Text="{loc:Tr setup.currencySymbol}" Classes="caption" />
+                <TextBox Text="{Binding CurrencySymbol}" />
+              </StackPanel>
+              <StackPanel Grid.Row="1" Grid.Column="0" Spacing="6">
+                <TextBlock Text="{loc:Tr setup.taxName}" Classes="caption" />
+                <TextBox Text="{Binding TaxName}" />
+              </StackPanel>
+              <StackPanel Grid.Row="1" Grid.Column="1" Spacing="6">
+                <TextBlock Text="{loc:Tr setup.taxRate}" Classes="caption" />
+                <TextBox Text="{Binding TaxPercent}" />
+              </StackPanel>
+              <StackPanel Grid.Row="2" Grid.Column="0" Spacing="6">
+                <TextBlock Text="{loc:Tr setup.invoicePrefix}" Classes="caption" />
+                <TextBox Text="{Binding InvoicePrefix}" />
+              </StackPanel>
+              <StackPanel Grid.Row="2" Grid.Column="1" Spacing="6">
+                <TextBlock Text="{loc:Tr settings.receiptWidth}" Classes="caption" />
+                <ComboBox ItemsSource="{Binding ReceiptWidths}" SelectedIndex="{Binding ReceiptWidthIndex}" HorizontalAlignment="Stretch" />
+              </StackPanel>
+            </Grid>
+            <CheckBox Content="{loc:Tr setup.pricesIncludeTax}" IsChecked="{Binding PricesIncludeTax}" />
+            <Border Classes="accentCard">
+              <TextBlock Text="{loc:Tr setup.tipTax}"
+                         TextWrapping="Wrap" Foreground="{DynamicResource TextBrush}" FontSize="13" />
+            </Border>
+          </StackPanel>
+
+          <!-- Step 2: Printer -->
+          <StackPanel Spacing="18" IsVisible="{Binding IsStep2}">
+            <TextBlock Text="{loc:Tr setup.printerTitle}" Classes="h1" />
+            <TextBlock Text="{loc:Tr setup.printerText}" Classes="muted" TextWrapping="Wrap" />
+            <Separator />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+              <ComboBox ItemsSource="{Binding Printers}" SelectedItem="{Binding SelectedPrinter}" HorizontalAlignment="Stretch">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate>
+                    <StackPanel Spacing="1">
+                      <TextBlock Text="{Binding Name}" />
+                      <TextBlock Text="{Binding Kind}" Classes="caption" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+              <Button Grid.Column="1" Content="{loc:Tr setup.detectPrinters}" Command="{Binding DetectPrintersCommand}" />
+            </Grid>
+            <StackPanel Spacing="6">
+              <TextBlock Text="{loc:Tr setup.printerConnection}" Classes="caption" />
+              <TextBox Text="{Binding PrinterConnection}" Watermark="tcp://192.168.1.50:9100" />
+              <TextBlock Text="{loc:Tr setup.printerHint}" Classes="caption" TextWrapping="Wrap" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Content="{loc:Tr setup.testPrint}" Command="{Binding TestPrinterCommand}" />
+              <Button Content="{loc:Tr setup.skipPrinter}" Classes="ghost" Command="{Binding NextCommand}" />
+            </StackPanel>
+          </StackPanel>
+
+          <!-- Step 3: Admin -->
+          <StackPanel Spacing="18" IsVisible="{Binding IsStep3}">
+            <TextBlock Text="{loc:Tr setup.adminTitle}" Classes="h1" />
+            <TextBlock Text="{loc:Tr setup.adminText}" Classes="muted" TextWrapping="Wrap" />
+            <Separator />
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="12">
+              <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
+                <TextBlock Text="{loc:Tr setup.adminName}" Classes="caption" />
+                <TextBox Text="{Binding AdminFullName}" />
+              </StackPanel>
+              <StackPanel Grid.Row="0" Grid.Column="1" Spacing="6">
+                <TextBlock Text="{loc:Tr setup.adminUsername}" Classes="caption" />
+                <TextBox Text="{Binding AdminUsername}" />
+              </StackPanel>
+              <StackPanel Grid.Row="1" Grid.Column="0" Spacing="6">
+                <TextBlock Text="{loc:Tr setup.adminPassword}" Classes="caption" />
+                <TextBox Text="{Binding AdminPassword}" PasswordChar="●" />
+              </StackPanel>
+              <StackPanel Grid.Row="1" Grid.Column="1" Spacing="6">
+                <TextBlock Text="{loc:Tr setup.adminPin}" Classes="caption" />
+                <TextBox Text="{Binding AdminPin}" PasswordChar="●" MaxLength="8" />
+              </StackPanel>
+            </Grid>
+            <Border Classes="soft">
+              <TextBlock Text="{loc:Tr setup.adminHint}"
+                         TextWrapping="Wrap" Classes="muted" FontSize="13" />
+            </Border>
+          </StackPanel>
+
+          <!-- Step 4: Done -->
+          <StackPanel Spacing="18" IsVisible="{Binding IsStep4}" VerticalAlignment="Center">
+            <Border Width="72" Height="72" CornerRadius="22" Background="{DynamicResource AccentSoftBrush}" HorizontalAlignment="Left">
+              <TextBlock Text="✓" FontSize="34" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <TextBlock Text="{loc:Tr setup.doneTitle}" Classes="h1" />
+            <TextBlock Text="{loc:Tr setup.doneText}" Classes="muted" TextWrapping="Wrap" FontSize="15" LineHeight="24" />
+            <Border Classes="card" HorizontalAlignment="Left">
+              <StackPanel Spacing="6">
+                <TextBlock Text="{Binding BusinessName}" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding LegalName}" Classes="caption" />
+                <TextBlock Text="{Binding TaxName}" Classes="caption" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+
+          <Border Classes="dangerCard" IsVisible="{Binding StatusIsError}">
+            <TextBlock Text="{Binding StatusMessage}" Classes="danger" TextWrapping="Wrap" />
+          </Border>
+          <TextBlock Text="{Binding StatusMessage}" Classes="muted" TextWrapping="Wrap" IsVisible="{Binding !StatusIsError}" />
+        </StackPanel>
+      </ScrollViewer>
+
+      <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" Margin="0,20,0,0">
+        <Button Content="{loc:Tr common.back}" Classes="ghost" Command="{Binding BackCommand}" IsVisible="{Binding CanGoBack}" />
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10">
+          <Button Content="{loc:Tr common.next}" Classes="primary big" Command="{Binding NextCommand}" IsVisible="{Binding !IsStep4}" />
+          <Button Content="{loc:Tr setup.openApp}" Classes="primary big" Command="{Binding OpenAppCommand}" IsVisible="{Binding IsStep4}" />
+        </StackPanel>
+      </Grid>
+    </Grid>
+  </Grid>
+
+  <Window.Styles>
+    <Style Selector="Border.setupStep">
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Padding" Value="12,10" />
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="Border.setupStep.active">
+      <Setter Property="Background" Value="#103B37" />
+    </Style>
+  </Window.Styles>
+</Window>

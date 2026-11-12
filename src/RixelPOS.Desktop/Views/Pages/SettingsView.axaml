@@ -1,0 +1,296 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:RixelPOS.Desktop.Localization"
+             x:Class="RixelPOS.Desktop.Views.Pages.SettingsView">
+  <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
+    <Grid ColumnDefinitions="*,Auto">
+      <StackPanel Spacing="3">
+        <TextBlock Text="{loc:Tr settings.businessInfo}" Classes="h3" />
+      </StackPanel>
+      <Button Grid.Column="1" Classes="primary" Content="{loc:Tr settings.saveSettings}" Command="{Binding SaveCommand}" />
+    </Grid>
+
+    <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedTabIndex}">
+      <!-- Business -->
+      <TabItem Header="{loc:Tr settings.tabBusiness}">
+        <ScrollViewer Margin="0,14,0,0" HorizontalScrollBarVisibility="Auto">
+          <StackPanel Spacing="14" MaxWidth="860" HorizontalAlignment="Stretch">
+            <Border Classes="card">
+              <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="12">
+                <StackPanel Spacing="6"><TextBlock Text="{loc:Tr settings.businessName}" Classes="caption" /><TextBox Text="{Binding BusinessName}" /></StackPanel>
+                <StackPanel Grid.Column="1" Spacing="6"><TextBlock Text="{loc:Tr settings.legalName}" Classes="caption" /><TextBox Text="{Binding LegalName}" /></StackPanel>
+                <StackPanel Grid.Row="1" Spacing="6"><TextBlock Text="{loc:Tr settings.taxId}" Classes="caption" /><TextBox Text="{Binding TaxId}" /></StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="1" Spacing="6"><TextBlock Text="{loc:Tr settings.phone}" Classes="caption" /><TextBox Text="{Binding Phone}" /></StackPanel>
+                <StackPanel Grid.Row="2" Spacing="6"><TextBlock Text="{loc:Tr settings.email}" Classes="caption" /><TextBox Text="{Binding Email}" /></StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="1" Spacing="6"><TextBlock Text="{loc:Tr settings.website}" Classes="caption" /><TextBox Text="{Binding Website}" /></StackPanel>
+                <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Spacing="6"><TextBlock Text="{loc:Tr settings.address}" Classes="caption" /><TextBox Text="{Binding Address}" /></StackPanel>
+              </Grid>
+            </Border>
+            <Border Classes="card">
+              <StackPanel Spacing="10">
+                <TextBlock Text="{loc:Tr settings.logo}" Classes="h3" />
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                  <TextBox Text="{Binding LogoPath}" IsReadOnly="True" />
+                  <Button Grid.Column="1" Content="{loc:Tr settings.chooseLogo}" Command="{Binding PickLogoCommand}" />
+                </Grid>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- Tax -->
+      <TabItem Header="{loc:Tr settings.tabTax}">
+        <ScrollViewer Margin="0,14,0,0" HorizontalScrollBarVisibility="Auto">
+          <StackPanel Spacing="14" MaxWidth="860" HorizontalAlignment="Stretch">
+            <Border Classes="card">
+              <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="12">
+                <StackPanel Spacing="6"><TextBlock Text="{loc:Tr settings.currencyCode}" Classes="caption" /><TextBox Text="{Binding CurrencyCode}" /></StackPanel>
+                <StackPanel Grid.Column="1" Spacing="6"><TextBlock Text="{loc:Tr settings.currencySymbol}" Classes="caption" /><TextBox Text="{Binding CurrencySymbol}" /></StackPanel>
+                <StackPanel Grid.Column="2" Spacing="6"><TextBlock Text="{loc:Tr settings.taxName}" Classes="caption" /><TextBox Text="{Binding TaxName}" /></StackPanel>
+                <StackPanel Grid.Row="1" Spacing="6"><TextBlock Text="{loc:Tr settings.defaultTaxRate}" Classes="caption" /><TextBox Text="{Binding TaxPercentText}" /></StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="1" Spacing="6"><TextBlock Text="{loc:Tr settings.invoicePrefix}" Classes="caption" /><TextBox Text="{Binding InvoicePrefix}" /></StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="2" Spacing="6"><TextBlock Text="{loc:Tr settings.invoicePadding}" Classes="caption" /><TextBox Text="{Binding InvoicePaddingText}" /></StackPanel>
+              </Grid>
+            </Border>
+            <CheckBox Content="{loc:Tr settings.pricesIncludeTax}" IsChecked="{Binding PricesIncludeTax}" />
+            <Border Classes="card">
+              <StackPanel Spacing="12">
+                <TextBlock Text="{loc:Tr settings.fiscal}" Classes="h3" />
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="16">
+                  <StackPanel Spacing="6"><TextBlock Text="{loc:Tr settings.fiscalMode}" Classes="caption" /><ComboBox ItemsSource="{Binding FiscalModes}" SelectedIndex="{Binding FiscalModeIndex}" HorizontalAlignment="Stretch" /></StackPanel>
+                  <StackPanel Grid.Column="1" Spacing="6"><TextBlock Text="{loc:Tr settings.rnc}" Classes="caption" /><TextBox Text="{Binding FiscalRnc}" /></StackPanel>
+                  <StackPanel Grid.Column="2" Spacing="6"><TextBlock Text="{loc:Tr settings.ncfPrefix}" Classes="caption" /><TextBox Text="{Binding NcfPrefix}" /></StackPanel>
+                </Grid>
+                <TextBlock Text="{loc:Tr settings.ncfHint}" Classes="caption" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+            <Border Classes="card">
+              <StackPanel Spacing="12">
+                <TextBlock Text="{loc:Tr settings.creditSalesEnabled}" Classes="h3" />
+                <CheckBox Content="{loc:Tr settings.storeCreditEnabled}" IsChecked="{Binding StoreCreditEnabled}" />
+                <CheckBox Content="{loc:Tr settings.creditSalesEnabled}" IsChecked="{Binding CreditSalesEnabled}" />
+                <CheckBox Content="{loc:Tr settings.allowNegativeStock}" IsChecked="{Binding AllowNegativeStock}" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                  <StackPanel Spacing="6"><TextBlock Text="{loc:Tr settings.lowStockThreshold}" Classes="caption" /><TextBox Text="{Binding LowStockThresholdText}" /></StackPanel>
+                  <StackPanel Grid.Column="1" Spacing="6"><TextBlock Text="{loc:Tr settings.discountApproval}" Classes="caption" /><TextBox Text="{Binding DiscountApprovalText}" /></StackPanel>
+                </Grid>
+                <CheckBox Content="{loc:Tr settings.requireVoidApproval}" IsChecked="{Binding RequireManagerForVoids}" />
+                <CheckBox Content="{loc:Tr settings.requireRefundApproval}" IsChecked="{Binding RequireManagerForRefunds}" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- Receipts / hardware -->
+      <TabItem Header="{loc:Tr settings.tabReceipt}">
+        <ScrollViewer Margin="0,14,0,0" HorizontalScrollBarVisibility="Auto">
+          <StackPanel Spacing="14" MaxWidth="920" HorizontalAlignment="Stretch">
+            <Border Classes="card">
+              <StackPanel Spacing="12">
+                <TextBlock Text="{loc:Tr settings.printer}" Classes="h3" />
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                  <TextBox Text="{Binding PrinterConnection}" Watermark="tcp://192.168.1.50:9100" />
+                  <Button Grid.Column="1" Content="{loc:Tr settings.detect}" Command="{Binding DetectPrintersCommand}" />
+                </Grid>
+                <TextBlock Text="{loc:Tr settings.printerConnectionHint}" Classes="caption" TextWrapping="Wrap" />
+                <ComboBox ItemsSource="{Binding Printers}" SelectedItem="{Binding SelectedPrinter}" HorizontalAlignment="Stretch">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                      <StackPanel Spacing="1"><TextBlock Text="{Binding Name}" /><TextBlock Text="{Binding Kind}" Classes="caption" /></StackPanel>
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Button Content="{loc:Tr settings.testPrint}" Command="{Binding TestPrintCommand}" />
+                  <Button Content="{loc:Tr settings.testDrawer}" Command="{Binding TestDrawerCommand}" />
+                </StackPanel>
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                  <StackPanel Spacing="6"><TextBlock Text="{loc:Tr settings.receiptWidth}" Classes="caption" /><ComboBox ItemsSource="{Binding ReceiptWidths}" SelectedIndex="{Binding ReceiptWidthIndex}" HorizontalAlignment="Stretch" /></StackPanel>
+                  <StackPanel Grid.Column="1" Spacing="6"><TextBlock Text="{loc:Tr settings.receiptFooter}" Classes="caption" /><TextBox Text="{Binding ReceiptFooter}" /></StackPanel>
+                </Grid>
+                <CheckBox Content="{loc:Tr settings.autoPrint}" IsChecked="{Binding AutoPrintReceipt}" />
+                <CheckBox Content="{loc:Tr settings.showQr}" IsChecked="{Binding ShowQrOnReceipt}" />
+                <CheckBox Content="{loc:Tr settings.autoOpenDrawer}" IsChecked="{Binding AutoOpenDrawerOnCash}" />
+                <CheckBox Content="{loc:Tr settings.cashDrawer}" IsChecked="{Binding CashDrawerEnabled}" />
+              </StackPanel>
+            </Border>
+
+            <Border Classes="card">
+              <StackPanel Spacing="12">
+                <TextBlock Text="{loc:Tr settings.scanner}" Classes="h3" />
+                <TextBox Text="{Binding ScannerConnection}" Watermark="serial:/dev/ttyUSB0@9600" />
+                <TextBlock Text="{loc:Tr settings.scannerHint}" Classes="caption" TextWrapping="Wrap" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                  <StackPanel Spacing="6"><TextBlock Text="{loc:Tr settings.debounce}" Classes="caption" /><TextBox Text="{Binding ScannerDebounceText}" /></StackPanel>
+                  <StackPanel Grid.Column="1" Spacing="6"><TextBlock Text="{loc:Tr settings.scannerTest}" Classes="caption" /><TextBox Watermark="{loc:Tr settings.scanToTest}" /></StackPanel>
+                </Grid>
+              </StackPanel>
+            </Border>
+
+            <Border Classes="card">
+              <StackPanel Spacing="12">
+                <TextBlock Text="{loc:Tr settings.customerDisplay}" Classes="h3" />
+                <CheckBox Content="{loc:Tr settings.customerDisplay}" IsChecked="{Binding CustomerDisplayEnabled}" />
+                <TextBox Text="{Binding CustomerDisplayConnection}" Watermark="serial:/dev/ttyUSB1@9600" />
+                <Button Content="{loc:Tr settings.testDisplay}" Command="{Binding TestDisplayCommand}" HorizontalAlignment="Left" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- Users -->
+      <TabItem Header="{loc:Tr settings.tabUsers}">
+        <Grid Margin="0,14,0,0" RowDefinitions="Auto,*" RowSpacing="10">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="{loc:Tr settings.users}" Classes="h3" VerticalAlignment="Center" />
+            <Button Grid.Column="1" Classes="primary" Content="{loc:Tr settings.addUser}" Command="{Binding AddUserCommand}" />
+          </Grid>
+          <Border Grid.Row="1" Classes="card" Padding="0">
+            <DataGrid ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedUser}" Background="Transparent" BorderThickness="0">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="{loc:Tr common.name}" Binding="{Binding FullName}" Width="2*" />
+                <DataGridTextColumn Header="{loc:Tr common.username}" Binding="{Binding Username}" Width="1.4*" />
+                <DataGridTextColumn Header="{loc:Tr users.role}" Binding="{Binding RoleText}" Width="1*" />
+                <DataGridTextColumn Header="{loc:Tr common.status}" Binding="{Binding StatusText}" Width="0.8*" />
+                <DataGridTemplateColumn Header="{loc:Tr common.actions}" Width="Auto">
+                  <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                      <StackPanel Orientation="Horizontal" Spacing="2">
+                        <Button Classes="ghost" Content="{loc:Tr common.edit}"
+                                Command="{Binding $parent[DataGrid].DataContext.EditUserCommand}" CommandParameter="{Binding}" />
+                        <Button Classes="ghost" Content="{loc:Tr settings.resetPin}"
+                                Command="{Binding $parent[DataGrid].DataContext.ResetPinCommand}" CommandParameter="{Binding}" />
+                        <Button Classes="ghost" Content="{loc:Tr common.active}"
+                                Command="{Binding $parent[DataGrid].DataContext.ToggleUserActiveCommand}" CommandParameter="{Binding}" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+              </DataGrid.Columns>
+            </DataGrid>
+          </Border>
+        </Grid>
+      </TabItem>
+
+      <!-- Backup -->
+      <TabItem Header="{loc:Tr settings.tabBackup}">
+        <ScrollViewer Margin="0,14,0,0" HorizontalScrollBarVisibility="Auto">
+          <StackPanel Spacing="14" MaxWidth="920" HorizontalAlignment="Stretch">
+            <Border Classes="card">
+              <StackPanel Spacing="12">
+                <TextBlock Text="{loc:Tr settings.backup}" Classes="h3" />
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                  <TextBox Text="{Binding BackupFolder}" IsReadOnly="True" Watermark="{loc:Tr settings.backupFolder}" />
+                  <Button Grid.Column="1" Content="{loc:Tr settings.chooseFolder}" Command="{Binding PickBackupFolderCommand}" />
+                </Grid>
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                  <StackPanel Spacing="6"><TextBlock Text="{loc:Tr settings.backupKeep}" Classes="caption" /><TextBox Text="{Binding BackupKeepText}" /></StackPanel>
+                  <CheckBox Grid.Column="1" Content="{loc:Tr settings.autoBackup}" IsChecked="{Binding AutoBackupOnClose}" VerticalAlignment="Bottom" />
+                </Grid>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Button Classes="primary" Content="{loc:Tr settings.createBackup}" Command="{Binding CreateBackupCommand}" />
+                  <Button Classes="ghost" Content="{loc:Tr settings.openFolder}" Command="{Binding OpenBackupFolderCommand}" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+            <Border Classes="card" Padding="0">
+              <Grid RowDefinitions="Auto,*">
+                <Grid ColumnDefinitions="*,Auto" Margin="16,14">
+                  <TextBlock Text="{loc:Tr settings.backups}" Classes="h3" />
+                  <Button Grid.Column="1" Classes="softDanger" Content="{loc:Tr settings.restoreBackup}" Command="{Binding RestoreBackupCommand}" />
+                </Grid>
+                <DataGrid Grid.Row="1" ItemsSource="{Binding BackupList}" SelectedItem="{Binding SelectedBackup}"
+                          Background="Transparent" BorderThickness="0" MaxHeight="320">
+                  <DataGrid.Columns>
+                    <DataGridTextColumn Header="{loc:Tr settings.backups}" Binding="{Binding Path}" Width="3*" />
+                    <DataGridTextColumn Header="{loc:Tr common.date}" Binding="{Binding CreatedAt, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="1.3*" />
+                    <DataGridTextColumn Header="Bytes" Binding="{Binding SizeBytes}" Width="0.7*" />
+                  </DataGrid.Columns>
+                </DataGrid>
+              </Grid>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- Appearance -->
+      <TabItem Header="{loc:Tr settings.tabAppearance}">
+        <ScrollViewer Margin="0,14,0,0" HorizontalScrollBarVisibility="Auto">
+          <StackPanel Spacing="14" MaxWidth="700" HorizontalAlignment="Left">
+            <Border Classes="card">
+              <StackPanel Spacing="14">
+                <TextBlock Text="{loc:Tr settings.theme}" Classes="h3" />
+                <ComboBox ItemsSource="{Binding Themes}" SelectedIndex="{Binding ThemeIndex}" HorizontalAlignment="Stretch" />
+                <TextBlock Text="{loc:Tr settings.language}" Classes="h3" />
+                <ComboBox ItemsSource="{Binding Languages}" SelectedIndex="{Binding LanguageIndex}" HorizontalAlignment="Stretch" />
+                <TextBlock Text="{loc:Tr settings.restartLanguage}" Classes="caption" />
+                <TextBlock Text="{loc:Tr settings.uiScale}" Classes="caption" />
+                <TextBox Text="{Binding UiScaleText}" Width="120" HorizontalAlignment="Left" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- Audit -->
+      <TabItem Header="{loc:Tr settings.tabAudit}">
+        <Grid Margin="0,14,0,0" RowDefinitions="Auto,*" RowSpacing="10">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="{loc:Tr settings.auditLog}" Classes="h3" VerticalAlignment="Center" />
+            <Button Grid.Column="1" Classes="ghost" Content="{loc:Tr common.refresh}" Command="{Binding RefreshAuditCommand}" />
+          </Grid>
+          <Border Grid.Row="1" Classes="card" Padding="0">
+            <DataGrid ItemsSource="{Binding AuditItems}" Background="Transparent" BorderThickness="0">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="{loc:Tr common.date}" Binding="{Binding DateText}" Width="1.5*" />
+                <DataGridTextColumn Header="{loc:Tr settings.user}" Binding="{Binding UserName}" Width="1.2*" />
+                <DataGridTextColumn Header="{loc:Tr settings.action}" Binding="{Binding Action}" Width="1.2*" />
+                <DataGridTextColumn Header="{loc:Tr settings.entity}" Binding="{Binding EntityType}" Width="1*" />
+                <DataGridTextColumn Header="{loc:Tr settings.details}" Binding="{Binding Details}" Width="2.5*" />
+              </DataGrid.Columns>
+            </DataGrid>
+          </Border>
+        </Grid>
+      </TabItem>
+
+      <!-- About -->
+      <TabItem Header="{loc:Tr settings.tabAbout}">
+        <StackPanel Margin="0,14,0,0" Spacing="14" MaxWidth="720" HorizontalAlignment="Left">
+          <Border Classes="card">
+            <StackPanel Spacing="8">
+              <StackPanel Orientation="Horizontal" Spacing="12">
+                <Image Source="avares://RixelPOS/Assets/rixelpos.png" Width="54" Height="54" />
+                <StackPanel VerticalAlignment="Center">
+                  <TextBlock Text="RixelPOS" Classes="h2" />
+                  <TextBlock Text="{Binding VersionText}" Classes="caption" />
+                </StackPanel>
+              </StackPanel>
+              <Separator />
+              <TextBlock Text="{loc:Tr settings.support}: soporte@rixeldev.com" />
+              <TextBlock Text="{loc:Tr settings.website}: rixeldev.com" />
+              <TextBlock Text="{loc:Tr settings.license}: © 2026 RixelDev. Todos los derechos reservados." />
+            </StackPanel>
+          </Border>
+          <Border Classes="soft">
+            <StackPanel Spacing="4">
+              <TextBlock Text="Carpeta de datos" Classes="caption" />
+              <SelectableTextBlock Text="{Binding DataFolder}" FontSize="12" TextWrapping="Wrap" />
+              <TextBlock Text="Registros" Classes="caption" Margin="0,8,0,0" />
+              <SelectableTextBlock Text="{Binding LogFolder}" FontSize="12" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </TabItem>
+    </TabControl>
+
+    <StackPanel Grid.Row="2" Spacing="4">
+      <Border Classes="dangerCard" IsVisible="{Binding StatusIsError}">
+        <TextBlock Text="{Binding StatusMessage}" Classes="danger" />
+      </Border>
+      <TextBlock Text="{Binding StatusMessage}" Classes="caption" Foreground="{DynamicResource AccentBrush}" IsVisible="{Binding !StatusIsError}" />
+    </StackPanel>
+  </Grid>
+</UserControl>

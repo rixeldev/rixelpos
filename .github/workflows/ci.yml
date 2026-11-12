@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    name: Build & test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore RixelPOS.sln
+
+      - name: Build
+        run: dotnet build RixelPOS.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test RixelPOS.sln -c Release --no-build --logger "console;verbosity=normal"
+
+      - name: Publish Linux
+        if: runner.os == 'Linux'
+        run: dotnet publish src/RixelPOS.Desktop/RixelPOS.Desktop.csproj -c Release -r linux-x64 --self-contained true -p:DebugType=None -o dist/ci/linux
+
+      - name: Publish Windows
+        if: runner.os == 'Windows'
+        run: dotnet publish src/RixelPOS.Desktop/RixelPOS.Desktop.csproj -c Release -r win-x64 --self-contained true -p:DebugType=None -o dist/ci/windows
+
+      - name: Upload Linux artifact
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: RixelPOS-linux-x64
+          path: dist/ci/linux
+          retention-days: 7
+
+      - name: Upload Windows artifact
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: RixelPOS-win-x64
+          path: dist/ci/windows
+          retention-days: 7
+
+  package-linux:
+    name: Linux packages
+    needs: build-test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Build AppImage/deb/tar
+        run: |
+          chmod +x packaging/linux/build.sh
+          ./packaging/linux/build.sh "${{ github.ref_name }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RixelPOS-linux-packages
+          path: dist/linux
+          retention-days: 14

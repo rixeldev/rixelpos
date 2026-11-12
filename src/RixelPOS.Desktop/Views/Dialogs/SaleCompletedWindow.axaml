@@ -1,0 +1,49 @@
+<dialogs:DialogWindow xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:dialogs="using:RixelPOS.Desktop.Views.Dialogs"
+                     xmlns:loc="using:RixelPOS.Desktop.Localization"
+                     x:Class="RixelPOS.Desktop.Views.Dialogs.SaleCompletedWindow"
+                     Title="{loc:Tr checkout.saleCompleted}"
+                     Width="500" SizeToContent="Height" CanResize="False" ShowInTaskbar="False"
+                     WindowStartupLocation="CenterOwner" Background="{DynamicResource SurfaceBrush}">
+  <dialogs:DialogWindow.KeyBindings>
+    <KeyBinding Gesture="Enter" Command="{Binding DoneCommand}" />
+    <KeyBinding Gesture="Escape" Command="{Binding DoneCommand}" />
+  </dialogs:DialogWindow.KeyBindings>
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+  <StackPanel Margin="28" Spacing="18">
+    <Border Width="76" Height="76" CornerRadius="24" Background="{DynamicResource SuccessSoftBrush}" HorizontalAlignment="Center">
+      <TextBlock Text="✓" FontSize="40" Foreground="{DynamicResource SuccessBrush}"
+                 HorizontalAlignment="Center" VerticalAlignment="Center" />
+    </Border>
+    <StackPanel Spacing="4" HorizontalAlignment="Center">
+      <TextBlock Text="{loc:Tr checkout.saleCompleted}" Classes="h1" HorizontalAlignment="Center" />
+      <TextBlock Text="{Binding InvoiceNumber}" Classes="muted" HorizontalAlignment="Center" />
+    </StackPanel>
+
+    <Border Classes="soft" Padding="18">
+      <StackPanel Spacing="8">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Text="{loc:Tr common.total}" Classes="caption" />
+          <TextBlock Grid.Column="1" Text="{Binding TotalText}" Classes="money" FontSize="22" />
+        </Grid>
+        <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding ShowChange}">
+          <TextBlock Text="{loc:Tr checkout.change}" FontWeight="SemiBold" />
+          <TextBlock Grid.Column="1" Text="{Binding ChangeText}" Classes="money" FontSize="26" Foreground="{DynamicResource AccentBrush}" />
+        </Grid>
+      </StackPanel>
+    </Border>
+
+    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+      <Button Classes="soft" Content="{loc:Tr checkout.printReceipt}" Command="{Binding PrintCommand}" HorizontalAlignment="Stretch" />
+      <Button Grid.Column="1" Classes="soft" Content="{loc:Tr checkout.exportPdf}" Command="{Binding ExportPdfCommand}" HorizontalAlignment="Stretch" />
+    </Grid>
+    <Button Classes="primary big" Content="{loc:Tr checkout.newSale}" Command="{Binding DoneCommand}" HorizontalAlignment="Stretch" />
+
+    <Border Classes="dangerCard" IsVisible="{Binding StatusIsError}">
+      <TextBlock Text="{Binding StatusMessage}" Classes="danger" TextWrapping="Wrap" />
+    </Border>
+    <TextBlock Text="{Binding StatusMessage}" Classes="caption" Foreground="{DynamicResource AccentBrush}" IsVisible="{Binding !StatusIsError}" TextWrapping="Wrap" />
+  </StackPanel>
+  </ScrollViewer>
+</dialogs:DialogWindow>

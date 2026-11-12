@@ -1,0 +1,95 @@
+<dialogs:DialogWindow xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:dialogs="using:RixelPOS.Desktop.Views.Dialogs"
+                     xmlns:loc="using:RixelPOS.Desktop.Localization"
+                     x:Class="RixelPOS.Desktop.Views.Dialogs.PurchaseEditorWindow"
+                     Title="{loc:Tr suppliers.newPurchase}" Width="940" Height="800" MinWidth="760" MinHeight="560" ShowInTaskbar="False"
+                     WindowStartupLocation="CenterOwner" Background="{DynamicResource SurfaceBrush}">
+  <Grid RowDefinitions="Auto,*,Auto" Margin="24" RowSpacing="14">
+    <Grid ColumnDefinitions="1.4*,*" ColumnSpacing="12">
+      <StackPanel Spacing="6">
+        <TextBlock Text="{loc:Tr suppliers.selectSupplier}" Classes="caption" />
+        <ComboBox ItemsSource="{Binding Suppliers}" SelectedItem="{Binding SelectedSupplier}" HorizontalAlignment="Stretch">
+          <ComboBox.ItemTemplate>
+            <DataTemplate><TextBlock Text="{Binding Name}" /></DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+      </StackPanel>
+      <StackPanel Grid.Column="1" Spacing="6">
+        <TextBlock Text="{loc:Tr common.notes}" Classes="caption" />
+        <TextBox Text="{Binding Notes}" />
+      </StackPanel>
+    </Grid>
+
+    <Grid Grid.Row="1" ColumnDefinitions="1.1*,*" ColumnSpacing="16">
+      <StackPanel Spacing="10">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+          <TextBox Text="{Binding ProductSearch}" Watermark="{loc:Tr common.search}" />
+        </Grid>
+        <Border Classes="soft" Padding="6" MaxHeight="180" IsVisible="{Binding HasProductSearch}">
+          <ScrollViewer>
+            <ItemsControl ItemsSource="{Binding ProductResults}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Button Classes="ghost" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                          Command="{Binding $parent[Window].DataContext.AddProductCommand}" CommandParameter="{Binding}">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Text="{Binding Name}" />
+                      <TextBlock Grid.Column="1" Text="{Binding Sku}" Classes="caption" />
+                    </Grid>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </Border>
+
+        <TextBlock Text="{loc:Tr suppliers.addLine}" Classes="h3" />
+        <Border Classes="card" Padding="0">
+          <Grid RowDefinitions="Auto,*">
+            <Grid ColumnDefinitions="2*,0.8*,1*,0.8*,Auto" Margin="12,10">
+              <TextBlock Text="{loc:Tr suppliers.product}" Classes="caption" />
+              <TextBlock Grid.Column="1" Text="{loc:Tr suppliers.qty}" Classes="caption" />
+              <TextBlock Grid.Column="2" Text="{loc:Tr suppliers.unitCost}" Classes="caption" />
+              <TextBlock Grid.Column="3" Text="{loc:Tr common.total}" Classes="caption" />
+            </Grid>
+            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto">
+              <ItemsControl ItemsSource="{Binding Lines}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="2*,0.8*,1*,0.8*,Auto" ColumnSpacing="8" Margin="12,4">
+                      <TextBlock Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Grid.Column="1" Text="{Binding Quantity, StringFormat='{}{0:0.###}'}" VerticalAlignment="Center" />
+                      <TextBox Grid.Column="2" Text="{Binding CostText}" MinHeight="34" Padding="8,4" />
+                      <TextBlock Grid.Column="3" Text="{Binding TotalText}" VerticalAlignment="Center" />
+                      <Button Grid.Column="4" Classes="icon ghost" Width="28" Height="28" MinWidth="28" MinHeight="28"
+                              Command="{Binding $parent[Window].DataContext.RemoveLineCommand}" CommandParameter="{Binding}">
+                        <PathIcon Data="{DynamicResource IconTrash}" Width="12" Height="12" />
+                      </Button>
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+          </Grid>
+        </Border>
+      </StackPanel>
+
+      <Border Grid.Column="1" Classes="soft" Padding="16">
+        <StackPanel Spacing="12">
+          <TextBlock Text="{loc:Tr suppliers.orderTotal}" Classes="h3" />
+          <TextBlock Text="{Binding TotalText}" Classes="bigMoney" />
+          <TextBlock Text="{loc:Tr suppliers.addLine}" Classes="caption" TextWrapping="Wrap" />
+          <Separator />
+          <Border Classes="dangerCard" IsVisible="{Binding HasErrorMessage}">
+            <TextBlock Text="{Binding ErrorMessage}" Classes="danger" TextWrapping="Wrap" />
+          </Border>
+          <Button Classes="primary big" Content="{loc:Tr suppliers.createOrder}" Command="{Binding ConfirmCommand}" IsEnabled="{Binding HasLines}" />
+          <Button Classes="ghost" Content="{loc:Tr common.cancel}" Command="{Binding CancelCommand}" />
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <Button Grid.Row="2" Classes="ghost" Content="{loc:Tr common.cancel}" Command="{Binding CancelCommand}" HorizontalAlignment="Left" />
+  </Grid>
+</dialogs:DialogWindow>

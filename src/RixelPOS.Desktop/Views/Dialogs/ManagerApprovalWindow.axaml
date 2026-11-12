@@ -1,0 +1,64 @@
+<dialogs:DialogWindow xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:dialogs="using:RixelPOS.Desktop.Views.Dialogs"
+                     xmlns:loc="using:RixelPOS.Desktop.Localization"
+                     x:Class="RixelPOS.Desktop.Views.Dialogs.ManagerApprovalWindow"
+                     Title="{loc:Tr dialogs.managerApprovalTitle}"
+                     Width="440" SizeToContent="Height" CanResize="False" ShowInTaskbar="False"
+                     WindowStartupLocation="CenterOwner" Background="{DynamicResource SurfaceBrush}">
+  <StackPanel Margin="24" Spacing="16">
+    <StackPanel Orientation="Horizontal" Spacing="12">
+      <Border Width="42" Height="42" CornerRadius="12" Background="{DynamicResource WarningSoftBrush}">
+        <PathIcon Data="{DynamicResource IconLock}" Width="20" Height="20" Foreground="{DynamicResource WarningBrush}"
+                  HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </Border>
+      <StackPanel VerticalAlignment="Center">
+        <TextBlock Text="{loc:Tr dialogs.managerApprovalTitle}" Classes="h2" />
+        <TextBlock Text="{loc:Tr dialogs.managerApprovalHint}" Classes="caption" TextWrapping="Wrap" />
+      </StackPanel>
+    </StackPanel>
+    <Border Classes="soft">
+      <StackPanel Spacing="2">
+        <TextBlock Text="{loc:Tr dialogs.approvalReason}" Classes="caption" />
+        <TextBlock Text="{Binding Reason}" FontWeight="SemiBold" TextWrapping="Wrap" />
+      </StackPanel>
+    </Border>
+    <Border Classes="soft" Padding="14">
+      <TextBlock Text="{Binding PinDots}" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center" MinHeight="34" />
+    </Border>
+    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="8" RowSpacing="8">
+      <Button Grid.Row="0" Grid.Column="0" Content="1" Classes="pinKey" Command="{Binding AddDigitCommand}" CommandParameter="1" />
+      <Button Grid.Row="0" Grid.Column="1" Content="2" Classes="pinKey" Command="{Binding AddDigitCommand}" CommandParameter="2" />
+      <Button Grid.Row="0" Grid.Column="2" Content="3" Classes="pinKey" Command="{Binding AddDigitCommand}" CommandParameter="3" />
+      <Button Grid.Row="1" Grid.Column="0" Content="4" Classes="pinKey" Command="{Binding AddDigitCommand}" CommandParameter="4" />
+      <Button Grid.Row="1" Grid.Column="1" Content="5" Classes="pinKey" Command="{Binding AddDigitCommand}" CommandParameter="5" />
+      <Button Grid.Row="1" Grid.Column="2" Content="6" Classes="pinKey" Command="{Binding AddDigitCommand}" CommandParameter="6" />
+      <Button Grid.Row="2" Grid.Column="0" Content="7" Classes="pinKey" Command="{Binding AddDigitCommand}" CommandParameter="7" />
+      <Button Grid.Row="2" Grid.Column="1" Content="8" Classes="pinKey" Command="{Binding AddDigitCommand}" CommandParameter="8" />
+      <Button Grid.Row="2" Grid.Column="2" Content="9" Classes="pinKey" Command="{Binding AddDigitCommand}" CommandParameter="9" />
+      <Button Grid.Row="3" Grid.Column="0" Content="⌫" Classes="pinKey" Command="{Binding BackspaceCommand}" />
+      <Button Grid.Row="3" Grid.Column="1" Content="0" Classes="pinKey" Command="{Binding AddDigitCommand}" CommandParameter="0" />
+      <Button Grid.Row="3" Grid.Column="2" Content="✓" Classes="pinKey primary" Command="{Binding ApproveCommand}" />
+    </Grid>
+    <Border Classes="dangerCard" IsVisible="{Binding HasErrorMessage}">
+      <TextBlock Text="{Binding ErrorMessage}" Classes="danger" TextWrapping="Wrap" />
+    </Border>
+    <Button Content="{loc:Tr common.cancel}" Classes="ghost" Command="{Binding CancelCommand}" HorizontalAlignment="Right" />
+  </StackPanel>
+
+  <dialogs:DialogWindow.Styles>
+    <Style Selector="Button.pinKey">
+      <Setter Property="Height" Value="52" />
+      <Setter Property="FontSize" Value="18" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Background" Value="{DynamicResource Surface2Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+    </Style>
+    <Style Selector="Button.pinKey.primary">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}" />
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+  </dialogs:DialogWindow.Styles>
+</dialogs:DialogWindow>

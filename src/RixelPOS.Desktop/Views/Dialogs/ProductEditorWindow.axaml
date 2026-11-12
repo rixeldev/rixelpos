@@ -1,0 +1,144 @@
+<dialogs:DialogWindow xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:dialogs="using:RixelPOS.Desktop.Views.Dialogs"
+                     xmlns:loc="using:RixelPOS.Desktop.Localization"
+                     x:Class="RixelPOS.Desktop.Views.Dialogs.ProductEditorWindow"
+                     Title="{Binding Title}"
+                     Width="920" Height="800" MinWidth="720" MinHeight="540" ShowInTaskbar="False"
+                     WindowStartupLocation="CenterOwner" Background="{DynamicResource SurfaceBrush}">
+  <Grid RowDefinitions="Auto,*,Auto" Margin="24" RowSpacing="14">
+    <Grid ColumnDefinitions="*,Auto">
+      <StackPanel Spacing="3">
+        <TextBlock Text="{Binding Title}" Classes="h2" />
+        <TextBlock Text="{loc:Tr inventory.tabProducts}" Classes="caption" />
+      </StackPanel>
+      <Border Grid.Column="1" Classes="accentCard" Padding="12,6" CornerRadius="10" IsVisible="{Binding IsDeferred}">
+        <TextBlock Text="{loc:Tr inventory.newProductWithBarcode}" FontSize="12" />
+      </Border>
+    </Grid>
+
+    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto">
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="24">
+        <!-- Left -->
+        <StackPanel Spacing="12">
+          <StackPanel Spacing="6">
+            <TextBlock Text="{loc:Tr common.name}" Classes="caption" />
+            <TextBox x:Name="NameBox" Text="{Binding Name}" Classes="big" />
+          </StackPanel>
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+            <StackPanel Spacing="6">
+              <TextBlock Text="{loc:Tr common.sku}" Classes="caption" />
+              <TextBox Text="{Binding Sku}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Spacing="6">
+              <TextBlock Text="{loc:Tr common.category}" Classes="caption" />
+              <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}" HorizontalAlignment="Stretch">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate><TextBlock Text="{Binding Name}" /></DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+            </StackPanel>
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <StackPanel Spacing="6">
+              <TextBlock Text="{loc:Tr common.barcode}" Classes="caption" />
+              <TextBox Text="{Binding Barcode}" Watermark="7460000000000" />
+            </StackPanel>
+            <Button Grid.Column="1" Content="{loc:Tr common.add}" Command="{Binding AddBarcodeFromFieldCommand}" VerticalAlignment="Bottom" />
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <TextBox Text="{Binding NewCategoryName}" Watermark="{loc:Tr inventory.addCategory}" />
+            <Button Grid.Column="1" Classes="ghost" Content="{loc:Tr inventory.addCategory}" Command="{Binding AddCategoryCommand}" />
+          </Grid>
+          <Border Classes="soft" Padding="10">
+            <StackPanel Spacing="6">
+              <TextBlock Text="{loc:Tr common.barcode}" Classes="caption" />
+              <ItemsControl ItemsSource="{Binding Barcodes}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" Margin="0,2">
+                      <TextBlock Text="{Binding Code}" FontFamily="monospace" />
+                      <TextBlock Grid.Column="1" Text="{Binding PrimaryText}" Classes="caption" VerticalAlignment="Center" />
+                      <Button Grid.Column="2" Classes="icon ghost" Width="26" Height="26" MinWidth="26" MinHeight="26"
+                              Command="{Binding $parent[Window].DataContext.RemoveBarcodeCommand}" CommandParameter="{Binding}">
+                        <PathIcon Data="{DynamicResource IconClose}" Width="10" Height="10" />
+                      </Button>
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <Button Classes="ghost" Content="{loc:Tr inventory.generateBarcode}" Command="{Binding GenerateBarcodeCommand}" HorizontalAlignment="Left" />
+            </StackPanel>
+          </Border>
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+            <StackPanel Spacing="6">
+              <TextBlock Text="{loc:Tr common.price}" Classes="caption" />
+              <TextBox Text="{Binding PriceText}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Spacing="6">
+              <TextBlock Text="{loc:Tr common.cost}" Classes="caption" />
+              <TextBox Text="{Binding CostText}" />
+            </StackPanel>
+          </Grid>
+        </StackPanel>
+
+        <!-- Right -->
+        <StackPanel Grid.Column="1" Spacing="12">
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+            <StackPanel Spacing="6">
+              <TextBlock Text="{loc:Tr common.tax}" Classes="caption" />
+              <TextBox Text="{Binding TaxPercentText}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Spacing="6" IsVisible="{Binding IsDeferred}">
+              <TextBlock Text="{loc:Tr common.unit}" Classes="caption" />
+              <TextBox Text="{Binding Unit}" />
+            </StackPanel>
+          </Grid>
+          <CheckBox Content="{loc:Tr inventory.taxInclusive}" IsChecked="{Binding TaxInclusive}" />
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="12" IsVisible="{Binding !IsDeferred}">
+            <StackPanel Spacing="6">
+              <TextBlock Text="{loc:Tr inventory.initialStock}" Classes="caption" />
+              <TextBox Text="{Binding StockText}" IsEnabled="{Binding IsNew}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Spacing="6">
+              <TextBlock Text="{loc:Tr inventory.minStock}" Classes="caption" />
+              <TextBox Text="{Binding MinStockText}" />
+            </StackPanel>
+          </Grid>
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+            <StackPanel Spacing="6">
+              <TextBlock Text="{loc:Tr common.unit}" Classes="caption" />
+              <TextBox Text="{Binding Unit}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Spacing="6">
+              <TextBlock Text="{loc:Tr common.status}" Classes="caption" />
+              <CheckBox Content="{loc:Tr inventory.trackStock}" IsChecked="{Binding TrackStock}" />
+            </StackPanel>
+          </Grid>
+          <CheckBox Content="{loc:Tr inventory.favorite}" IsChecked="{Binding IsFavorite}" />
+          <StackPanel Spacing="6">
+            <TextBlock Text="{loc:Tr common.notes}" Classes="caption" />
+            <TextBox Text="{Binding Notes}" AcceptsReturn="True" Height="90" />
+          </StackPanel>
+          <Border Classes="soft">
+            <StackPanel Spacing="4">
+              <TextBlock Text="{loc:Tr common.barcode}" Classes="caption" />
+              <TextBlock Text="{loc:Tr inventory.scanHint}" Classes="caption" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </Grid>
+    </ScrollViewer>
+
+    <StackPanel Grid.Row="2" Spacing="8">
+      <Border Classes="dangerCard" IsVisible="{Binding HasErrorMessage}">
+        <TextBlock Text="{Binding ErrorMessage}" Classes="danger" TextWrapping="Wrap" />
+      </Border>
+      <TextBlock Text="{Binding StatusMessage}" Classes="caption" Foreground="{DynamicResource AccentBrush}" />
+      <Grid ColumnDefinitions="*,Auto,Auto">
+        <Button Grid.Column="1" Classes="ghost" Content="{loc:Tr common.cancel}" Command="{Binding CancelCommand}" />
+        <Button Grid.Column="2" Classes="primary big" Content="{loc:Tr common.save}" Command="{Binding SaveCommand}" />
+      </Grid>
+    </StackPanel>
+  </Grid>
+</dialogs:DialogWindow>

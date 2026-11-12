@@ -1,0 +1,29 @@
+<dialogs:DialogWindow xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:dialogs="using:RixelPOS.Desktop.Views.Dialogs"
+                     xmlns:loc="using:RixelPOS.Desktop.Localization"
+                     x:Class="RixelPOS.Desktop.Views.Dialogs.StockAdjustWindow"
+                     Title="{loc:Tr inventory.adjustStock}" Width="480" MinWidth="420" SizeToContent="Height" ShowInTaskbar="False"
+                     WindowStartupLocation="CenterOwner" Background="{DynamicResource SurfaceBrush}">
+  <StackPanel Margin="24" Spacing="14">
+    <TextBlock Text="{loc:Tr inventory.adjustStock}" Classes="h2" />
+    <Border Classes="soft">
+      <StackPanel Spacing="2">
+        <TextBlock Text="{Binding ProductName}" FontWeight="SemiBold" />
+        <TextBlock Text="{Binding CurrentStockText}" Classes="caption" />
+      </StackPanel>
+    </Border>
+    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+      <StackPanel Spacing="6"><TextBlock Text="{loc:Tr inventory.newStock}" Classes="caption" /><TextBox Text="{Binding NewStockText}" Classes="big" /></StackPanel>
+      <StackPanel Grid.Column="1" Spacing="6"><TextBlock Text="{loc:Tr inventory.difference}" Classes="caption" /><TextBlock Text="{Binding DifferenceText}" Classes="money" VerticalAlignment="Center" /></StackPanel>
+    </Grid>
+    <StackPanel Spacing="6"><TextBlock Text="{loc:Tr inventory.reason}" Classes="caption" /><TextBox Text="{Binding Reason}" Watermark="{loc:Tr inventory.reason}" /></StackPanel>
+    <Border Classes="dangerCard" IsVisible="{Binding HasErrorMessage}">
+      <TextBlock Text="{Binding ErrorMessage}" Classes="danger" TextWrapping="Wrap" />
+    </Border>
+    <Grid ColumnDefinitions="*,Auto,Auto">
+      <Button Grid.Column="1" Classes="ghost" Content="{loc:Tr common.cancel}" Command="{Binding CancelCommand}" />
+      <Button Grid.Column="2" Classes="primary" Content="{loc:Tr common.save}" Command="{Binding SaveCommand}" />
+    </Grid>
+  </StackPanel>
+</dialogs:DialogWindow>
