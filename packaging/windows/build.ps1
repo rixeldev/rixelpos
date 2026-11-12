@@ -14,9 +14,13 @@ New-Item -ItemType Directory -Path $Publish -Force | Out-Null
 
 dotnet publish (Join-Path $Root "src\RixelPOS.Desktop\RixelPOS.Desktop.csproj") `
     -c Release -r $Runtime --self-contained true `
-    -p:DebugType=None -p:DebugSymbols=false `
+    -p:Version=$Version -p:DebugType=None -p:DebugSymbols=false `
     -o $Publish
 if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed" }
+
+$prereq = Join-Path $Publish "prerequisites"
+New-Item -ItemType Directory -Path $prereq -Force | Out-Null
+Copy-Item (Join-Path $Root "packaging\prerequisites\install-dotnet.ps1") $prereq -Force
 
 $zip = Join-Path $Out "RixelPOS-$Version-win-x64.zip"
 Compress-Archive -Path (Join-Path $Publish "*") -DestinationPath $zip -Force

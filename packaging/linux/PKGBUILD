@@ -12,6 +12,7 @@ depends=('glibc' 'icu' 'fontconfig' 'freetype2' 'harfbuzz' 'zlib'
          'libx11' 'libice' 'libsm' 'libxext' 'libxrandr' 'libxi'
          'libxcursor' 'libxrender' 'libxcb' 'mesa' 'libglvnd')
 makedepends=('dotnet-sdk')
+optdepends=('dotnet-sdk: opcional para desarrollo y compilación desde código fuente')
 install=rixelpos.install
 source=("$pkgname-$pkgver.tar.gz::https://github.com/rixeldev/rixelpos/archive/refs/tags/v$pkgver.tar.gz")
 sha256sums=('SKIP')
@@ -20,8 +21,11 @@ build() {
   cd "$srcdir/rixelpos-$pkgver"
   dotnet publish src/RixelPOS.Desktop/RixelPOS.Desktop.csproj \
     -c Release -r linux-x64 --self-contained true \
-    -p:DebugType=None -p:DebugSymbols=false \
+    -p:Version="$pkgver" -p:DebugType=None -p:DebugSymbols=false \
     -o "$srcdir/app"
+  mkdir -p "$srcdir/app/prerequisites"
+  install -m755 "$srcdir/rixelpos-$pkgver/packaging/prerequisites/install-dotnet.sh" \
+    "$srcdir/app/prerequisites/install-dotnet.sh"
 }
 
 package() {
@@ -38,4 +42,10 @@ package() {
   install -m644 "$srcdir/rixelpos-$pkgver/packaging/linux/udev/99-rixelpos.rules" \
     "$pkgdir/lib/udev/rules.d/99-rixelpos.rules"
   install -m644 "$srcdir/rixelpos-$pkgver/LICENSE" "$pkgdir/usr/lib/rixelpos/LICENSE"
+  install -d "$pkgdir/usr/bin"
+  cat > "$pkgdir/usr/bin/rixelpos-install-dotnet" <<'EOF'
+#!/bin/sh
+exec /usr/lib/rixelpos/prerequisites/install-dotnet.sh "$@"
+EOF
+  chmod 755 "$pkgdir/usr/bin/rixelpos-install-dotnet"
 }

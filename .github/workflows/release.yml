@@ -1,0 +1,199 @@
+name: Release
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish (for example 1.2.0). Empty uses the build number."
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  version:
+    name: Resolve version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      tag: ${{ steps.v.outputs.tag }}
+      release_name: ${{ steps.v.outputs.release_name }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            version="${GITHUB_REF_NAME#v}"
+            tag="${GITHUB_REF_NAME}"
+            name="RixelPOS ${version}"
+          elif [ -n "${{ inputs.version }}" ]; then
+            version="${{ inputs.version }}"
+            tag="v${version}"
+            name="RixelPOS ${version}"
+          else
+            base="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' Directory.Build.props | head -1)"
+            base="${base:-1.0.0}"
+            version="${base}.${GITHUB_RUN_NUMBER}"
+            tag="latest"
+            name="RixelPOS latest (${version})"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "release_name=$name" >> "$GITHUB_OUTPUT"
+
+  quality:
+    name: Build and test
+    needs: version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore
+        run: dotnet restore RixelPOS.sln
+      - name: Build
+        run: dotnet build RixelPOS.sln -c Release --no-restore
+      - name: Test
+        run: dotnet test RixelPOS.sln -c Release --no-build
+
+  linux:
+    name: Linux packages
+    needs: [ version, quality ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zstd libarchive-tools dpkg-dev curl
+          curl -fsSL -o "$RUNNER_TEMP/appimagetool" \
+            https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x "$RUNNER_TEMP/appimagetool"
+      - name: Build Linux artifacts
+        env:
+          APPIMAGETOOL: ${{ runner.temp }}/appimagetool
+        run: |
+          chmod +x packaging/linux/build.sh packaging/linux/install.sh packaging/prerequisites/install-dotnet.sh
+          ./packaging/linux/build.sh "${{ needs.version.outputs.version }}"
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RixelPOS-linux
+          path: dist/linux
+          retention-days: 7
+      - name: Upload pacman repository
+        uses: actions/upload-artifact@v4
+        with:
+          name: RixelPOS-pacman
+          path: dist/linux/pacman
+          retention-days: 7
+
+  windows:
+    name: Windows installer
+    needs: [ version, quality ]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Install Inno Setup
+        run: choco install innosetup --yes --no-progress
+      - name: Build Windows artifacts
+        shell: pwsh
+        run: |
+          ./packaging/windows/build.ps1 -Version "${{ needs.version.outputs.version }}"
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RixelPOS-windows
+          path: dist/windows
+          retention-days: 7
+
+  publish:
+    name: Publish GitHub release
+    needs: [ version, quality, linux, windows ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: RixelPOS-linux
+          path: artifacts/linux
+      - uses: actions/download-artifact@v4
+        with:
+          name: RixelPOS-windows
+          path: artifacts/windows
+      - name: Collect release files
+        run: |
+          mkdir -p release
+          find artifacts -type f \
+            \( -name '*.AppImage' -o -name '*.deb' -o -name '*.tar.gz' \
+               -o -name '*.pkg.tar.zst' -o -name '*.zip' -o -name '*.exe' \
+               -o -name 'PKGBUILD' \) -exec cp -v {} release/ \;
+          cd release
+          sha256sum * > SHA256SUMS.txt
+          ls -lh
+      - name: Create or update release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.version.outputs.tag }}
+          VERSION: ${{ needs.version.outputs.version }}
+          NAME: ${{ needs.version.outputs.release_name }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [ "$TAG" = "latest" ]; then
+            if gh release view latest >/dev/null 2>&1; then
+              for asset in $(gh release view latest --json assets --jq '.assets[].name'); do
+                gh release delete-asset latest "$asset" --yes || true
+              done
+              gh release edit latest --title "$NAME" --notes "Rolling build from main: $SHA" --latest
+            else
+              gh release create latest --target "$SHA" --title "$NAME" --notes "Rolling build from main: $SHA" --latest
+            fi
+          elif gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --title "$NAME" --notes "RixelPOS $VERSION" --latest
+          else
+            gh release create "$TAG" --title "$NAME" --notes "RixelPOS $VERSION" --latest
+          fi
+          gh release upload "$TAG" release/* --clobber
+
+  pacman-repo:
+    name: Update pacman repository
+    needs: [ version, quality, linux ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: RixelPOS-pacman
+          path: pacman
+      - name: Publish repository to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./pacman
+          destination_dir: pacman
+          keep_files: true
+          user_name: RixelDev
+          user_email: soporte@rixeldev.com
+          commit_message: "pacman repo ${{ needs.version.outputs.version }}"

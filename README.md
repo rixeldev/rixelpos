@@ -173,7 +173,40 @@ sincronización opcional replica a la nube. El modo actual es 100% local y no re
 
 ---
 
-## 4. Instalación y ejecución
+## 4. Descargas e instalación
+
+El workflow `.github/workflows/release.yml` publica automáticamente Linux y Windows en
+cada actualización de `main` (release **latest**) y en cada tag `v*` (release versionada).
+Descarga desde:
+
+**https://github.com/rixeldev/rixelpos/releases/latest**
+
+| Sistema | Instalación |
+| --- | --- |
+| CachyOS / Arch | Repositorio pacman: añade `[rixelpos]` (ver abajo) y `sudo pacman -S rixelpos` |
+| Arch directo | `sudo pacman -U rixelpos-<version>-1-x86_64.pkg.tar.zst` |
+| AppImage | `chmod +x RixelPOS-<version>-x86_64.AppImage && ./RixelPOS-<version>-x86_64.AppImage` |
+| .deb | `sudo apt install ./rixelpos_<version>_amd64.deb` |
+| Portable Linux | `tar -xzf rixelpos-<version>-linux-x64.tar.gz && ./install.sh` |
+| Windows | `RixelPOS-Setup-<version>.exe` (o el ZIP portable) |
+
+Repositorio pacman (rama `gh-pages`, habilitar Pages en el repositorio):
+
+```ini
+[rixelpos]
+SigLevel = Optional TrustAll
+Server = https://rixeldev.github.io/rixelpos/pacman/$arch
+```
+
+```bash
+sudo pacman -Syu
+sudo pacman -S rixelpos
+```
+
+**La app es self-contained: no necesita .NET instalado.** Para desarrollo o si quieres el
+SDK, el instalador de Windows marca por defecto la tarea “Instalar .NET SDK 8 si falta” (desmarcable), y
+Linux incluye `rixelpos-install-dotnet` (`packaging/prerequisites/install-dotnet.sh`).
+También puedes descargar el SDK manualmente. Ver [docs/RELEASES.md](docs/RELEASES.md).
 
 ### Requisitos de desarrollo
 - .NET SDK 8.0 (probado también con SDK 10 usando `rollForward`).
@@ -231,6 +264,8 @@ Genera:
 - `dist/linux/RixelPOS-x86_64.AppImage` (si `appimagetool` está disponible),
 - `dist/linux/rixelpos_1.0.0_amd64.deb` (si `dpkg-deb` está disponible),
 - `dist/linux/rixelpos-1.0.0-linux-x64.tar.gz`,
+- `dist/linux/rixelpos-1.0.0-1-x86_64.pkg.tar.zst`,
+- `dist/linux/pacman/x86_64/` con `rixelpos.db` listo para `pacman -S`,
 - `dist/linux/PKGBUILD` listo para AUR (ajusta el `source` a tu release).
 
 `packaging/linux/PKGBUILD` también se puede copiar a un directorio y ejecutar:
@@ -342,7 +377,15 @@ y publica artefactos self-contained de cada plataforma.
 
 ---
 
-## 11. Licencia
+## 11. Agentes y mantenimiento
+
+- Lee y actualiza [AGENTS.md](AGENTS.md): contiene reglas de arquitectura, UI/DPI,
+  pruebas, releases y seguridad para cualquier agente que trabaje en el proyecto.
+- Antes de un cambio grande: `dotnet build` + `dotnet test`; después, actualiza docs y
+  AGENTS si cambia la estructura o el empaquetado.
+- El repositorio se mantiene privado y sin secretos; ver `.gitignore` y `SECURITY.md`.
+
+## 12. Licencia
 
 Software propietario de **RixelDev**. Ver [LICENSE](LICENSE).
 
@@ -350,7 +393,7 @@ Hecho con cariño para que cobrar sea lo más simple del día.
 
 ---
 
-## 12. Repositorio y manejo de secretos
+## 13. Repositorio y manejo de secretos
 
 - Repositorio remoto: `git@github.com:rixeldev/rixelpos.git` (privado).
 - `bin/`, `obj/`, `dist/`, bases de datos, respaldos, logs y material de firma están

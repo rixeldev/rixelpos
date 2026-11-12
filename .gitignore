@@ -58,3 +58,7 @@ appsettings.Development.json
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Python helper output
+__pycache__/
+*.pyc

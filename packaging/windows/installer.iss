@@ -36,9 +36,11 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "Crear un acceso directo en el escritorio"; GroupDescription: "Accesos directos:"; Flags: unchecked
+Name: "dotnet"; Description: "Instalar .NET SDK 8 si falta (requiere internet)"; GroupDescription: "Componentes opcionales:"; Flags: checkedonce
 
 [Files]
 Source: "..\..\dist\windows\RixelPOS\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\packaging\prerequisites\install-dotnet.ps1"; DestDir: "{app}\prerequisites"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
@@ -47,6 +49,7 @@ Name: "{group}\Desinstalar {#AppName}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desktopicon
 
 [Run]
+Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\prerequisites\install-dotnet.ps1"" -Channel 8.0 -Quiet"; StatusMsg: "Verificando/instalando .NET SDK 8 (opcional)..."; Flags: waituntilterminated ignoreerrors; Tasks: dotnet
 Filename: "{app}\{#AppExeName}"; Description: "Abrir {#AppName}"; Flags: nowait postinstall skipifsilent
 
 [UninstallDelete]

@@ -81,6 +81,19 @@ dotnet test tests/RixelPOS.Infrastructure.Tests
   `Localization/es.json` y `en.json`.
 - No introduzcas secretos. Usa variables de entorno o el gestor de secretos de la CI.
 
+## Prerrequisitos automáticos
+
+La app es self-contained; no necesita .NET para ejecutarse. Si necesitas el SDK:
+
+```bash
+./packaging/prerequisites/install-dotnet.sh 8.0     # o 10.0
+powershell -ExecutionPolicy Bypass -File packaging/prerequisites/install-dotnet.ps1 -Channel 8.0
+```
+
+El script de Linux detecta `pacman`, `apt`, `dnf` o `zypper`; si no encuentra el paquete
+usa `dotnet-install.sh`. El instalador de Windows marca la tarea por defecto y el paquete
+Linux incluye `rixelpos-install-dotnet`.
+
 ## Empaquetado
 
 ```bash
@@ -90,6 +103,10 @@ powershell -ExecutionPolicy Bypass -File packaging/windows/build.ps1 -Version 1.
 
 Los scripts no firman binarios. La firma se realiza con el certificado del cliente en el
 entorno de release. No subas certificados ni contraseñas al repositorio.
+
+El build de Linux genera además el paquete `.pkg.tar.zst`, el repositorio pacman en
+`dist/linux/pacman/x86_64` y el instalador portable `install.sh`. Consulta
+[RELEASES.md](RELEASES.md) y [AGENTS.md](../AGENTS.md) antes de tocar el workflow.
 
 ## Estilo de UI
 
