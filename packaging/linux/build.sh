@@ -82,7 +82,7 @@ Version: ${VERSION}
 Section: misc
 Priority: optional
 Architecture: amd64
-Maintainer: RixelDev <soporte@rixeldev.com>
+Maintainer: RixelDev <support@rixel.dev>
 Recommends: dotnet-sdk-8.0 | dotnet-sdk-10.0
 Description: RixelPOS - billing and point of sale by RixelDev
  Offline-first point of sale with ESC/POS receipts, inventory, cash register and reports.
@@ -116,9 +116,9 @@ pkgname = $NAME
 pkgbase = $NAME
 pkgver = $PKGVER-$PKGREL
 pkgdesc = Offline-first billing and point of sale by RixelDev
-url = https://rixeldev.com
+url = https://rixel.dev
 builddate = $BUILD_DATE
-packager = RixelDev <soporte@rixeldev.com>
+packager = RixelDev <support@rixel.dev>
 size = $INSTALLED_SIZE
 arch = $ARCH
 license = custom

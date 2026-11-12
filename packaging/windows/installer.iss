@@ -3,7 +3,7 @@
   #define AppVersion "1.0.0"
 #endif
 #define AppPublisher "RixelDev"
-#define AppURL "https://rixeldev.com"
+#define AppURL "https://rixel.dev"
 #define AppExeName "RixelPOS.exe"
 
 [Setup]

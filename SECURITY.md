@@ -9,7 +9,7 @@
 ## Reporting a vulnerability
 
 Please do not open a public issue for security problems. Send a private report to
-**soporte@rixeldev.com** with:
+**support@rixel.dev** with:
 
 - affected version and operating system,
 - a short description of the issue,

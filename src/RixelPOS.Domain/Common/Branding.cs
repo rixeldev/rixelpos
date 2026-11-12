@@ -7,8 +7,8 @@ public static class Branding
     public const string ProductName = "RixelPOS";
     public const string ProductCode = "rixelpos";
     public const string Tagline = "Punto de venta rápido, simple y confiable";
-    public const string Website = "https://rixeldev.com";
-    public const string SupportEmail = "soporte@rixeldev.com";
+    public const string Website = "https://rixel.dev";
+    public const string SupportEmail = "support@rixel.dev";
     public const string DefaultCurrencyCode = "DOP";
     public const string DefaultCurrencySymbol = "RD$";
     public const string DefaultLocale = "es-DO";

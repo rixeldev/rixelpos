@@ -1,4 +1,4 @@
-# Maintainer: RixelDev <soporte@rixeldev.com>
+# Maintainer: RixelDev <support@rixel.dev>
 # AUR-ready PKGBUILD. Replace @VERSION@ (the Linux build script does it) and
 # fill the checksum for a real release.
 pkgname=rixelpos
@@ -6,7 +6,7 @@ pkgver=@VERSION@
 pkgrel=1
 pkgdesc="Offline-first billing and point of sale by RixelDev"
 arch=('x86_64')
-url="https://rixeldev.com"
+url="https://rixel.dev"
 license=('custom')
 depends=('glibc' 'icu' 'fontconfig' 'freetype2' 'harfbuzz' 'zlib'
          'libx11' 'libice' 'libsm' 'libxext' 'libxrandr' 'libxi'

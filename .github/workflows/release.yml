@@ -195,5 +195,5 @@ jobs:
           destination_dir: pacman
           keep_files: true
           user_name: RixelDev
-          user_email: soporte@rixeldev.com
+          user_email: support@rixel.dev
           commit_message: "pacman repo ${{ needs.version.outputs.version }}"
