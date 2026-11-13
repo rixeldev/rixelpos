@@ -145,9 +145,10 @@ Cambios típicos:
   caja y exige el PIN del usuario actual (`LockService` + `LockWindow`). No permitas cerrar
   la ventana de bloqueo sin desbloquear o cerrar sesión.
 - **Vista previa**: `PreviewReceiptBeforePrint` muestra el comprobante antes de imprimir
-  (`ReceiptPreviewWindow`). `Enter` imprime y cierra siempre, aunque no haya impresora;
-  el error se muestra en la ventana de venta completada. Cualquier cambio en el recibo
-  debe verse también en `ReceiptFormatter.FormatPreview`.
+  (`ReceiptPreviewWindow`). Se imprime automáticamente a los 3 segundos y se cierra,
+  aunque no haya impresora; `Enter` imprime al instante y `Esc` cancela. El error se
+  muestra en la ventana de venta completada. Cualquier cambio en el recibo debe verse
+  también en `ReceiptFormatter.FormatPreview`.
 - **Post-venta no bloqueante**: `SaleCompletedWindow` es una sola instancia no modal.
   Se cierra al escanear o agregar el siguiente producto, al navegar o con `Nueva venta`.
   No permitas dos vistas previas ni dos ventanas de venta completada a la vez.

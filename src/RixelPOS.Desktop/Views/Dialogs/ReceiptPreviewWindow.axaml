@@ -13,6 +13,8 @@
       <TextBlock Text="{loc:Tr receipt.previewHint}" Classes="caption" />
       <TextBlock Text="{loc:Tr receipt.enterToPrint}" Classes="caption"
                  Foreground="{DynamicResource AccentBrush}" />
+      <TextBlock Text="{Binding AutoPrintText}" Classes="caption"
+                 Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold" />
     </StackPanel>
 
     <Border Grid.Row="1" Background="#FFFFFF" CornerRadius="8" Padding="18"

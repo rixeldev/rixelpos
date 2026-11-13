@@ -11,7 +11,22 @@ public partial class ReceiptPreviewWindow : DialogWindow
     {
         InitializeComponent();
         AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel);
-        Opened += (_, _) => Focus();
+        Opened += (_, _) =>
+        {
+            if (DataContext is ReceiptPreviewViewModel vm)
+            {
+                vm.StartAutoPrint();
+            }
+
+            Focus();
+        };
+        Closed += (_, _) =>
+        {
+            if (DataContext is ReceiptPreviewViewModel vm)
+            {
+                vm.CancelAutoPrint();
+            }
+        };
     }
 
     private void OnKeyDown(object? sender, KeyEventArgs e)

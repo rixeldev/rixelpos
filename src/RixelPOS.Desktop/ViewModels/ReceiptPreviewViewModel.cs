@@ -1,3 +1,4 @@
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RixelPOS.Application.Checkout;
@@ -21,6 +22,10 @@ public sealed partial class ReceiptPreviewViewModel : DialogViewModelBase
     [ObservableProperty] private bool _hasStatus;
     [ObservableProperty] private bool _statusIsError;
     [ObservableProperty] private bool _isPrinting;
+    [ObservableProperty] private string _autoPrintText = "";
+
+    private readonly DispatcherTimer _autoTimer = new() { Interval = TimeSpan.FromSeconds(1) };
+    private int _secondsLeft;
 
     public ReceiptPreviewViewModel(ReceiptService receipt, LocalizationService loc, Sale sale)
     {
@@ -28,6 +33,32 @@ public sealed partial class ReceiptPreviewViewModel : DialogViewModelBase
         _loc = loc;
         _sale = sale;
         PreviewText = ReceiptFormatter.FormatPreview(receipt.BuildData(sale));
+        _autoTimer.Tick += (_, _) => OnAutoTick();
+    }
+
+    /// <summary>Starts the automatic print countdown shown when the preview opens.</summary>
+    public void StartAutoPrint(int seconds = 3)
+    {
+        _secondsLeft = Math.Max(1, seconds);
+        AutoPrintText = _loc.Format("receipt.autoPrintIn", _secondsLeft);
+        _autoTimer.Start();
+    }
+
+    /// <summary>Cancels the timer when the window is closed by any route.</summary>
+    public void CancelAutoPrint() => _autoTimer.Stop();
+
+    private void OnAutoTick()
+    {
+        _secondsLeft--;
+        if (_secondsLeft > 0)
+        {
+            AutoPrintText = _loc.Format("receipt.autoPrintIn", _secondsLeft);
+            return;
+        }
+
+        _autoTimer.Stop();
+        AutoPrintText = _loc.Get("receipt.printing");
+        _ = PrintAsync();
     }
 
     public PrintResult? PrintResult { get; private set; }
@@ -35,12 +66,14 @@ public sealed partial class ReceiptPreviewViewModel : DialogViewModelBase
     [RelayCommand]
     private async Task PrintAsync()
     {
+        _autoTimer.Stop();
         if (IsPrinting)
         {
             return;
         }
 
         IsPrinting = true;
+        AutoPrintText = _loc.Get("receipt.printing");
         try
         {
             var result = await _receipt.PrintAsync(_sale);
@@ -86,5 +119,9 @@ public sealed partial class ReceiptPreviewViewModel : DialogViewModelBase
     }
 
     [RelayCommand]
-    private void ClosePreview() => Close(false);
+    private void ClosePreview()
+    {
+        _autoTimer.Stop();
+        Close(false);
+    }
 }

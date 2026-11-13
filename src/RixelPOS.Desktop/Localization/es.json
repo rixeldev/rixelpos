@@ -700,6 +700,8 @@
   "inventory.skuHint": "Se genera automáticamente a partir del nombre y el código de barras.",
   "shortcuts.open": "Atajos de teclado (F12)",
   "shortcuts.charge": "Cobrar (F9)",
-  "receipt.enterToPrint": "Pulsa Enter para imprimir y cerrar.",
-  "checkout.scanNextHint": "Escanea el siguiente producto o usa «Nueva venta» para cerrar."
+  "receipt.enterToPrint": "Enter imprime ahora; Esc cierra sin imprimir.",
+  "checkout.scanNextHint": "Escanea el siguiente producto o usa «Nueva venta» para cerrar.",
+  "receipt.autoPrintIn": "Imprimiendo automáticamente en {0} s…",
+  "receipt.printing": "Imprimiendo…"
 }

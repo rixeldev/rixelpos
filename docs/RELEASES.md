@@ -156,6 +156,8 @@ Get-FileHash .\RixelPOS-Setup-*.exe -Algorithm SHA256
 - **Desde 1.2.2** la venta completada es una tarjeta no modal de una sola instancia; se
   cierra al escanear o agregar otro producto, y la vista previa siempre se cierra al
   imprimir, incluso si la impresora no está configurada.
+- **Desde 1.2.3** la vista previa imprime automáticamente a los 3 segundos y se cierra,
+  sin necesidad de pulsar nada. `Enter` imprime al instante y `Esc` cancela.
 
 ## 7. Versionado
 
