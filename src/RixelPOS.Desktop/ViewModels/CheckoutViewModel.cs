@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -117,6 +118,12 @@ public sealed partial class CheckoutViewModel : ViewModelBase, IActivatable, ISc
         try
         {
             SearchResults.Clear();
+            if (IsQuantityModifier(value))
+            {
+                IsSearchOpen = false;
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(value))
             {
                 IsSearchOpen = false;
@@ -211,7 +218,21 @@ public sealed partial class CheckoutViewModel : ViewModelBase, IActivatable, ISc
             return;
         }
 
-        _cart.SetQuantity(item.Id, item.Quantity + 1);
+        var max = MaxQuantityForLine(item);
+        var desired = item.Quantity + 1;
+        if (desired > max)
+        {
+            if (max <= item.Quantity)
+            {
+                StatusMessage = _loc.Format("checkout.stockLimit", max.ToString("0.###", CultureInfo.InvariantCulture));
+                StatusIsError = true;
+                return;
+            }
+
+            desired = max;
+        }
+
+        _cart.SetQuantity(item.Id, desired);
     }
 
     [RelayCommand]
@@ -252,7 +273,22 @@ public sealed partial class CheckoutViewModel : ViewModelBase, IActivatable, ISc
         var quantity = await _dialogs.AskQuantityAsync(item.Quantity);
         if (quantity is > 0)
         {
-            _cart.SetQuantity(item.Id, quantity.Value);
+            var max = MaxQuantityForLine(item);
+            var desired = quantity.Value;
+            if (desired > max)
+            {
+                desired = max;
+                StatusMessage = _loc.Format("checkout.stockLimit", max.ToString("0.###", CultureInfo.InvariantCulture));
+                StatusIsError = true;
+            }
+
+            if (desired <= 0)
+            {
+                _cart.RemoveLine(item.Id);
+                return;
+            }
+
+            _cart.SetQuantity(item.Id, desired);
         }
     }
 
@@ -505,6 +541,11 @@ public sealed partial class CheckoutViewModel : ViewModelBase, IActivatable, ISc
                 return;
             }
 
+            if (TryApplyQuantityModifier(code))
+            {
+                return;
+            }
+
             var product = _inventory.FindByCode(code);
             if (product is null)
             {
@@ -534,8 +575,33 @@ public sealed partial class CheckoutViewModel : ViewModelBase, IActivatable, ISc
         _dialogs.CloseSaleCompleted();
         try
         {
-            _cart.AddProduct(product);
-            StatusMessage = $"{product.Name} · {_loc.Get("checkout.addedToCart")}";
+            var current = _inventory.GetProduct(product.Id) ?? product;
+            var quantity = 1m;
+            var capped = false;
+
+            if (current.TrackStock && !_settings.Current.AllowNegativeStock)
+            {
+                var inCart = _cart.Lines.Where(l => l.ProductId == current.Id).Sum(l => l.Quantity);
+                var room = Math.Max(0, current.Stock - inCart);
+                if (room <= 0)
+                {
+                    StatusMessage = _loc.Get("checkout.noStock");
+                    StatusIsError = true;
+                    _sound.Play(ScanSound.Error);
+                    return;
+                }
+
+                if (room < 1)
+                {
+                    quantity = room;
+                    capped = true;
+                }
+            }
+
+            _cart.AddProduct(current, quantity);
+            StatusMessage = capped
+                ? _loc.Format("checkout.stockLimit", quantity.ToString("0.###"))
+                : $"{current.Name} · {_loc.Get("checkout.addedToCart")}";
             StatusIsError = false;
             SearchText = "";
             SearchResults.Clear();
@@ -549,6 +615,118 @@ public sealed partial class CheckoutViewModel : ViewModelBase, IActivatable, ISc
             StatusIsError = true;
             _sound.Play(ScanSound.Error);
         }
+    }
+
+    private decimal MaxQuantityForLine(CartLineItem item)
+    {
+        if (item.Line.ProductId is not Guid productId)
+        {
+            return decimal.MaxValue;
+        }
+
+        var product = _inventory.GetProduct(productId);
+        if (product is null || !product.TrackStock || _settings.Current.AllowNegativeStock)
+        {
+            return decimal.MaxValue;
+        }
+
+        var others = _cart.Lines
+            .Where(l => l.Id != item.Id && l.ProductId == productId)
+            .Sum(l => l.Quantity);
+        return Math.Max(0, product.Stock - others);
+    }
+
+    private static bool IsQuantityModifier(string? text)
+    {
+        var value = text?.Trim() ?? "";
+        return value.Length > 0 && (value[0] == '+' || value[0] == '-');
+    }
+
+    /// <summary>
+    /// Applies +N or -N to the last cart line. Positive values are capped at the
+    /// available stock; a line is removed when its quantity reaches zero.
+    /// </summary>
+    private bool TryApplyQuantityModifier(string text)
+    {
+        var value = text.Trim();
+        if (!IsQuantityModifier(value))
+        {
+            return false;
+        }
+
+        var numberText = value[1..].Trim();
+        if (numberText.Length == 0)
+        {
+            numberText = "1";
+        }
+
+        if (!decimal.TryParse(numberText.Replace(',', '.'), NumberStyles.Number,
+                CultureInfo.InvariantCulture, out var amount) || amount <= 0)
+        {
+            return false;
+        }
+
+        var delta = value[0] == '+' ? amount : -amount;
+        var last = _cart.Lines.LastOrDefault();
+        if (last is null)
+        {
+            StatusMessage = _loc.Get("checkout.noItemsToAdjust");
+            StatusIsError = true;
+            _sound.Play(ScanSound.Error);
+            ClearSearch();
+            return true;
+        }
+
+        if (delta > 0 && last.ProductId is Guid productId)
+        {
+            var product = _inventory.GetProduct(productId);
+            if (product is not null && product.TrackStock && !_settings.Current.AllowNegativeStock)
+            {
+                var others = _cart.Lines
+                    .Where(l => l.Id != last.Id && l.ProductId == productId)
+                    .Sum(l => l.Quantity);
+                var maxForLine = Math.Max(0, product.Stock - others);
+
+                if (last.Quantity + delta > maxForLine)
+                {
+                    if (maxForLine <= last.Quantity)
+                    {
+                        StatusMessage = _loc.Format("checkout.stockLimit", maxForLine.ToString("0.###"));
+                        StatusIsError = true;
+                        _sound.Play(ScanSound.Error);
+                        ClearSearch();
+                        return true;
+                    }
+
+                    delta = maxForLine - last.Quantity;
+                }
+            }
+        }
+
+        var adjusted = _cart.AdjustLastQuantity(delta);
+        if (adjusted is null)
+        {
+            StatusMessage = _loc.Format("checkout.quantityRemoved", last.Name);
+            StatusIsError = false;
+        }
+        else
+        {
+            StatusMessage = _loc.Format("checkout.quantityAdjusted", adjusted.Name,
+                adjusted.Quantity.ToString("0.###", CultureInfo.InvariantCulture));
+            StatusIsError = false;
+        }
+
+        _sound.Play(ScanSound.Found);
+        ClearSearch();
+        return true;
+    }
+
+    private void ClearSearch()
+    {
+        SearchText = "";
+        SearchResults.Clear();
+        IsSearchOpen = false;
+        FocusSearchRequested?.Invoke(this, EventArgs.Empty);
     }
 
     private void LoadCart(Cart cart)

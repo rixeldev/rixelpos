@@ -61,6 +61,8 @@ self-contained para no depender de un runtime instalado en la caja.
 - Bloqueo automático por inactividad con PIN del usuario actual.
 - Atajos de teclado completos y ayuda con F12; SKU automático a partir del nombre y el código.
 - Cantidades, descuentos por línea y por venta (porcentaje o monto fijo), eliminación de líneas.
+- Ajuste rápido del último artículo: escribe `+2` o `-1` y Enter; al llegar a 0 se elimina.
+- Las cantidades nunca superan el stock disponible del producto.
 - Ventas en espera y reanudación.
 - Pago en efectivo con cambio automático, tarjeta, transferencia, crédito a favor y venta a crédito.
 - Pagos mixtos y validaciones de límite de crédito / crédito a favor.

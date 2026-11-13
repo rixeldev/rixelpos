@@ -110,6 +110,31 @@ public sealed class Cart
         NotifyChanged();
     }
 
+    /// <summary>
+    /// Adds or subtracts from the last added line. Returns null when the line is removed
+    /// because its quantity reached zero.
+    /// </summary>
+    public SaleLine? AdjustLastQuantity(decimal delta)
+    {
+        var line = _sale.Lines.LastOrDefault();
+        if (line is null)
+        {
+            return null;
+        }
+
+        var next = Math.Round(line.Quantity + delta, 3, MidpointRounding.AwayFromZero);
+        if (next <= 0)
+        {
+            _sale.Lines.Remove(line);
+            NotifyChanged();
+            return null;
+        }
+
+        line.Quantity = next;
+        NotifyChanged();
+        return line;
+    }
+
     public void IncrementQuantity(Guid lineId, decimal delta)
     {
         var line = FindLine(lineId);

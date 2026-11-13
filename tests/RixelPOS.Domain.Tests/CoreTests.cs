@@ -1,4 +1,5 @@
 using RixelPOS.Application.Inventory;
+using RixelPOS.Application.Sales;
 using RixelPOS.Domain.Common;
 using RixelPOS.Domain.Entities;
 using RixelPOS.Domain.Enums;
@@ -197,5 +198,38 @@ public class PermissionTests
     public void Roles_Have_Expected_Permissions(UserRole role, Permission permission, bool expected)
     {
         Assert.Equal(expected, RolePermissions.Can(role, permission));
+    }
+}
+
+public class CartAdjustmentTests
+{
+    private static Product Product(string name) => new()
+    {
+        Name = name,
+        PriceCents = 1000,
+        Stock = 10,
+        TrackStock = true
+    };
+
+    [Fact]
+    public void Adjust_Last_Quantity_Adds_Subtracts_And_Removes_At_Zero()
+    {
+        var cart = new Cart();
+        var first = Product("Primero");
+        var second = Product("Segundo");
+        cart.AddProduct(first, 1);
+        cart.AddProduct(second, 2);
+
+        var adjusted = cart.AdjustLastQuantity(1);
+        Assert.NotNull(adjusted);
+        Assert.Equal(3, cart.Lines.Last().Quantity);
+
+        cart.AdjustLastQuantity(-2);
+        Assert.Equal(1, cart.Lines.Last().Quantity);
+
+        var removed = cart.AdjustLastQuantity(-1);
+        Assert.Null(removed);
+        Assert.Single(cart.Lines);
+        Assert.Equal(first.Id, cart.Lines[0].ProductId);
     }
 }

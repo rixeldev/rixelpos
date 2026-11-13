@@ -158,6 +158,8 @@ Get-FileHash .\RixelPOS-Setup-*.exe -Algorithm SHA256
   imprimir, incluso si la impresora no está configurada.
 - **Desde 1.2.3** la vista previa imprime automáticamente a los 3 segundos y se cierra,
   sin necesidad de pulsar nada. `Enter` imprime al instante y `Esc` cancela.
+- **Desde 1.3.0** `+N`/`-N` ajustan el último artículo del carrito y se elimina al llegar a
+  cero. Las cantidades se limitan automáticamente al stock disponible.
 
 ## 7. Versionado
 

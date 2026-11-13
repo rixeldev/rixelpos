@@ -165,12 +165,12 @@
   "dashboard.viewReports": "View reports",
   "dashboard.cashClosedHint": "Open the register to start charging.",
   "checkout.title": "Sell",
-  "checkout.searchPlaceholder": "Scan a code or search by name / SKU… (Enter to add)",
+  "checkout.searchPlaceholder": "Scan a code or search by name / SKU… (Enter adds · +2 / -1 adjusts)",
   "checkout.favorites": "Favorites",
   "checkout.allProducts": "Products",
   "checkout.cartEmpty": "Your cart is empty",
   "checkout.cartEmptyHint": "Scan a product or search above to get started.",
-  "checkout.scanHint": "Scan a barcode or type to search",
+  "checkout.scanHint": "Scan or search for a product. Use +2 / -1 and Enter to adjust the last item.",
   "checkout.hold": "Hold",
   "checkout.resume": "Resume",
   "checkout.clear": "Clear",
@@ -703,5 +703,11 @@
   "receipt.enterToPrint": "Enter prints now; Esc closes without printing.",
   "checkout.scanNextHint": "Scan the next product or use “New sale” to close.",
   "receipt.autoPrintIn": "Printing automatically in {0} s…",
-  "receipt.printing": "Printing…"
+  "receipt.printing": "Printing…",
+  "checkout.quantityHint": "Type +2 to add or -1 to subtract from the last item.",
+  "checkout.noItemsToAdjust": "Add a product before using + or -.",
+  "checkout.quantityAdjusted": "{0} · quantity {1}",
+  "checkout.quantityRemoved": "{0} removed from the cart.",
+  "checkout.stockLimit": "Only {0} in stock.",
+  "checkout.noStock": "Out of stock."
 }

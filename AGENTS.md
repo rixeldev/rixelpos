@@ -152,6 +152,10 @@ Cambios típicos:
 - **Post-venta no bloqueante**: `SaleCompletedWindow` es una sola instancia no modal.
   Se cierra al escanear o agregar el siguiente producto, al navegar o con `Nueva venta`.
   No permitas dos vistas previas ni dos ventanas de venta completada a la vez.
+- **Cantidades y stock**: en el checkout, escribir `+2` o `-1` y `Enter` ajusta el último
+  artículo; `-` hasta 0 lo elimina. Los botones `+`/`-`, el diálogo de cantidad y el escaneo
+  deben respetar el stock disponible cuando `TrackStock` está activo y
+  `AllowNegativeStock` es `false`. Nunca permitas vender por encima de ese máximo.
 - **SKU y códigos**: el SKU se genera con nombre + código de barras (`InventoryService.GenerateSku`).
   Al archivar un producto se liberan su SKU y sus códigos de barras.
 - **Feedback**: sonidos de escaneo encontrado/nuevo/error, mensajes claros y estados

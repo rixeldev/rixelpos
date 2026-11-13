@@ -163,12 +163,12 @@
   "dashboard.viewReports": "Ver reportes",
   "dashboard.cashClosedHint": "Abre la caja para comenzar a cobrar.",
   "checkout.title": "Vender",
-  "checkout.searchPlaceholder": "Escanea un código o busca por nombre / SKU… (Enter para agregar)",
+  "checkout.searchPlaceholder": "Escanea un código o busca por nombre / SKU… (Enter agrega · +2 / -1 ajusta)",
   "checkout.favorites": "Favoritos",
   "checkout.allProducts": "Productos",
   "checkout.cartEmpty": "El carrito está vacío",
   "checkout.cartEmptyHint": "Escanea un producto o búscalo arriba para comenzar.",
-  "checkout.scanHint": "Escanea un código de barras o escribe para buscar",
+  "checkout.scanHint": "Escanea o busca un producto. Usa +2 / -1 y Enter para ajustar el último.",
   "checkout.hold": "En espera",
   "checkout.resume": "Retomar",
   "checkout.clear": "Limpiar",
@@ -703,5 +703,11 @@
   "receipt.enterToPrint": "Enter imprime ahora; Esc cierra sin imprimir.",
   "checkout.scanNextHint": "Escanea el siguiente producto o usa «Nueva venta» para cerrar.",
   "receipt.autoPrintIn": "Imprimiendo automáticamente en {0} s…",
-  "receipt.printing": "Imprimiendo…"
+  "receipt.printing": "Imprimiendo…",
+  "checkout.quantityHint": "Escribe +2 para sumar o -1 para restar al último artículo.",
+  "checkout.noItemsToAdjust": "Agrega un producto antes de usar + o -.",
+  "checkout.quantityAdjusted": "{0} · cantidad {1}",
+  "checkout.quantityRemoved": "{0} eliminado del carrito.",
+  "checkout.stockLimit": "Solo hay {0} en stock.",
+  "checkout.noStock": "Sin stock disponible."
 }
