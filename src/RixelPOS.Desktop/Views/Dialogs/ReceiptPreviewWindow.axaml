@@ -7,10 +7,6 @@
                      Width="540" Height="780" MinWidth="420" MinHeight="520"
                      ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
                      Background="{DynamicResource SurfaceBrush}">
-  <dialogs:DialogWindow.KeyBindings>
-    <KeyBinding Gesture="Enter" Command="{Binding PrintCommand}" />
-    <KeyBinding Gesture="Escape" Command="{Binding ClosePreviewCommand}" />
-  </dialogs:DialogWindow.KeyBindings>
   <Grid RowDefinitions="Auto,*,Auto" Margin="22" RowSpacing="12">
     <StackPanel Spacing="2">
       <TextBlock Text="{loc:Tr receipt.preview}" Classes="h2" />

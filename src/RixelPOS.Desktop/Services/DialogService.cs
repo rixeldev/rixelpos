@@ -31,6 +31,8 @@ public sealed class DialogService
     private readonly SettingsService _settings;
     private readonly AppSession _session;
     private readonly LocalizationService _loc;
+    private SaleCompletedWindow? _saleCompleted;
+    private ReceiptPreviewWindow? _preview;
 
     public DialogService(
         AuthService auth,
@@ -132,18 +134,75 @@ public sealed class DialogService
         return await ShowAsync(new PaymentWindow(), vm) ? vm.Result : null;
     }
 
-    public async Task ShowSaleCompletedAsync(Sale sale, PrintResult? printResult)
+    /// <summary>
+    /// Shows the completed-sale card without blocking the register. It closes itself
+    /// when the cashier scans or adds the next product.
+    /// </summary>
+    public void ShowSaleCompleted(Sale sale, PrintResult? printResult)
     {
+        CloseSaleCompleted();
+
         var vm = new SaleCompletedViewModel(_receipt, _settings, _loc, sale, printResult, this);
-        await ShowAsync(new SaleCompletedWindow(), vm);
+        var window = new SaleCompletedWindow { DataContext = vm };
+        window.Closed += (_, _) =>
+        {
+            if (ReferenceEquals(_saleCompleted, window))
+            {
+                _saleCompleted = null;
+            }
+        };
+
+        _saleCompleted = window;
+        if (Owner is null)
+        {
+            return;
+        }
+
+        window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+        window.Show(Owner);
+        Owner.Activate();
+    }
+
+    public void CloseSaleCompleted()
+    {
+        var window = _saleCompleted;
+        _saleCompleted = null;
+        if (window is null)
+        {
+            return;
+        }
+
+        try
+        {
+            window.Close();
+        }
+        catch
+        {
+            // Already closed.
+        }
     }
 
     /// <summary>Shows the receipt as it will be printed. Returns the print result when printed.</summary>
     public async Task<PrintResult?> ShowReceiptPreviewAsync(Sale sale)
     {
+        if (_preview is not null)
+        {
+            _preview.Activate();
+            return null;
+        }
+
         var vm = new ReceiptPreviewViewModel(_receipt, _loc, sale);
-        await ShowAsync(new ReceiptPreviewWindow(), vm);
-        return vm.PrintResult;
+        var window = new ReceiptPreviewWindow();
+        _preview = window;
+        try
+        {
+            await ShowAsync(window, vm);
+            return vm.PrintResult;
+        }
+        finally
+        {
+            _preview = null;
+        }
     }
 
     public async Task<HeldSaleItem?> PickHeldSaleAsync(IReadOnlyList<HeldSaleItem> items)

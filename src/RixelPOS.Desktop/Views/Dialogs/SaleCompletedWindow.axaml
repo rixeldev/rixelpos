@@ -5,11 +5,8 @@
                      x:Class="RixelPOS.Desktop.Views.Dialogs.SaleCompletedWindow"
                      Title="{loc:Tr checkout.saleCompleted}"
                      Width="500" SizeToContent="Height" CanResize="False" ShowInTaskbar="False"
-                     WindowStartupLocation="CenterOwner" Background="{DynamicResource SurfaceBrush}">
-  <dialogs:DialogWindow.KeyBindings>
-    <KeyBinding Gesture="Enter" Command="{Binding DoneCommand}" />
-    <KeyBinding Gesture="Escape" Command="{Binding DoneCommand}" />
-  </dialogs:DialogWindow.KeyBindings>
+                     ShowActivated="False" WindowStartupLocation="CenterOwner"
+                     Background="{DynamicResource SurfaceBrush}">
   <ScrollViewer VerticalScrollBarVisibility="Auto">
   <StackPanel Margin="28" Spacing="18">
     <Border Width="76" Height="76" CornerRadius="24" Background="{DynamicResource SuccessSoftBrush}" HorizontalAlignment="Center">
@@ -40,6 +37,8 @@
     </Grid>
     <Button Classes="soft" Content="{loc:Tr receipt.preview}" Command="{Binding PreviewCommand}" HorizontalAlignment="Stretch" />
     <Button Classes="primary big" Content="{loc:Tr checkout.newSale}" Command="{Binding DoneCommand}" HorizontalAlignment="Stretch" />
+    <TextBlock Text="{loc:Tr checkout.scanNextHint}" Classes="caption"
+               HorizontalAlignment="Center" TextWrapping="Wrap" />
 
     <Border Classes="dangerCard" IsVisible="{Binding StatusIsError}">
       <TextBlock Text="{Binding StatusMessage}" Classes="danger" TextWrapping="Wrap" />

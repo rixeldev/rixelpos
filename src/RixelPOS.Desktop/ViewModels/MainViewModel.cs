@@ -91,6 +91,7 @@ public sealed partial class MainViewModel : ViewModelBase
     private readonly LocalizationService _loc;
     private readonly IClock _clock;
     private readonly CheckoutViewModel _checkout;
+    private readonly DialogService _dialogs;
     private readonly ScanRouter _scannerRouter;
     private readonly IScannerListener _scannerListener;
     private readonly IAppLogger _logger;
@@ -121,6 +122,7 @@ public sealed partial class MainViewModel : ViewModelBase
         ScanRouter scannerRouter,
         IScannerListener scannerListener,
         IAppLogger logger,
+        DialogService dialogs,
         DashboardViewModel dashboard,
         CheckoutViewModel checkout,
         InventoryViewModel inventory,
@@ -142,6 +144,7 @@ public sealed partial class MainViewModel : ViewModelBase
         _logger = logger;
 
         _checkout = checkout;
+        _dialogs = dialogs;
         _pages["dashboard"] = dashboard;
         _pages["checkout"] = checkout;
         _pages["inventory"] = inventory;
@@ -187,6 +190,7 @@ public sealed partial class MainViewModel : ViewModelBase
 
     public void Navigate(string key)
     {
+        _dialogs.CloseSaleCompleted();
         string? tab = null;
         if (key.Contains(':'))
         {

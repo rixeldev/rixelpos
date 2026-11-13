@@ -342,7 +342,11 @@ public sealed partial class ReportsViewModel : ViewModelBase, IActivatable
             return;
         }
 
-        await _dialogs.ShowReceiptPreviewAsync(_foundSale);
+        var result = await _dialogs.ShowReceiptPreviewAsync(_foundSale);
+        if (result is not null)
+        {
+            InvoiceSearchMessage = result.Message;
+        }
     }
 
     [RelayCommand]

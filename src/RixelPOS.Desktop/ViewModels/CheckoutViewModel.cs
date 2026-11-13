@@ -410,6 +410,7 @@ public sealed partial class CheckoutViewModel : ViewModelBase, IActivatable, ISc
     [RelayCommand]
     private async Task ChargeAsync()
     {
+        _dialogs.CloseSaleCompleted();
         if (!HasItems)
         {
             return;
@@ -464,7 +465,7 @@ public sealed partial class CheckoutViewModel : ViewModelBase, IActivatable, ISc
             }
 
             LoadCart(new Cart());
-            await _dialogs.ShowSaleCompletedAsync(sale, printResult);
+            _dialogs.ShowSaleCompleted(sale, printResult);
             RefreshCash();
             FocusSearchRequested?.Invoke(this, EventArgs.Empty);
         }
@@ -495,6 +496,7 @@ public sealed partial class CheckoutViewModel : ViewModelBase, IActivatable, ISc
 
     private void AddByCode(string code)
     {
+        _dialogs.CloseSaleCompleted();
         try
         {
             code = code.Trim();
@@ -529,6 +531,7 @@ public sealed partial class CheckoutViewModel : ViewModelBase, IActivatable, ISc
 
     private void AddToCart(Product product)
     {
+        _dialogs.CloseSaleCompleted();
         try
         {
             _cart.AddProduct(product);

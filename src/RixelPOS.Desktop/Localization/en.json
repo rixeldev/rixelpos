@@ -700,5 +700,6 @@
   "inventory.skuHint": "Generated automatically from the name and barcode.",
   "shortcuts.open": "Keyboard shortcuts (F12)",
   "shortcuts.charge": "Charge (F9)",
-  "receipt.enterToPrint": "Press Enter to print and close."
+  "receipt.enterToPrint": "Press Enter to print and close.",
+  "checkout.scanNextHint": "Scan the next product or use “New sale” to close."
 }

@@ -20,6 +20,7 @@ public sealed partial class ReceiptPreviewViewModel : DialogViewModelBase
     [ObservableProperty] private string _statusMessage = "";
     [ObservableProperty] private bool _hasStatus;
     [ObservableProperty] private bool _statusIsError;
+    [ObservableProperty] private bool _isPrinting;
 
     public ReceiptPreviewViewModel(ReceiptService receipt, LocalizationService loc, Sale sale)
     {
@@ -34,13 +35,32 @@ public sealed partial class ReceiptPreviewViewModel : DialogViewModelBase
     [RelayCommand]
     private async Task PrintAsync()
     {
-        var result = await _receipt.PrintAsync(_sale);
-        PrintResult = result;
-        StatusMessage = result.Message;
-        HasStatus = true;
-        StatusIsError = !result.Success;
-        if (result.Success)
+        if (IsPrinting)
         {
+            return;
+        }
+
+        IsPrinting = true;
+        try
+        {
+            var result = await _receipt.PrintAsync(_sale);
+            PrintResult = result;
+            StatusMessage = result.Message;
+            HasStatus = true;
+            StatusIsError = !result.Success;
+        }
+        catch (Exception ex)
+        {
+            PrintResult = RixelPOS.Application.Printing.PrintResult.Fail(ex.Message);
+            StatusMessage = ex.Message;
+            HasStatus = true;
+            StatusIsError = true;
+        }
+        finally
+        {
+            IsPrinting = false;
+            // The receipt window must never trap the cashier: close even when the
+            // printer is not configured, and let the sale summary show the error.
             Close(true);
         }
     }

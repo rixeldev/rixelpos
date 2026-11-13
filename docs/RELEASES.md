@@ -153,6 +153,9 @@ Get-FileHash .\RixelPOS-Setup-*.exe -Algorithm SHA256
 - **Desde 1.2.1** la factura muestra `Pagado`, `Recibido` y `Cambio`, conserva tildes en
   el PDF y el descuento se informa sin restarse dos veces. En la vista previa, `Enter`
   imprime y cierra.
+- **Desde 1.2.2** la venta completada es una tarjeta no modal de una sola instancia; se
+  cierra al escanear o agregar otro producto, y la vista previa siempre se cierra al
+  imprimir, incluso si la impresora no está configurada.
 
 ## 7. Versionado
 

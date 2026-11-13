@@ -55,6 +55,8 @@ self-contained para no depender de un runtime instalado en la caja.
 - Sin tasa de impuesto por defecto: si no configuras una, el total es el precio tal cual.
 - Al escanear o escribir un código exacto, el artículo se agrega automáticamente.
 - Vista previa del comprobante antes de imprimir, con impresión o PDF desde la misma ventana.
+  `Enter` imprime y cierra; la venta completada no bloquea la caja y se cierra al escanear
+  el siguiente producto.
 - Bloqueo automático por inactividad con PIN del usuario actual.
 - Atajos de teclado completos y ayuda con F12; SKU automático a partir del nombre y el código.
 - Cantidades, descuentos por línea y por venta (porcentaje o monto fijo), eliminación de líneas.
