@@ -4,6 +4,7 @@ using RixelPOS.Domain.Common;
 using RixelPOS.Domain.Entities;
 using RixelPOS.Domain.Enums;
 using RixelPOS.Infrastructure.Hardware;
+using RixelPOS.Infrastructure.Licensing;
 
 namespace RixelPOS.Infrastructure.Tests;
 
@@ -620,5 +621,55 @@ public sealed class HardwareTests
 
         Assert.True(bytes.Length > 100);
         Assert.Contains((byte)0x1D, bytes);
+    }
+}
+
+
+public sealed class LicenseTests
+{
+    [Fact]
+    public void Vendor_Pin_Verification_Rejects_Invalid_Values()
+    {
+        Assert.False(VendorLicense.VerifyPin("000000"));
+        Assert.False(VendorLicense.VerifyPin("12345"));
+        Assert.False(VendorLicense.VerifyPin("abcdef"));
+        Assert.False(VendorLicense.VerifyPin(""));
+    }
+
+    [Fact]
+    public void Vendor_Pin_Verification_Uses_Pbkdf2()
+    {
+        var salt = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+        var hash = System.Security.Cryptography.Rfc2898DeriveBytes.Pbkdf2(
+            "123456", salt, 210_000, System.Security.Cryptography.HashAlgorithmName.SHA256, 32);
+
+        Assert.True(VendorLicense.VerifyPin("123456", salt, hash));
+        Assert.False(VendorLicense.VerifyPin("123457", salt, hash));
+    }
+
+    [Fact]
+    public void Activation_Is_Persisted_And_Tampering_Is_Rejected()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "rixelpos-license-tests", Guid.NewGuid().ToString("N"));
+        var path = Path.Combine(directory, "license.key");
+        Directory.CreateDirectory(directory);
+        try
+        {
+            var license = new LicenseService(new NullLogger(), path, pin => pin == "123456");
+            Assert.False(license.IsActivated);
+            Assert.False(license.TryActivate("000000"));
+            Assert.True(license.TryActivate("123456"));
+            Assert.True(license.IsActivated);
+
+            var reloaded = new LicenseService(new NullLogger(), path);
+            Assert.True(reloaded.IsActivated);
+
+            File.AppendAllText(path, "tampered");
+            Assert.False(new LicenseService(new NullLogger(), path).IsActivated);
+        }
+        finally
+        {
+            Directory.Delete(directory, true);
+        }
     }
 }

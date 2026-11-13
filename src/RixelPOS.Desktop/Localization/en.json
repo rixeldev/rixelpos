@@ -709,5 +709,12 @@
   "checkout.quantityAdjusted": "{0} · quantity {1}",
   "checkout.quantityRemoved": "{0} removed from the cart.",
   "checkout.stockLimit": "Only {0} in stock.",
-  "checkout.noStock": "Out of stock."
+  "checkout.noStock": "Out of stock.",
+  "license.title": "License activation",
+  "license.message": "RixelPOS requires the installation PIN to run on this computer.",
+  "license.pin": "License PIN",
+  "license.activate": "Activate",
+  "license.wrongPin": "Wrong PIN.",
+  "license.tooManyAttempts": "Too many attempts. Close and reopen RixelPOS.",
+  "license.hint": "The PIN is requested once per computer. If you change computers or erase the data, it will be requested again."
 }

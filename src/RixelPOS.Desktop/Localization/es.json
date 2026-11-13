@@ -709,5 +709,12 @@
   "checkout.quantityAdjusted": "{0} · cantidad {1}",
   "checkout.quantityRemoved": "{0} eliminado del carrito.",
   "checkout.stockLimit": "Solo hay {0} en stock.",
-  "checkout.noStock": "Sin stock disponible."
+  "checkout.noStock": "Sin stock disponible.",
+  "license.title": "Activación de licencia",
+  "license.message": "RixelPOS requiere el PIN de instalación para funcionar en este equipo.",
+  "license.pin": "PIN de licencia",
+  "license.activate": "Activar",
+  "license.wrongPin": "PIN incorrecto.",
+  "license.tooManyAttempts": "Demasiados intentos. Cierra y vuelve a abrir RixelPOS.",
+  "license.hint": "El PIN se solicita una vez por equipo. Si cambias de equipo o borras los datos, se pedirá de nuevo."
 }

@@ -110,6 +110,9 @@ self-contained para no depender de un runtime instalado en la caja.
 - Bitácora de auditoría de acciones sensibles.
 - Ajustes de negocio, impuestos, facturación fiscal, recibos, hardware, usuarios, respaldos, tema e idioma.
 - Instancia única por carpeta de datos y validación de integridad al restaurar respaldos.
+- Activación de licencia con PIN: el programa no arranca en un equipo nuevo hasta validar
+  el PIN y guardar un archivo firmado y ligado a ese equipo. No hay opción para borrar la
+  licencia desde la interfaz.
 - “Acerca de” con sitio web, correo de soporte copiable y licencia de uso.
 - Los productos archivados liberan su SKU y sus códigos de barras para poder recrearlos.
 - Copias de seguridad locales automáticas/manuales, restauración y retención configurable.

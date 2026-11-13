@@ -225,6 +225,11 @@ dotnet test RixelPOS.sln -c Release
   un backup de seguridad y exige reinicio. Un archivo inválido se rechaza.
 - Revisa `SECURITY.md` antes de cambiar autenticación, backups o red.
 - No añadas telemetría ni llamadas externas sin consentimiento y documentación.
+- **Licencia**: `VendorLicense` guarda solo un hash PBKDF2 del PIN; **nunca escribas el PIN
+  en el repositorio, docs, pruebas, capturas ni commits**. `LicenseService` crea un
+  `license.key` firmado y ligado al equipo; no añadas una UI para borrar o cambiar la
+  licencia. Un PIN de 6 dígitos es disuasorio, no DRM absoluto: no prometas que es
+  imposible de eludir si el cliente controla el binario o el código.
 
 ## 11. Checklist antes de cerrar una tarea
 

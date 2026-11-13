@@ -160,6 +160,9 @@ Get-FileHash .\RixelPOS-Setup-*.exe -Algorithm SHA256
   sin necesidad de pulsar nada. `Enter` imprime al instante y `Esc` cancela.
 - **Desde 1.3.0** `+N`/`-N` ajustan el último artículo del carrito y se elimina al llegar a
   cero. Las cantidades se limitan automáticamente al stock disponible.
+- **Desde 1.4.0** la primera ejecución en cada equipo pide el PIN de licencia. La
+  activación se guarda firmada y ligada al equipo. Si se borra `license.key` o se cambia
+  de equipo, se vuelve a pedir el PIN.
 
 ## 7. Versionado
 

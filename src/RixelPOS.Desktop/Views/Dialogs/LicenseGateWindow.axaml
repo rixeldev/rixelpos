@@ -1,0 +1,29 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:RixelPOS.Desktop.Localization"
+        x:Class="RixelPOS.Desktop.Views.Dialogs.LicenseGateWindow"
+        Title="{loc:Tr license.title}"
+        Icon="avares://RixelPOS/Assets/rixelpos.png"
+        Width="480" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource AppBgBrush}">
+  <Border Classes="card" Margin="26" Padding="28">
+    <StackPanel Spacing="16">
+      <Image Source="avares://RixelPOS/Assets/rixelpos.png" Width="76" Height="76" HorizontalAlignment="Center" />
+      <StackPanel Spacing="4" HorizontalAlignment="Center">
+        <TextBlock Text="RixelPOS" Classes="h1" HorizontalAlignment="Center" />
+        <TextBlock Text="{loc:Tr license.title}" Classes="h2" HorizontalAlignment="Center" />
+      </StackPanel>
+      <TextBlock Text="{loc:Tr license.message}" Classes="muted" TextWrapping="Wrap" TextAlignment="Center" />
+      <TextBox x:Name="PinBox" Text="{Binding Pin}" PasswordChar="●" MaxLength="6"
+               Watermark="{loc:Tr license.pin}" Classes="big" HorizontalContentAlignment="Center" />
+      <TextBlock Text="{Binding ErrorMessage}" Classes="danger" TextWrapping="Wrap"
+                 HorizontalAlignment="Center" IsVisible="{Binding HasErrorMessage}" />
+      <Button Classes="primary big" Content="{loc:Tr license.activate}"
+              Command="{Binding UnlockCommand}" IsEnabled="{Binding CanSubmit}"
+              HorizontalAlignment="Stretch" />
+      <TextBlock Text="{loc:Tr license.hint}" Classes="caption" TextWrapping="Wrap"
+                 TextAlignment="Center" />
+    </StackPanel>
+  </Border>
+</Window>

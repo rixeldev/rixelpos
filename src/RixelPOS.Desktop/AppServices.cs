@@ -18,6 +18,7 @@ using RixelPOS.Infrastructure;
 using RixelPOS.Infrastructure.Backup;
 using RixelPOS.Infrastructure.Data;
 using RixelPOS.Infrastructure.Hardware;
+using RixelPOS.Infrastructure.Licensing;
 using RixelPOS.Infrastructure.Logging;
 using RixelPOS.Infrastructure.Printing;
 using RixelPOS.Infrastructure.Security;
@@ -32,6 +33,7 @@ public static class AppServices
         var services = new ServiceCollection();
 
         services.AddSingleton<IAppLogger>(new FileLogger(AppPaths.LogsDirectory));
+        services.AddSingleton<LicenseService>();
 
         var database = new SqliteDb(AppPaths.DatabasePath);
         database.Initialize();

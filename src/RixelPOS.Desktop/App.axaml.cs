@@ -11,7 +11,9 @@ using RixelPOS.Desktop.Localization;
 using RixelPOS.Desktop.Services;
 using RixelPOS.Desktop.ViewModels;
 using RixelPOS.Desktop.Views;
+using RixelPOS.Desktop.Views.Dialogs;
 using RixelPOS.Infrastructure;
+using RixelPOS.Infrastructure.Licensing;
 
 namespace RixelPOS.Desktop;
 
@@ -55,13 +57,14 @@ public partial class App : Avalonia.Application
             themeService.Apply(settings.Current.Theme);
             themeService.ApplyUiScale(settings.Current.UiScalePercent);
 
-            if (!settings.Current.Configured || Services.GetRequiredService<IPosStore>().GetUsers().Count == 0)
+            var license = Services.GetRequiredService<LicenseService>();
+            if (license.IsActivated)
             {
-                ShowSetup();
+                ShowStartup();
             }
             else
             {
-                ShowLogin();
+                ShowLicenseGate(license);
             }
         }
         catch (Exception ex)
@@ -70,6 +73,40 @@ public partial class App : Avalonia.Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private void ShowStartup()
+    {
+        var settings = Services!.GetRequiredService<SettingsService>();
+        if (!settings.Current.Configured || Services.GetRequiredService<IPosStore>().GetUsers().Count == 0)
+        {
+            ShowSetup();
+        }
+        else
+        {
+            ShowLogin();
+        }
+    }
+
+    private void ShowLicenseGate(LicenseService license)
+    {
+        var vm = new LicenseGateViewModel(license);
+        var window = new LicenseGateWindow { DataContext = vm };
+        vm.Activated += (_, _) =>
+        {
+            window.Close();
+            ShowStartup();
+        };
+        window.Closed += (_, _) =>
+        {
+            if (!license.IsActivated)
+            {
+                _desktop?.Shutdown();
+            }
+        };
+
+        _desktop!.MainWindow = window;
+        window.Show();
     }
 
     private void ShowSetup()
