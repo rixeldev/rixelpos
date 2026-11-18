@@ -716,5 +716,13 @@
   "license.activate": "Activar",
   "license.wrongPin": "PIN incorrecto.",
   "license.tooManyAttempts": "Demasiados intentos. Cierra y vuelve a abrir RixelPOS.",
-  "license.hint": "El PIN se solicita una vez por equipo. Si cambias de equipo o borras los datos, se pedirá de nuevo."
+  "license.hint": "El PIN se solicita una vez por equipo. Si cambias de equipo o borras los datos, se pedirá de nuevo.",
+  "update.title": "Actualizaciones",
+  "update.checking": "Buscando actualizaciones…",
+  "update.upToDate": "No se encontraron actualizaciones. Se iniciará la versión actual.",
+  "update.downloading": "Descargando la versión {0}…",
+  "update.installing": "Instalando la versión {0}…",
+  "update.downloadFailed": "No se pudo descargar la actualización. Se iniciará la versión actual.",
+  "settings.autoUpdate": "Buscar actualizaciones al iniciar",
+  "settings.checkUpdates": "Buscar actualizaciones ahora"
 }

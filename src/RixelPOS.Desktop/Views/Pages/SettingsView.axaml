@@ -427,6 +427,14 @@
               <TextBlock Text="{Binding LicenseText}" Classes="caption" TextWrapping="Wrap" />
             </StackPanel>
           </Border>
+          <Border Classes="card">
+            <StackPanel Spacing="10">
+              <TextBlock Text="{loc:Tr update.title}" Classes="h3" />
+              <CheckBox Content="{loc:Tr settings.autoUpdate}" IsChecked="{Binding AutoUpdateOnStartup}" />
+              <Button Classes="soft" Content="{loc:Tr settings.checkUpdates}"
+                      Command="{Binding CheckUpdatesCommand}" HorizontalAlignment="Left" />
+            </StackPanel>
+          </Border>
           <Border Classes="soft">
             <StackPanel Spacing="4">
               <TextBlock Text="{loc:Tr settings.dataFolder}" Classes="caption" />

@@ -113,6 +113,9 @@ self-contained para no depender de un runtime instalado en la caja.
 - Activación de licencia con PIN: el programa no arranca en un equipo nuevo hasta validar
   el PIN y guardar un archivo firmado y ligado a ese equipo. No hay opción para borrar la
   licencia desde la interfaz.
+- Autoactualización al iniciar: comprueba el manifiesto público, verifica SHA-256 e instala
+  antes de cargar la caja. Si no hay internet, continúa con la versión actual.
+- Botón “Buscar actualizaciones ahora” en Ajustes → Acerca de.
 - “Acerca de” con sitio web, correo de soporte copiable y licencia de uso.
 - Los productos archivados liberan su SKU y sus códigos de barras para poder recrearlos.
 - Copias de seguridad locales automáticas/manuales, restauración y retención configurable.

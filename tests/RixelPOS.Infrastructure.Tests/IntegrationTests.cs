@@ -5,6 +5,7 @@ using RixelPOS.Domain.Entities;
 using RixelPOS.Domain.Enums;
 using RixelPOS.Infrastructure.Hardware;
 using RixelPOS.Infrastructure.Licensing;
+using RixelPOS.Infrastructure.Updates;
 
 namespace RixelPOS.Infrastructure.Tests;
 
@@ -671,5 +672,18 @@ public sealed class LicenseTests
         {
             Directory.Delete(directory, true);
         }
+    }
+}
+
+
+public sealed class UpdateTests
+{
+    [Fact]
+    public void Version_Comparison_Detects_Newer_Builds()
+    {
+        Assert.True(UpdateService.IsNewer(new Version(1, 5, 0, 2), new Version(1, 5, 0, 1)));
+        Assert.True(UpdateService.IsNewer(new Version(1, 5, 0, 1), new Version(1, 4, 9, 9)));
+        Assert.False(UpdateService.IsNewer(new Version(1, 5, 0, 1), new Version(1, 5, 0, 1)));
+        Assert.False(UpdateService.IsNewer(new Version(1, 4, 0, 9), new Version(1, 5, 0, 0)));
     }
 }

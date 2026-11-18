@@ -176,12 +176,54 @@ jobs:
           fi
           gh release upload "$TAG" release/* --clobber
 
+  update-repo:
+    name: Publish update manifest
+    needs: [ version, linux, windows, publish ]
+    if: needs.version.outputs.tag == 'latest'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: RixelPOS-linux
+          path: artifacts/linux
+      - uses: actions/download-artifact@v4
+        with:
+          name: RixelPOS-windows
+          path: artifacts/windows
+      - name: Build update manifest
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          mkdir -p updates
+          find artifacts/linux -type f -name '*.pkg.tar.zst' -exec cp {} updates/ \;
+          find artifacts/linux -type f -name '*.deb' -exec cp {} updates/ \;
+          find artifacts/windows -type f -name 'RixelPOS-Setup-*.exe' -exec cp {} updates/ \;
+          python3 packaging/linux/make-update-manifest.py --dir updates --version "$VERSION"
+          cat updates/update.json
+      - name: Publish update files
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./updates
+          destination_dir: updates
+          keep_files: true
+          user_name: RixelDev
+          user_email: soporte@rixeldev.com
+          commit_message: "update manifest ${{ needs.version.outputs.version }}"
+
   pacman-repo:
     name: Update pacman repository
     needs: [ version, quality, linux ]
     runs-on: ubuntu-latest
     concurrency:
-      group: pacman-repo
+      group: gh-pages
       cancel-in-progress: false
     permissions:
       contents: write

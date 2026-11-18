@@ -21,6 +21,7 @@ using RixelPOS.Infrastructure.Hardware;
 using RixelPOS.Infrastructure.Licensing;
 using RixelPOS.Infrastructure.Logging;
 using RixelPOS.Infrastructure.Printing;
+using RixelPOS.Infrastructure.Updates;
 using RixelPOS.Infrastructure.Security;
 
 namespace RixelPOS.Desktop;
@@ -34,6 +35,7 @@ public static class AppServices
 
         services.AddSingleton<IAppLogger>(new FileLogger(AppPaths.LogsDirectory));
         services.AddSingleton<LicenseService>();
+        services.AddSingleton<UpdateService>();
 
         var database = new SqliteDb(AppPaths.DatabasePath);
         database.Initialize();

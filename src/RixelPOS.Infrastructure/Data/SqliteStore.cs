@@ -195,6 +195,7 @@ public sealed partial class SqliteStore : IPosStore
         s.ReceiptWidth = Enum("receipt.width", ReceiptWidth.Mm80);
         s.AutoPrintReceipt = Bool("receipt.autoprint", true);
         s.PreviewReceiptBeforePrint = Bool("receipt.preview", true);
+        s.AutoUpdateOnStartup = Bool("update.on_startup", true);
         s.PrinterConnection = Str("printer.connection", "");
         s.PrinterName = Str("printer.name", "");
         s.CashDrawerEnabled = Bool("drawer.enabled", true);
@@ -252,6 +253,7 @@ public sealed partial class SqliteStore : IPosStore
                 ["receipt.width"] = s.ReceiptWidth.ToString(),
                 ["receipt.autoprint"] = s.AutoPrintReceipt.ToString(),
                 ["receipt.preview"] = s.PreviewReceiptBeforePrint.ToString(),
+                ["update.on_startup"] = s.AutoUpdateOnStartup.ToString(),
                 ["printer.connection"] = s.PrinterConnection,
                 ["printer.name"] = s.PrinterName,
                 ["drawer.enabled"] = s.CashDrawerEnabled.ToString(),

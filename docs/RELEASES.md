@@ -163,6 +163,12 @@ Get-FileHash .\RixelPOS-Setup-*.exe -Algorithm SHA256
 - **Desde 1.4.0** la primera ejecución en cada equipo pide el PIN de licencia. La
   activación se guarda firmada y ligada al equipo. Si se borra `license.key` o se cambia
   de equipo, se vuelve a pedir el PIN.
+- **Desde 1.5.0** RixelPOS comprueba y aplica actualizaciones al iniciar, antes de cargar
+  la interfaz, si hay internet. El manifiesto está en
+  `https://rixeldev.github.io/rixelpos/updates/update.json` y los paquetes se verifican
+  con SHA-256. En Arch/CachyOS la instalación usa `pkexec pacman -U`; en Windows se lanza
+  el instalador silencioso. También hay un botón manual en Ajustes → Acerca de.
+  La autoactualización de AppImage/portable no está implementada.
 
 ## 7. Versionado
 

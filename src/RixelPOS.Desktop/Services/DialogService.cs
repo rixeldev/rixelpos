@@ -17,6 +17,7 @@ using RixelPOS.Domain.Common;
 using RixelPOS.Domain.Entities;
 using RixelPOS.Domain.Enums;
 using RixelPOS.Domain.Reporting;
+using RixelPOS.Infrastructure.Updates;
 
 namespace RixelPOS.Desktop.Services;
 
@@ -31,6 +32,7 @@ public sealed class DialogService
     private readonly SettingsService _settings;
     private readonly AppSession _session;
     private readonly LocalizationService _loc;
+    private readonly UpdateService _updates;
     private SaleCompletedWindow? _saleCompleted;
     private ReceiptPreviewWindow? _preview;
 
@@ -43,7 +45,8 @@ public sealed class DialogService
         CashRegisterService cash,
         SettingsService settings,
         AppSession session,
-        LocalizationService loc)
+        LocalizationService loc,
+        UpdateService updates)
     {
         _auth = auth;
         _customers = customers;
@@ -54,6 +57,7 @@ public sealed class DialogService
         _settings = settings;
         _session = session;
         _loc = loc;
+        _updates = updates;
     }
 
     private static Window? Owner =>
@@ -180,6 +184,37 @@ public sealed class DialogService
         {
             // Already closed.
         }
+    }
+
+    public async Task<UpdateOutcome?> ShowUpdateAsync()
+    {
+        if (Owner is null)
+        {
+            return null;
+        }
+
+        var vm = new UpdateViewModel(_updates, manual: true);
+        var window = new UpdateWindow { DataContext = vm };
+        UpdateOutcome? outcome = null;
+        vm.Completed += (_, result) =>
+        {
+            outcome = result;
+            window.Close();
+        };
+
+        window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+        await window.ShowDialog<bool>(Owner);
+
+        if (outcome?.Restart == true)
+        {
+            AppRestart.Restart();
+        }
+        else if (outcome?.ExitApplication == true)
+        {
+            AppRestart.Shutdown();
+        }
+
+        return outcome;
     }
 
     /// <summary>Shows the receipt as it will be printed. Returns the print result when printed.</summary>

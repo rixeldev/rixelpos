@@ -210,8 +210,16 @@ dotnet test RixelPOS.sln -c Release
   3. Actualizar `README.md`, `docs/` y este archivo si cambió algo visible.
   4. Commit descriptivo y `git push origin main` → publica la release `latest`.
   5. `git tag vX.Y.Z && git push origin vX.Y.Z` → publica la release versionada.
-- El job `pacman-repo` está serializado (`concurrency: pacman-repo`) para que dos pushes
-  seguidos no compitan por la rama `gh-pages`.
+- Los jobs `pacman-repo` y `update-repo` comparten `concurrency: gh-pages` para que no
+  compitan por la rama `gh-pages`.
+- **Autoactualización**: solo en `main` (tag `latest`) se publica
+  `https://rixeldev.github.io/rixelpos/updates/update.json` con la versión y los SHA-256.
+  La app lo comprueba una vez al iniciar, descarga y verifica el paquete, y en Linux lo
+  instala con `pkexec pacman -U`/`dpkg`; en Windows lanza el instalador silencioso. Nunca
+  actualices mientras la caja está en uso. Si no hay internet o el manifiesto falla, la app
+  arranca normal. No incluyas secretos en el manifiesto.
+- **Botón manual**: Ajustes → Acerca de → “Buscar actualizaciones ahora”. Debe usar el
+  mismo `UpdateService` y mostrar progreso/errores, sin bloquear una venta en curso.
 - Los paquetes Arch **no deben incluir un `/lib` de nivel superior** (choca con el paquete
   `filesystem`). Las reglas udev van en `/usr/lib/udev/rules.d`; lo mismo aplica al `.deb`
   en sistemas con `usrmerge`.

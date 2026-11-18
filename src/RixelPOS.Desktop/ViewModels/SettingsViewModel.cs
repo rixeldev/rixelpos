@@ -101,6 +101,7 @@ public sealed partial class SettingsViewModel : ViewModelBase, IActivatable
     [ObservableProperty] private string _receiptFooter = "";
     [ObservableProperty] private bool _autoPrintReceipt;
     [ObservableProperty] private bool _previewReceiptBeforePrint;
+    [ObservableProperty] private bool _autoUpdateOnStartup = true;
     [ObservableProperty] private string _autoLockMinutesText = "";
     [ObservableProperty] private bool _showQrOnReceipt;
     [ObservableProperty] private string _printerConnection = "";
@@ -295,6 +296,7 @@ public sealed partial class SettingsViewModel : ViewModelBase, IActivatable
             s.ReceiptFooter = ReceiptFooter.Trim();
             s.AutoPrintReceipt = AutoPrintReceipt;
             s.PreviewReceiptBeforePrint = PreviewReceiptBeforePrint;
+            s.AutoUpdateOnStartup = AutoUpdateOnStartup;
             s.ShowQrOnReceipt = ShowQrOnReceipt;
             s.PrinterConnection = PrinterConnection.Trim();
             s.PrinterName = PrinterName.Trim();
@@ -418,6 +420,20 @@ public sealed partial class SettingsViewModel : ViewModelBase, IActivatable
         {
             BackupFolder = path;
         }
+    }
+
+    [RelayCommand]
+    private async Task CheckUpdatesAsync()
+    {
+        var result = await _dialogs.ShowUpdateAsync();
+        if (result is null)
+        {
+            return;
+        }
+
+        StatusMessage = result.Message;
+        StatusIsError = result.UpdateFound && !result.Updated;
+        HasStatus = true;
     }
 
     [RelayCommand]
@@ -640,6 +656,7 @@ public sealed partial class SettingsViewModel : ViewModelBase, IActivatable
         ReceiptFooter = s.ReceiptFooter;
         AutoPrintReceipt = s.AutoPrintReceipt;
         PreviewReceiptBeforePrint = s.PreviewReceiptBeforePrint;
+        AutoUpdateOnStartup = s.AutoUpdateOnStartup;
         AutoLockMinutesText = s.AutoLockMinutes.ToString();
         ShowQrOnReceipt = s.ShowQrOnReceipt;
         PrinterConnection = s.PrinterConnection;

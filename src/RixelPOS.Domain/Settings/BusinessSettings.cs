@@ -36,6 +36,7 @@ public sealed class BusinessSettings
     public ReceiptWidth ReceiptWidth { get; set; } = ReceiptWidth.Mm80;
     public bool AutoPrintReceipt { get; set; } = true;
     public bool PreviewReceiptBeforePrint { get; set; } = true;
+    public bool AutoUpdateOnStartup { get; set; } = true;
 
     public string PrinterConnection { get; set; } = "";
     public string PrinterName { get; set; } = "";

@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:RixelPOS.Desktop.Localization"
+        x:Class="RixelPOS.Desktop.Views.Dialogs.UpdateWindow"
+        Title="{loc:Tr update.title}"
+        Width="500" SizeToContent="Height" CanResize="False"
+        ShowInTaskbar="False" SystemDecorations="None"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource SurfaceBrush}">
+  <Border Margin="1" Padding="30" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+    <StackPanel Spacing="14">
+      <Image Source="avares://RixelPOS/Assets/rixelpos.png" Width="62" Height="62" HorizontalAlignment="Center" />
+      <TextBlock Text="{loc:Tr update.title}" Classes="h2" HorizontalAlignment="Center" />
+      <TextBlock Text="{Binding Message}" Classes="muted" TextWrapping="Wrap" TextAlignment="Center" />
+      <ProgressBar Minimum="0" Maximum="100" Value="{Binding Progress}"
+                   IsIndeterminate="{Binding IsIndeterminate}" IsVisible="{Binding HasProgress}" />
+    </StackPanel>
+  </Border>
+</Window>

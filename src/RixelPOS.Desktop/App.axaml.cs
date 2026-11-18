@@ -14,6 +14,7 @@ using RixelPOS.Desktop.Views;
 using RixelPOS.Desktop.Views.Dialogs;
 using RixelPOS.Infrastructure;
 using RixelPOS.Infrastructure.Licensing;
+using RixelPOS.Infrastructure.Updates;
 
 namespace RixelPOS.Desktop;
 
@@ -60,7 +61,7 @@ public partial class App : Avalonia.Application
             var license = Services.GetRequiredService<LicenseService>();
             if (license.IsActivated)
             {
-                ShowStartup();
+                CheckForUpdatesThenStart();
             }
             else
             {
@@ -73,6 +74,38 @@ public partial class App : Avalonia.Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private void CheckForUpdatesThenStart()
+    {
+        var settings = Services!.GetRequiredService<SettingsService>();
+        if (!settings.Current.AutoUpdateOnStartup)
+        {
+            ShowStartup();
+            return;
+        }
+
+        var vm = new UpdateViewModel(Services.GetRequiredService<UpdateService>(), manual: false);
+        var window = new UpdateWindow { DataContext = vm };
+        vm.Completed += (_, outcome) =>
+        {
+            window.Close();
+            if (outcome.Restart)
+            {
+                AppRestart.Restart();
+            }
+            else if (outcome.ExitApplication)
+            {
+                _desktop?.Shutdown();
+            }
+            else
+            {
+                ShowStartup();
+            }
+        };
+
+        _desktop!.MainWindow = window;
+        window.Show();
     }
 
     private void ShowStartup()
@@ -95,7 +128,7 @@ public partial class App : Avalonia.Application
         vm.Activated += (_, _) =>
         {
             window.Close();
-            ShowStartup();
+            CheckForUpdatesThenStart();
         };
         window.Closed += (_, _) =>
         {

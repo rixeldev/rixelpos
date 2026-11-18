@@ -15,6 +15,25 @@ public static class SingleInstance
     /// <summary>True when another RixelPOS process already owns this data folder.</summary>
     public static bool IsSecondary { get; private set; }
 
+    /// <summary>Releases the mutex so the updated process can take over immediately.</summary>
+    public static void Release()
+    {
+        try
+        {
+            _mutex?.ReleaseMutex();
+            _mutex?.Dispose();
+        }
+        catch
+        {
+            // The mutex may already have been released.
+        }
+        finally
+        {
+            _mutex = null;
+            IsSecondary = false;
+        }
+    }
+
     public static bool TryAcquire()
     {
         try
