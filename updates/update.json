@@ -1,0 +1,15 @@
+{
+  "version": "1.5.0.20",
+  "linux": {
+    "file": "rixelpos-1.5.0.20-1-x86_64.pkg.tar.zst",
+    "sha256": "4263653d29a80615563e81b4f6a3284cd5f77bf13853e065f4863cfb56e4163a"
+  },
+  "linuxDeb": {
+    "file": "rixelpos_1.5.0.20_amd64.deb",
+    "sha256": "fcf70927d3930a5da4e69bcb3e814db76e5aca65742783d38c6e7bb657d34105"
+  },
+  "windows": {
+    "file": "RixelPOS-Setup-1.5.0.20.exe",
+    "sha256": "33dfe7358a365877e646b65088538cf04be1c5d0c8641adb2b84fc29b7c45613"
+  }
+}
